@@ -39,14 +39,14 @@ TODO
 \label{sec:algorithm}
 
 Consider the following loss function:
-\[ L(u) = \max_{\theta \in \Theta} [\langle \theta, u \rangle - R(\theta)] \]
-$R$ is some convex function that we should think of as a measure of complexity 
+\[ L(u) = \max_{\theta \in \Theta} \left\{\langle \theta, u \rangle - R(\theta) \right\}, \]
+where $R$ is some convex function that we should think of as a measure of complexity 
 of $\theta$. Thus, the loss is equal to the maximum amount that $\theta$ can match 
 $u$, regularized by the complexity function $R(\theta)$.
 
 Examples:
 \begin{itemize}
-\item Let $R(\theta) = \langle \theta, u_0 \rangle$. Then $L(u)$ is the 
+\item Let $R(\theta) = \langle \theta, u_0 \rangle$. Then, assuming $-\Theta = \Theta$, $L(u)$ is the 
       \emph{maximum mean discrepancy} between $u$ and $u_0$ 
       relative to $\Theta$.
 \item Let $R(\theta) = S^*(\theta)$ where $S^*$ is the Fenchel conjugate of 
@@ -62,7 +62,7 @@ to consider a \emph{two-argument} loss function
 \[ L(u,\theta) = h(u) + \langle \theta, u \rangle - R(\theta). \]
 In the case $h(u) \equiv 0$, we can get the previous setting by 
 considering $\max_{\theta \in \Theta} L(u,\theta)$. We will assume 
-throughout this document that $h$ and $R$ are both convex functions.
+throughout this document that $h$ and $R$ are both convex functions. \NA{JH: Should we comment on the symmetry introduced by this formulation?}
 
 Boosted mirror descent can be thought of as an algorithm for finding 
 ``saddle points'' of $L$. It is the following algorithm:
@@ -73,7 +73,7 @@ Boosted mirror descent can be thought of as an algorithm for finding
 \end{enumerate}
 Let $\hat{u} = \frac{1}{T} \sum_{t = 1}^{T} u_t$. As long as $h$ is strongly convex, we obtain the 
 bound:
-\[ \sup_{\theta \in \Theta} L(\hat{u}, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/\sqrt{T}). \]
+\[ \sup_{\theta \in \Theta} L(\hat{u}, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(\log(T)/T). \]
 However, it is often the case that $h$ is not strongly convex, whereas $R$ is strongly convex. In this case 
 we may wish to use the following slightly different algorithm:
 \begin{enumerate}
@@ -83,7 +83,8 @@ we may wish to use the following slightly different algorithm:
 \end{enumerate}
 Once again, if we let $\hat{u} = \frac{1}{T} \sum_{t=1}^T u_t$, then we obtain the following bound, which now 
 only requires the convexity of $R$:
-\[ \sup_{\theta \in \Theta} L(\hat{u}, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/\sqrt{T}). \]
+\[ \sup_{\theta \in \Theta} L(\hat{u}, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(\log(T)/T). \]
+\NA{JH: It would be more elegant to argue either here or below that the bounds on the second algorithm follow directly from duality}
 
 \section{Convergence Proofs}
 \label{sec:proofs}
@@ -208,12 +209,12 @@ The proof is identical to the previous corollary.
 Suppose we are given a family of features $\phi$ together 
 with a known value $\bar{\phi}$ for $\bE_{\mu}[\phi]$. We 
 would like to construct a distribution that approximately 
-matches this distribution, i.e. one for which 
+matches this distribution, i.e.~one for which 
 $\bE_{\hat{\mu}}[\phi] \approx \bar{\phi}$. A natural way 
 to do this is by using boosted mirror descent to minimize the 
 maximum mean discrepancy relative to $\phi$; 
 in other words, to minimize
-\[ L(\mu) = \max\limits_{i=1}^d |\bE_{\mu}[\phi_i]-\bar{\phi}_i|. \]
+\[ L(\mu) = \max_{i \in \{1,\dots,d\}} |\bE_{\mu}[\phi_i]-\bar{\phi}_i|. \]
 If we wish to write this more similarly to the original problem 
 formulation, we can write
 \[ L(\mu) = \sup_{\|\theta\|_1 \leq 1} \theta^T(\bE_{\mu}[\phi]-\bar{\phi}). \]
