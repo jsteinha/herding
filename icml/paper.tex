@@ -1,0 +1,258 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% ICML 2013 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+\usepackage{import, icml2013}
+\input{latex-defs.tex}
+
+\icmltitlerunning{Boosted Mirror Descent}
+
+\begin{document} 
+
+\twocolumn[
+\icmltitle{Boosted Mirror Descent, Frank-Wolfe, and Herding}
+
+\icmlauthor{Jacob Steinhardt}{jsteinhardt@cs.stanford.edu}
+\icmladdress{Stanford University,
+             353 Serra Street, Stanford, CA 94305 USA}
+\icmlauthor{Jonathan Huggins}{jhuggins@mit.edu}
+\icmladdress{Massachusetts Institute of Technology,
+             43 Vassar Street, Cambridge, MA 02139 USA}
+
+% You may provide any keywords that you 
+% find helpful for describing your paper; these are used to populate 
+% the "keywords" metadata in the PDF but will not be shown in the document
+\icmlkeywords{boosting, optimization, mirror descent, frank-wolfe, herding}
+
+\vskip 0.3in
+]
+
+\begin{abstract} 
+TODO
+\end{abstract} 
+
+\section{Introduction}
+\label{sec:intro}
+
+\section{Boosted Mirror Descent}
+\label{sec:algorithm}
+
+Consider the following loss function:
+\[ L(u) = \max_{\theta \in \Theta} [\langle \theta, u \rangle - R(\theta)] \]
+$R$ is some convex function that we should think of as a measure of complexity 
+of $\theta$. Thus, the loss is equal to the maximum amount that $\theta$ can match 
+$u$, regularized by the complexity function $R(\theta)$.
+
+Examples:
+\begin{itemize}
+\item Let $R(\theta) = \langle \theta, u_0 \rangle$. Then $L(u)$ is the 
+      \emph{maximum mean discrepancy} between $u$ and $u_0$ 
+      relative to $\Theta$.
+\item Let $R(\theta) = S^*(\theta)$ where $S^*$ is the Fenchel conjugate of 
+      any strongly convex function $S$. Then $L(u) = S(u)$.
+\end{itemize}
+
+In this document we consider a family of methods for minimizing $L(u)$, 
+which are based on Bach's generalization of the Frank-Wolfe algorithm and can 
+be interpreted as boosted mirror descent.
+
+First, let us generalize the setting 
+to consider a \emph{two-argument} loss function
+\[ L(u,\theta) = h(u) + \langle \theta, u \rangle - R(\theta). \]
+In the case $h(u) \equiv 0$, we can get the previous setting by 
+considering $\max_{\theta \in \Theta} L(u,\theta)$. We will assume 
+throughout this document that $h$ and $R$ are both convex functions.
+
+Boosted mirror descent can be thought of as an algorithm for finding 
+``saddle points'' of $L$. It is the following algorithm:
+\begin{enumerate}
+\item $u_1 = 0$
+\item $\theta_{t} \in \arg\max_{\theta \in \Theta} \langle \theta, u_t \rangle - R(\theta)$
+\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$
+\end{enumerate}
+Let $\hat{u} = \frac{1}{T} \sum_{t = 1}^{T} u_t$. As long as $h$ is strongly convex, we obtain the 
+bound:
+\[ \sup_{\theta \in \Theta} L(\hat{u}, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/\sqrt{T}). \]
+However, it is often the case that $h$ is not strongly convex, whereas $R$ is strongly convex. In this case 
+we may wish to use the following slightly different algorithm:
+\begin{enumerate}
+\item $\theta_1 = 0$
+\item $u_t \in \arg\min_{u} h(u) + \langle \theta_t, u \rangle$
+\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \frac{1}{t} \sum_{s \leq t} u_s \rangle - R(\theta)$
+\end{enumerate}
+Once again, if we let $\hat{u} = \frac{1}{T} \sum_{t=1}^T u_t$, then we obtain the following bound, which now 
+only requires the convexity of $R$:
+\[ \sup_{\theta \in \Theta} L(\hat{u}, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/\sqrt{T}). \]
+
+\section{Convergence Proofs}
+\label{sec:proofs}
+We now prove the convergence results cited in Section~\ref{sec:intro}.
+\begin{lemma}
+\label{lem:ftl}
+Let $l_1,\ldots,l_T$ be functions of $x$ and let $x_1,\ldots,x_T$ 
+be chosen via $x_{t+1} \in \arg\min_{x} \frac{1}{t} \sum_{s \leq t} l_s(x)$. 
+Then for any $x^*$ we have
+\[ \sum_{t=1}^T l_t(x_t) \leq \sum_{t=1}^T l_t(x^*) + \sum_{t=1}^T (l_t(x_t) - l_t(x_{t+1})). \]
+\end{lemma}
+\begin{proof}
+Re-arranging, we want to show that $\sum_{t=1}^T l_t(x_{t+1}) \leq \sum_{t=1}^T l_t(x^*)$ for 
+all $x^*$. We will show this by induction. In the base case $T=1$, we want to show that $l_1(x_2) \leq l_1(x^*)$ 
+for all $x^*$, which is true because $x_2 \in \arg\min_x l_1(x)$ by construction. For 
+the inductive step, suppose that the result holds for $T-1$:
+\[ \sum_{t=1}^{T-1} l_t(x_{t+1}) \leq \sum_{t=1}^T l_t(x^*). \]
+Now set $x^* = x_{T+1}$ in the above inequality and 
+add $l_T(x_{T+1})$ to both sides to get
+\begin{align*}
+\sum_{t=1}^T l_t(x_{t+1}) &\leq \sum_{t=1}^T l_t(x_{T+1}) \\
+ &= \min_{x} \sum_{t=1}^T l_t(x) \\
+ &\leq \sum_{t=1}^T l_t(x^*),
+\end{align*}
+which completes the induction. Here we are using the fact that $x_{T+1}$ 
+is the minimizer of $\frac{1}{T} \sum_{t=1}^T l_t(x)$ and hence also of 
+$\sum_{t=1}^T l_t(x)$.
+\end{proof}
+\begin{lemma}
+\label{lem:convexity}
+Suppose that $f(x)$ is \emph{$\alpha$-strongly convex}: $f(x) \geq f(x_0) + \partial f(x_0)^T(x-x_0) + \frac{\alpha}{2}\|x-x_0\|^2$. 
+Let $F(y) := \arg\min_x f(x) + y^Tx$. Then $\|F(y_0)-F(y_1)\| \leq \frac{2}{\alpha} \|y_0-y_1\|$.
+\end{lemma}
+\begin{proof}
+Let $x_0 = F(y_0)$. Then we must have $\partial f(x_0) = -y_0$, hence 
+\begin{align*}
+f(x)+y_1^Tx &\geq f(x_0) + y_1^Tx_0 - y_0^T(x-x_0) + \frac{\alpha}{2}\|x-x_0\|^2.
+\end{align*}
+But any minimizer of $f(x) + y_1^Tx$ must at least have a value less than $f(x_0) + y_1^Tx_0$. 
+It follows that 
+\begin{align*}
+         & y_1^Tx_0 \geq y_1^Tx_1 - y_0^T(x_1-x_0) + \frac{\alpha}{2}\|x_1-x_0\|^2 \\
+\implies & (y_1-y_0)^T(x_0-x_1) \geq \frac{\alpha}{2}\|x_1-x_0\|^2 \\
+\implies & \|y_1-y_0\|\|x_0-x_1\| \geq \frac{\alpha}{2}\|x_1-x_0\|^2 \\
+\implies & \|x_1-x_0\| \leq \frac{2}{\alpha} \|y_1-y_0\|,
+\end{align*}
+as was to be shown.
+\end{proof}
+\begin{proposition}[Convergence of Method 1]
+Consider the updates $\theta_t \in \arg\max_{\theta} \langle \theta, u_t \rangle - R(\theta)$ 
+and $u_{t+1} \in \arg\min_u h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$. 
+Then for $\hat{u} = \frac{1}{T} \sum_{t=1}^T u_t$, we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{1}{T} \sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle. \]
+\end{proposition}
+\begin{proof}
+Note that $L(u_t, \theta_t) = \max_{\theta} L(u_t, \theta)$ by construction. Also note that, if we invoke 
+Lemma~\ref{lem:ftl} with $l_t(u) = L(u, \theta_t)$, then we get the inequality
+\[ \sum_{t=1}^T L(u_t, \theta_t) \leq \sum_{t=1}^T L(u^*, \theta_t) + \sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle. \]
+Combining these together, we get the string of inequalities
+\begin{align*}
+L(\hat{u}, \theta) &= L\left(\frac{1}{T} \sum_{t=1}^T u_t, \theta\right) \\
+ &\leq \frac{1}{T} \sum_{t=1}^T L(u_t, \theta) \\
+ &\leq \frac{1}{T} \sum_{t=1}^T L(u_t, \theta_t) \\
+ &\leq \frac{1}{T} \sum_{t=1}^T L(u^*, \theta_t) + \frac{1}{T} \sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle \\
+ &\leq \frac{1}{T} \sum_{t=1}^T \sup_{\theta} L(u^*, \theta) + \frac{1}{T} \sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle \\
+ &= \sup_{\theta} L(u^*, \theta) + \frac{1}{T} \sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle,
+\end{align*}
+as was to be shown.
+\end{proof}
+\begin{corollary}
+Suppose that $h$ is $\alpha$-strongly convex and let $R = \sup_{\theta} |\langle \theta, \theta \rangle|$. Then 
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{4R^2\log(T+1)}{\alpha T}. \]
+\end{corollary}
+\begin{proof}
+By Lemma~\ref{lem:convexity}, we have 
+\begin{align*}
+\|u_t-u_{t+1}\| &\leq \frac{2}{\alpha}\|\frac{1}{t}\sum_{s \leq t}\theta_s - \frac{1}{t+1}\sum_{s \leq t+1}\theta_s\| \\
+ &= \frac{2}{\alpha}\|\frac{1}{t(t+1)} \sum_{s \leq t} \theta_s - \frac{1}{t+1} \theta_{t+1}\| \\
+ &\leq \frac{2}{\alpha} \left(\frac{1}{t(t+1)} \sum_{s \leq t} \|\theta_s\| + \frac{1}{t+1} \|\theta_{t+1}\|\right) \\
+ &\leq \frac{4R}{\alpha (t+1)}.
+\end{align*}
+It follows from Cauchy-Schwartz that 
+\begin{align*}
+\sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle &\leq \sum_{t=1}^T \frac{4R^2}{\alpha (t+1)} \\
+ &\leq \frac{4R^2\log(T+1)}{\alpha},
+\end{align*}
+which completes the proof.
+\end{proof}
+\begin{proposition}[Convergence of Method 2]
+Consider the updates $u_t \in \arg\min_{u} h(u) + \langle \theta_t, u \rangle$ 
+and $\theta_{t+1} \in \arg\max_{\theta} \langle \theta, \frac{1}{t} \sum_{s \leq t} u_s \rangle - R(\theta)$. 
+Then for $\hat{u} = \frac{1}{T} \sum_{t=1}^T u_t$, we have 
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{1}{T} \sum_{t=1}^T \langle u_t, \theta_{t+1} - \theta_{t} \rangle. \]
+\end{proposition}
+\begin{proof}
+If we invoke Lemma~\ref{lem:ftl} with $l_t(\theta) = -L(u_t, \theta)$, then we get the inequality
+\[ \sum_{t=1}^T -L(u_t, \theta_t) \leq -\sum_{t=1}^T L(u_t, \theta^*) - \sum_{t=1}^T \langle u_t, \theta_t - \theta_{t+1} \rangle. \]
+Re-arranging yields
+\[ \sum_{t=1}^T L(u_t, \theta^*) \leq \sum_{t=1}^T L(u_t, \theta_t) + \sum_{t=1}^T \langle u_t, \theta_{t+1} - \theta_t \rangle. \]
+Now, we have the following string of inequalities:
+\begin{align*}
+L(\hat{u}, \theta) &= L\left(\frac{1}{T} \sum_{t=1}^T u_t, \theta\right) \\
+ &\leq \frac{1}{T} \sum_{t=1}^T L(u_t, \theta) \\
+ &\leq \frac{1}{T} \sum_{t=1}^T L(u_t, \theta_t) + \frac{1}{T} \sum_{t=1}^T \langle u_t, \theta_{t+1} - \theta_t \rangle \\
+ &= \frac{1}{T} \sum_{t=1}^T \inf_{u} L(u, \theta_t) + \frac{1}{T} \sum_{t=1}^T \langle u_t, \theta_{t+1} - \theta_t \rangle \\
+ &\leq \frac{1}{T} \sum_{t=1}^T L(u^*, \theta_t) + \frac{1}{T} \sum_{t=1}^T \langle u_t, \theta_{t+1} - \theta_t \rangle \\
+ &\leq \frac{1}{T} \sum_{t=1}^T \sup_{\theta} L(u^*, \theta) + \frac{1}{T} \sum_{t=1}^T \langle u_t, \theta_{t+1} - \theta_t \rangle \\
+ &= \sup_{\theta} L(u^*, \theta) + \frac{1}{T} \sum_{t=1}^T \langle u_t, \theta_{t+1} - \theta_t \rangle,
+\end{align*}
+as was to be shown.
+\end{proof}
+\begin{corollary}
+Suppose that $R$ is $\alpha$-strongly convex and let $R = \sup_{u} |\langle u, u \rangle|$. 
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{4R^2\log(T+1)}{\alpha T}. \]
+\end{corollary}
+\begin{proof}
+The proof is identical to the previous corollary.
+\end{proof}
+
+\section{Application to Herding}
+\label{sec:herding}
+Suppose we are given a family of features $\phi$ together 
+with a known value $\bar{\phi}$ for $\bE_{\mu}[\phi]$. We 
+would like to construct a distribution that approximately 
+matches this distribution, i.e. one for which 
+$\bE_{\hat{\mu}}[\phi] \approx \bar{\phi}$. A natural way 
+to do this is by using boosted mirror descent to minimize the 
+maximum mean discrepancy relative to $\phi$; 
+in other words, to minimize
+\[ L(\mu) = \max\limits_{i=1}^d |\bE_{\mu}[\phi_i]-\bar{\phi}_i|. \]
+If we wish to write this more similarly to the original problem 
+formulation, we can write
+\[ L(\mu) = \sup_{\|\theta\|_1 \leq 1} \theta^T(\bE_{\mu}[\phi]-\bar{\phi}). \]
+One issue is that $\|\theta\|_1$ is not strongly convex, so we relax $\|\theta\|_1$ 
+to $\|\theta\|_2$ and write our loss function in the Lagrangian form:
+\[ L(\mu, \theta) = \theta^T\bE_{\mu}[\phi] - \theta^T\bar{\phi} - \frac{1}{2}\|\theta\|_2^2. \]
+Intriguingly, Method 1 and Method 2 are identical to each other for this choice of $L$ 
+(up to a change of index). In this case, $\mu_t = \delta_{x_t}$ for some $x_t$, and 
+the updates are the same as the standard herding updates. Let $R = \sup_{x} \|\phi(x)\|_2$; 
+then using the Method 2 convergence bound gives us
+\begin{align*}
+\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T \delta_{x_t}, \theta\right) &\leq \inf_{u^*} \sup_{\theta} L(u^*, \theta) + \frac{2R^2\log(T+1)}{T} \\
+ &= \sup_{\theta} \inf_{u^*} L(u^*, \theta) + \frac{2R^2\log(T+1)}{T} \\
+ &= \frac{2R^2\log(T+1)}{T}.
+\end{align*}
+This is a slightly weaker version of the typical herding bound on MMD.
+
+\section{Herding in Infinite Dimensions}
+\label{sec:infinite-case}
+
+\section{Herding and Maximum Entropy}
+\label{sec:max-ent}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+%\bibliography{example_paper}
+%\bibliographystyle{icml2013}
+
+\end{document} 
+
+
+% This document was modified from the file originally made available by
+% Pat Langley and Andrea Danyluk for ICML-2K. This version was
+% created by Lise Getoor and Tobias Scheffer, it was slightly modified  
+% from the 2010 version by Thorsten Joachims & Johannes Fuernkranz, 
+% slightly modified from the 2009 version by Kiri Wagstaff and 
+% Sam Roweis's 2008 version, which is slightly modified from 
+% Prasad Tadepalli's 2007 version which is a lightly 
+% changed version of the previous year's version by Andrew Moore, 
+% which was in turn edited from those of Kristian Kersting and 
+% Codrina Lauth. Alex Smola contributed to the algorithmic style files.  
