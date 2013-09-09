@@ -7,8 +7,13 @@
 \usepackage{ifthen}
 \usetikzlibrary{patterns,positioning}
 
+%%% Added by Jonathan %%%
 \definecolor{NAColor}{rgb}{.75,0,.75}
 \newcommand{\NA}[1]{\textcolor{NAColor}{($\star$) #1}}
+\newcommand{\dee}{\mathrm{d}}
+\def\argmax{\operatornamewithlimits{arg\,max}}
+\def\argmin{\operatornamewithlimits{arg\,min}}
+%%% End added by Jonathan %%%
 
 \newcommand{\lc}[1]{#1_{\mathrm{loc}}}
 \newcommand{\eq}[1]{\stackrel{\mathrm{#1}}{=}}
@@ -46,8 +51,8 @@
 \DeclareMathOperator{\lub}{lub}
 \newcommand{\atom}[1]{#1^{\circ}}
 \newcommand{\stitch}[2]{\overline{#1}^{#2}}
-\DeclareMathOperator{\argmin}{argmin}
-\DeclareMathOperator{\argmax}{argmax}
+%\DeclareMathOperator{\argmin}{argmin}
+%\DeclareMathOperator{\argmax}{argmax}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}

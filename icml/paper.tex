@@ -38,6 +38,8 @@ TODO
 \section{Boosted Mirror Descent}
 \label{sec:algorithm}
 
+\NA{JHH: I'm thinking that from the beginning we should let $u$ be defined over a different space than $\theta$ and assume a linear map $u \mapsto \eta(u) \in \Theta$. Then write $\langle \theta, \eta(u) \rangle$ so the setup will align with the herding case, where $\eta(u) = \bE_{u}[\phi(x)]$. }
+
 Consider the following loss function:
 \[ L(u) = \max_{\theta \in \Theta} \left\{\langle \theta, u \rangle - R(\theta) \right\}, \]
 where $R$ is some convex function that we should think of as a measure of complexity 
@@ -53,7 +55,7 @@ Examples:
       any strongly convex function $S$. Then $L(u) = S(u)$.
 \end{itemize}
 
-In this document we consider a family of methods for minimizing $L(u)$, 
+In this paper we consider a family of methods for minimizing $L(u)$, 
 which are based on Bach's generalization of the Frank-Wolfe algorithm and can 
 be interpreted as boosted mirror descent.
 
@@ -62,14 +64,14 @@ to consider a \emph{two-argument} loss function
 \[ L(u,\theta) = h(u) + \langle \theta, u \rangle - R(\theta). \]
 In the case $h(u) \equiv 0$, we can get the previous setting by 
 considering $\max_{\theta \in \Theta} L(u,\theta)$. We will assume 
-throughout this document that $h$ and $R$ are both convex functions. \NA{JH: Should we comment on the symmetry introduced by this formulation?}
+throughout this document that $h$ and $R$ are both convex functions. \NA{JHH: Should we comment on the symmetry introduced by this formulation?}
 
 Boosted mirror descent can be thought of as an algorithm for finding 
 ``saddle points'' of $L$. It is the following algorithm:
 \begin{enumerate}
-\item $u_1 = 0$
-\item $\theta_{t} \in \arg\max_{\theta \in \Theta} \langle \theta, u_t \rangle - R(\theta)$
-\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$
+\item $u_1 = \argmin_{u} h(u)$
+\item $\theta_{t} \in \argmax_{\theta \in \Theta} \langle \theta, u_t \rangle - R(\theta)$
+\item $u_{t+1} \in \argmin_{u} h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$
 \end{enumerate}
 Let $\hat{u} = \frac{1}{T} \sum_{t = 1}^{T} u_t$. As long as $h$ is strongly convex, we obtain the 
 bound:
@@ -78,13 +80,13 @@ However, it is often the case that $h$ is not strongly convex, whereas $R$ is st
 we may wish to use the following slightly different algorithm:
 \begin{enumerate}
 \item $\theta_1 = 0$
-\item $u_t \in \arg\min_{u} h(u) + \langle \theta_t, u \rangle$
-\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \frac{1}{t} \sum_{s \leq t} u_s \rangle - R(\theta)$
+\item $u_t \in \argmin_{u} h(u) + \langle \theta_t, u \rangle$
+\item $\theta_{t+1} \in \argmax_{\theta \in \Theta} \langle \theta, \frac{1}{t} \sum_{s \leq t} u_s \rangle - R(\theta)$
 \end{enumerate}
 Once again, if we let $\hat{u} = \frac{1}{T} \sum_{t=1}^T u_t$, then we obtain the following bound, which now 
 only requires the convexity of $R$:
 \[ \sup_{\theta \in \Theta} L(\hat{u}, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(\log(T)/T). \]
-\NA{JH: It would be more elegant to argue either here or below that the bounds on the second algorithm follow directly from duality}
+\NA{JHH: It would be more elegant to argue either here or below that the bounds on the second algorithm follow directly from duality}
 
 \section{Convergence Proofs}
 \label{sec:proofs}
@@ -92,14 +94,15 @@ We now prove the convergence results cited in Section~\ref{sec:intro}.
 \begin{lemma}
 \label{lem:ftl}
 Let $l_1,\ldots,l_T$ be functions of $x$ and let $x_1,\ldots,x_T$ 
-be chosen via $x_{t+1} \in \arg\min_{x} \frac{1}{t} \sum_{s \leq t} l_s(x)$. 
+be chosen via $x_{t+1} \in \argmin_{x} \frac{1}{t} \sum_{s \leq t} l_s(x)$. 
 Then for any $x^*$ we have
 \[ \sum_{t=1}^T l_t(x_t) \leq \sum_{t=1}^T l_t(x^*) + \sum_{t=1}^T (l_t(x_t) - l_t(x_{t+1})). \]
 \end{lemma}
 \begin{proof}
+\NA{JHH: Doesn't rely on the spaces $x$'s having any structure nor on any properties of the functions.}
 Re-arranging, we want to show that $\sum_{t=1}^T l_t(x_{t+1}) \leq \sum_{t=1}^T l_t(x^*)$ for 
 all $x^*$. We will show this by induction. In the base case $T=1$, we want to show that $l_1(x_2) \leq l_1(x^*)$ 
-for all $x^*$, which is true because $x_2 \in \arg\min_x l_1(x)$ by construction. For 
+for all $x^*$, which is true because $x_2 \in \argmin_x l_1(x)$ by construction. For 
 the inductive step, suppose that the result holds for $T-1$:
 \[ \sum_{t=1}^{T-1} l_t(x_{t+1}) \leq \sum_{t=1}^T l_t(x^*). \]
 Now set $x^* = x_{T+1}$ in the above inequality and 
@@ -113,12 +116,12 @@ which completes the induction. Here we are using the fact that $x_{T+1}$
 is the minimizer of $\frac{1}{T} \sum_{t=1}^T l_t(x)$ and hence also of 
 $\sum_{t=1}^T l_t(x)$.
 \end{proof}
-\begin{lemma}
-\label{lem:convexity}
+\begin{lemma} \label{lem:convexity}
 Suppose that $f(x)$ is \emph{$\alpha$-strongly convex}: $f(x) \geq f(x_0) + \partial f(x_0)^T(x-x_0) + \frac{\alpha}{2}\|x-x_0\|^2$. 
-Let $F(y) := \arg\min_x f(x) + y^Tx$. Then $\|F(y_0)-F(y_1)\| \leq \frac{2}{\alpha} \|y_0-y_1\|$.
+Let $F(y) := \argmin_x f(x) + y^Tx$. Then $\|F(y_0)-F(y_1)\| \leq \frac{2}{\alpha} \|y_0-y_1\|$.
 \end{lemma}
 \begin{proof}
+\NA{JHH: Follows from $f$ being strongly convex, the definition of inner product, and Cauchy-Schwartz. We'll just want to be careful about calculating $\alpha$ for our regularizer later on.}
 Let $x_0 = F(y_0)$. Then we must have $\partial f(x_0) = -y_0$, hence 
 \begin{align*}
 f(x)+y_1^Tx &\geq f(x_0) + y_1^Tx_0 - y_0^T(x-x_0) + \frac{\alpha}{2}\|x-x_0\|^2.
@@ -134,19 +137,20 @@ It follows that
 as was to be shown.
 \end{proof}
 \begin{proposition}[Convergence of Method 1]
-Consider the updates $\theta_t \in \arg\max_{\theta} \langle \theta, u_t \rangle - R(\theta)$ 
-and $u_{t+1} \in \arg\min_u h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$. 
+Consider the updates $\theta_t \in \argmax_{\theta} \langle \theta, u_t \rangle - R(\theta)$ 
+and $u_{t+1} \in \argmin_u h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$. 
 Then for $\hat{u} = \frac{1}{T} \sum_{t=1}^T u_t$, we have
 \[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{1}{T} \sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle. \]
 \end{proposition}
-\begin{proof}
+\begin{proof} 
+\NA{JHH: Uses, Lemma~\ref{lem:ftl}, convexity of $h$, taking supremums, and facts that follow from the construction of the algorithm.}
 Note that $L(u_t, \theta_t) = \max_{\theta} L(u_t, \theta)$ by construction. Also note that, if we invoke 
 Lemma~\ref{lem:ftl} with $l_t(u) = L(u, \theta_t)$, then we get the inequality
 \[ \sum_{t=1}^T L(u_t, \theta_t) \leq \sum_{t=1}^T L(u^*, \theta_t) + \sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle. \]
-Combining these together, we get the string of inequalities
+Combining these together, we get the string of inequalities 
 \begin{align*}
 L(\hat{u}, \theta) &= L\left(\frac{1}{T} \sum_{t=1}^T u_t, \theta\right) \\
- &\leq \frac{1}{T} \sum_{t=1}^T L(u_t, \theta) \\
+ &\leq \frac{1}{T} \sum_{t=1}^T L(u_t, \theta) & \\
  &\leq \frac{1}{T} \sum_{t=1}^T L(u_t, \theta_t) \\
  &\leq \frac{1}{T} \sum_{t=1}^T L(u^*, \theta_t) + \frac{1}{T} \sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle \\
  &\leq \frac{1}{T} \sum_{t=1}^T \sup_{\theta} L(u^*, \theta) + \frac{1}{T} \sum_{t=1}^T \langle u_t - u_{t+1}, \theta_t \rangle \\
@@ -159,6 +163,7 @@ Suppose that $h$ is $\alpha$-strongly convex and let $R = \sup_{\theta} |\langle
 \[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{4R^2\log(T+1)}{\alpha T}. \]
 \end{corollary}
 \begin{proof}
+\NA{JHH: Follows from Lemma~\ref{lem:convexity}, triangle inequality, taking supremums, and Cauchy-Schwartz.}
 By Lemma~\ref{lem:convexity}, we have 
 \begin{align*}
 \|u_t-u_{t+1}\| &\leq \frac{2}{\alpha}\|\frac{1}{t}\sum_{s \leq t}\theta_s - \frac{1}{t+1}\sum_{s \leq t+1}\theta_s\| \\
@@ -174,8 +179,8 @@ It follows from Cauchy-Schwartz that
 which completes the proof.
 \end{proof}
 \begin{proposition}[Convergence of Method 2]
-Consider the updates $u_t \in \arg\min_{u} h(u) + \langle \theta_t, u \rangle$ 
-and $\theta_{t+1} \in \arg\max_{\theta} \langle \theta, \frac{1}{t} \sum_{s \leq t} u_s \rangle - R(\theta)$. 
+Consider the updates $u_t \in \argmin_{u} h(u) + \langle \theta_t, u \rangle$ 
+and $\theta_{t+1} \in \argmax_{\theta} \langle \theta, \frac{1}{t} \sum_{s \leq t} u_s \rangle - R(\theta)$. 
 Then for $\hat{u} = \frac{1}{T} \sum_{t=1}^T u_t$, we have 
 \[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{1}{T} \sum_{t=1}^T \langle u_t, \theta_{t+1} - \theta_{t} \rangle. \]
 \end{proposition}
@@ -206,6 +211,8 @@ The proof is identical to the previous corollary.
 
 \section{Application to Herding}
 \label{sec:herding}
+
+\NA{JHH: Need to specify the spaces we are working with here.}
 Suppose we are given a family of features $\phi$ together 
 with a known value $\bar{\phi}$ for $\bE_{\mu}[\phi]$. We 
 would like to construct a distribution that approximately 
@@ -237,6 +244,47 @@ This is a slightly weaker version of the typical herding bound on MMD.
 
 \section{Herding and Maximum Entropy}
 \label{sec:max-ent}
+
+Let us now consider the entropic regularizer $h(u) = \tau\bE_{u}[\log u(x)]$ with 
+\[ R(\theta) = \bE_{u}[\theta^T\bar{\phi}] + \left\{ \begin{array}{llc} \infty & : & \|\theta\|_1 > 1 \\ 0 & : & \|\theta\|_1 \leq 1 \end{array} \right.\]
+If we use Method 1, we then end up with 
+\[ u_{t}(x) \propto \exp\left\{-\frac{1}{\alpha}\overline{\theta}_{t}^T\phi(x)\right\}, \]
+where $\overline{\theta}_{t} = \frac{1}{t} \sum_{s \le t} \theta_{s}$. Hence, $h(u) + \bE_{\mu}[\theta^T\phi(x)] - R(\theta)$ is no longer maximized at the boundary (when $\tau > 0$). We can instead consider the following sequence of distributions:
+\begin{enumerate}
+\item $\theta_t \in \argmax_{\|\theta\|_1 \leq 1} \theta^T (\bE_{u_t}[\phi(x)]-\bar{\phi})$
+\item $u_{t+1}(x) = Z(\overline{\theta}_{t}, \tau)^{-1} \exp\left\{-\frac{1}{\tau}\overline{\theta}_{t}^T\phi(x)\right\}$
+\end{enumerate}
+Here $Z(\overline{\theta}_{t}, \tau) = \int\exp\left\{-\frac{1}{\tau}\overline{\theta}_{t}^T\phi(x)\right\} \dee x$. 
+
+The entropic regularizer is not strongly convex but a more general analysis involving 
+Bregman divergence can nevertheless yield a convergence bound in this case. We thus 
+get something that looks like herding but actually gives us an exponential family 
+type distribution. In particular, we have a Gibbs distribution with temperature $\tau$, and 
+in the limit as the temperature goes to zero, we recover herding, since 
+\[ \lim_{\tau \to 0} u_{t+1}(x) = \delta_{x^{*}_{t+1}}, \]
+where $x^{*}_{t+1} = \argmin_{x} \overline{\theta}_{t}^T\phi(x)$. 
+This fact is reminiscent of Welling's original derivation of herding, in which 
+he took the zero temperature limit of the gradient descent algorithm for the optimization problem 
+\[ \argmin_{u} h(u) \quad \text{s.t.}~\bE_{u}[\phi(x)] - \bar\phi = 0. \]
+This optimization is quite similar to the entropic optimization considered here, which 
+we can write as 
+\begin{align*}
+\argmin_{u}& \argmax_{|\theta\|_1 \leq 1} h(u) + \theta^{T}(\bE_{u}[\phi(x)] - \bar \phi)  \\
+&= \argmin_{u} h(u) + \|\bE_{u}[\phi(x)] - \bar\phi\|_{2}. 
+\end{align*}
+In the entropic formulation, the expectation constraint $\bE_{u}[\phi(x)] - \bar\phi = 0$ becomes
+soft, though the two optimizations are equivalent in the zero-temperature limit. 
+
+We can view the entropic regularization
+with non-zero temperature as an alternative approximation to herding. If at each step we
+retain a sample $x_{t} \sim u_{t}$, then the sequence $(x_{t})_{t}$ converges to the 
+herding sample path as $\tau \to 0$. So $(x_{t})_{t}$ with non-zero temperature approximate
+herding samples. \NA{JHH: I'm not sure how useful this all is, other than to make contact with 
+the original paper, as I think the Gibbs distribution was exactly what Max was trying to 
+avoid by taking the zero-temperature limit.}
+
+
+
 
 \section{Conclusion}
 \label{sec:conclusion}
