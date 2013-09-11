@@ -1,0 +1,43 @@
+\documentclass{article}
+\usepackage{import}
+\input{latex-defs.tex}
+
+\begin{document} 
+
+Throughout this section, assume that $\alpha_1,\ldots,\alpha_T$ is 
+a sequence of real numbers and that $A_t = \sum_{s=1}^t \alpha_s$. 
+We further require that $A_t \geq 0$ for all $t$.
+
+Also recall that the Bregman divergence is defined by $D_f(x_2 \| x_1) \eqdef f(x_2) - \langle \nabla f(x_1), x_2-x_1 \rangle - f(x_1)$.
+
+A key observation in the following proof is that, if $x_0 = \arg\min f(x) + \langle z, x \rangle$, then $\nabla f(x_0) = -z$.
+
+\NA{JNS: In the following proof, (3) is by the update formula for $x_{t+1}$ together with the preceding observation. 
+(4) and (5) are re-arranging the sum. (6) is definition of Bregman divergence. (7) is the observation again. 
+(8) is the definition of $x_{T+1}$.}
+
+\begin{lemma}
+\label{lem:ftl}
+Let $z_1,\ldots,z_T$ be vectors and let $f(x)$ be a strictly convex 
+function. Define $\hat{z}_t$ to be $\frac{1}{A_t} \sum_{s=1}^t \alpha_s z_s$.
+
+Let $x_1,\ldots,x_T$ be chosen via $x_{t+1} = \arg\min_{x} f(x) + \langle \hat{z}_t, x\rangle$. 
+Then for any $x^*$ we have
+\begin{equation}
+\frac{1}{A_T} \sum_{t=1}^T \{\alpha_t(f(x_t) + \langle z_t, x_t \rangle)\} \leq f(x^*) + \langle \hat{z}_t, x^* \rangle + \frac{1}{A_T} \sum_{t=1}^T A_t D_{f}(x_t \| x_{t+1}). 
+\end{equation}
+\end{lemma}
+\begin{proof}
+We have
+\begin{align}
+\lefteqn{\sum_{t=1}^T \{\alpha_t(f(x_t) + \langle z_t, x_t \rangle)\}} \\
+ &= \sum_{t=1}^T \{\alpha_t f(x_t) + \langle A_{t-1} \nabla f(x_t) - A_t \nabla f(x_{t+1}), x_t \rangle\} \\
+ &= \sum_{t=1}^T \{\alpha_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle\} + A_T(f(x_{T+1})- \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \\
+ &= \sum_{t=1}^T \{A_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle - A_t f(x_{t+1})\} + A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \\
+ &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \\
+ &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x_{T+1}) + \langle \hat{z}_T, x_{T+1} \rangle) \\
+ &\leq \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x^*) + \langle \hat{z}_T, x^* \rangle). \\
+\end{align}
+Dividing both sides by $A_T$ completes the proof.
+\end{proof}
+\end{document}
