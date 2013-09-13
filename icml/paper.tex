@@ -174,25 +174,25 @@ Consider the updates $\theta_t \in \arg\max_{\theta} \langle \theta, u_t \rangle
 and $u_{t+1} \in \arg\min_u h(u) + \langle \hat{\theta}_s, u \rangle$. 
 Then we have
 \begin{equation}
-\sup_{\theta} L(\hat{u}_T, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{1}{A_T} \sum_{t=1}^T A_tD_f(x_t \| x_{t+1}).
+\sup_{\theta} L(\hat{u}_T, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{1}{A_T} \sum_{t=1}^T A_tD_h(x_t \| x_{t+1}).
 \end{equation}
 \end{proposition}
 \begin{proof}
 Note that $L(u_t, \theta_t) = \max_{\theta} L(u_t, \theta)$ by construction. 
 Also note that, if we invoke Lemma~\ref{lem:bregman} with $f = h$ and 
-$z_t = \theta_t$, then we get the inequality
+$z_t = \theta_t$ then we get the inequality
 \begin{align}
 \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u_t, \theta_t) 
 &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u^*, \theta_t) \\
-&\quad + \frac{1}{A_T} \sum_{t=1}^T A_tD_f(x_t \| x_{t+1}). \nonumber
+&\quad + \frac{1}{A_T} \sum_{t=1}^T A_tD_h(x_t \| x_{t+1}). \nonumber
 \end{align}
 Combining these together, we get the string of inequalities
 \begin{align*}
 L(\hat{u}_T, \theta) &= L\left(\frac{1}{A_T} \sum_{t=1}^T \alpha_tu_t, \theta\right) \\
  &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u_t, \theta) \\
  &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u_t, \theta_t) \\
- &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u^*, \theta_t) + \frac{1}{A_T} \sum_{t=1}^T A_t D_f(u_t \| u_{t+1}) \\
- &\leq \sup_{\theta} L(u^*, \theta) + \frac{1}{A_T} \sum_{t=1}^T A_tD_f(u_t \| u_{t+1}),
+ &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u^*, \theta_t) + \frac{1}{A_T} \sum_{t=1}^T A_t D_h(u_t \| u_{t+1}) \\
+ &\leq \sup_{\theta} L(u^*, \theta) + \frac{1}{A_T} \sum_{t=1}^T A_tD_h(u_t \| u_{t+1}),
 \end{align*}
 as was to be shown.
 \end{proof}
@@ -207,7 +207,7 @@ and let $r = \sup_{\theta} \|\theta\|_{*}$. Then
 \begin{proof}
 By Lemma~\ref{lem:convexity}, we have 
 \begin{align*}
-D_f(x_t \| x_{t+1}) &= D_{f^*}(\hat{\theta}_{t+1} \| \hat{\theta}_{t}) \\
+D_h(u_t \| u_{t+1}) &= D_{h^*}(\hat{\theta}_{t+1} \| \hat{\theta}_{t}) \\
  &\leq \frac{1}{2}\|\hat\theta_{t+1}-\hat\theta_{t}\|_{*}^2 \\
  &= \frac{1}{2}\|\frac{\sum_{s \leq t}\alpha_s\theta_s}{\sum_{s \leq t} \alpha_s} - \frac{\sum_{s \leq t+1}\alpha_s\theta_s}{\sum_{s \leq t+1} \alpha_s}\|_{*}^2 \\
  &= \frac{1}{2}\|\frac{\alpha_{t+1}}{A_tA_{t+1}} \sum_{s \leq t} \alpha_s\theta_s - \frac{\alpha_{t+1}}{A_{t+1}} \theta_{t+1}\|_{*}^2 \\
@@ -216,7 +216,7 @@ D_f(x_t \| x_{t+1}) &= D_{f^*}(\hat{\theta}_{t+1} \| \hat{\theta}_{t}) \\
 \end{align*}
 It follows that 
 \begin{align*}
-\frac{1}{A_T} \sum_{t=1}^T A_tD_f(x_t \| x_{t+1}) &\leq \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}.
+\frac{1}{A_T} \sum_{t=1}^T A_tD_h(u_t \| u_{t+1}) &\leq \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}.
 \end{align*}
 \end{proof}
 
@@ -323,11 +323,11 @@ Intriguingly, Algorithm 1 and Algorithm 2 are identical to each other for this c
 the updates are the same as the standard herding updates. Let $r = \sup_{x} \|\phi(x)\|_2$; 
 then using the Algorithm 2 convergence bound gives us
 \begin{align*}
-\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T \delta_{x_t}, \theta\right) &\leq \inf_{u^*} \sup_{\theta} L(u^*, \theta) + \frac{8r^2(\log(T)+1)}{T} \\
- &= \sup_{\theta} \inf_{u^*} L(u^*, \theta) + \frac{8R^2(\log(T)+1)}{T} \\
- &= \frac{8R^2(\log(T)+1)}{T}.
+\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T \delta_{x_t}, \theta\right) &\leq \inf_{u^*} \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T} \\
+ &= \sup_{\theta} \inf_{u^*} L(u^*, \theta) + \frac{8r^2}{T} \\
+ &= \frac{8r^2}{T}.
 \end{align*}
-This is a slightly weaker version of the typical herding bound on MMD.
+This is the same rate as the typical herding bound on MMD.
 
 \section{Herding in Infinite Dimensions}
 \label{sec:infinite-case}
