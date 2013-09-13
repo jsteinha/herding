@@ -61,7 +61,6 @@ In this paper we will consider a family of methods for minimizing $L(u)$,
 which are based on Bach's generalization of the Frank-Wolfe algorithm and can 
 be interpreted as boosted mirror descent.
 
-\NA{JHH: Should we comment on the symmetry introduced by this formulation?}
 First, let us generalize the setting 
 to consider a \emph{two-argument} loss function
 \begin{equation}
@@ -83,7 +82,7 @@ $\hat{\theta}_t = \frac{\sum_{s=1}^t \alpha_s\theta_s}{\sum_{s=1}^t \alpha_s}$.
 %\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$
 \end{enumerate}
 As long as $h$ is strongly convex, we obtain the 
-bound (see Proposition~\ref{cor:method-1}):
+bound (see Corollary~\ref{cor:method-1}):
 \begin{equation}
 \sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/T).
 \end{equation}
@@ -97,14 +96,11 @@ we may wish to use the following slightly different algorithm (called Algorithm 
 \item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \hat{u}_t \rangle - R(\theta)$
 \end{enumerate}
 We then obtain the following bound 
-when $R$ is strongly convex (see Proposition~\ref{cor:method-2}):
+when $R$ is strongly convex (see Corollary~\ref{cor:method-2}):
 \[ \sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/T). \]
 Algorithm 1 and Algorithm 2 are closely related; indeed, they are dual to each other 
 (performing Algorithm 1 on $L(u,\theta)$ is the same as performing Algorithm 2 on 
 $-L(\theta,u)$).
-\NA{JHH: It would be more elegant to argue either here or below that the bounds on the second algorithm follow directly from duality}
-\NA{JNS: The statements aren't actually dual to each other; the first is saying that the primal converges to its 
-    optimum, and the second is saying that the dual converges to its optimum.}
 
 \section{Convergence Proofs}
 \label{sec:proofs}
@@ -117,6 +113,7 @@ Also recall that the Bregman divergence is defined by
 $D_f(x_2 \| x_1) \eqdef f(x_2) - \langle \nabla f(x_1), x_2-x_1 \rangle - f(x_1)$.
 
 Our proofs hinge on the following key lemma:
+%%% MAIN LEMMA %%%
 \begin{lemma}
 \label{lem:bregman}
 Let $z_1,\ldots,z_T$ be vectors and let $f(x)$ be a strictly convex 
@@ -138,18 +135,24 @@ then $\nabla f(x_0) = -z$.
 
 Now note that
 \begin{align}
-\alpha_{t}z_{t} = A_{t}\hat z_{t} - A_{t-1}\hat z_{t-1} = - A_{t}\nabla f(x_{t+1}) + A_{t-1} \nabla f(x_{t}) 
+\alpha_{t}z_{t} 
+&= A_{t}\hat z_{t} - A_{t-1}\hat z_{t-1} \\
+&= - A_{t}\nabla f(x_{t+1}) + A_{t-1} \nabla f(x_{t}),
 \end{align}
 so we have
 \begin{align}
 \lefteqn{\sum_{t=1}^T \{\alpha_t(f(x_t) + \langle z_t, x_t \rangle)\}} \\
  &= \sum_{t=1}^T \{\alpha_t f(x_t) + \langle A_{t-1} \nabla f(x_t) - A_t \nabla f(x_{t+1}), x_t \rangle\} \\
- &= \sum_{t=1}^T \{\alpha_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle\} - A_{T}\langle \nabla f(x_{T+1}), x_{T+1} \rangle \\
+ &= \sum_{t=1}^T \{\alpha_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle\} \\
+ & \quad - A_{T}\langle \nabla f(x_{T+1}), x_{T+1} \rangle
+\end{align}
+\begin{align}
  &= \sum_{t=1}^T \{A_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle - A_t f(x_{t+1})\}  \\
  &\quad+ A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
- &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \\
+ &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\}  \\
+ &\quad+ A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
  &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x_{T+1}) + \langle \hat{z}_T, x_{T+1} \rangle) \\
- &\leq \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x^*) + \langle \hat{z}_T, x^* \rangle). \\
+ &\leq \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x^*) + \langle \hat{z}_T, x^* \rangle). 
 \end{align}
 Dividing both sides by $A_T$ completes the proof.
 \end{proof}
@@ -162,45 +165,50 @@ norm $\|\cdot\|$. (In this case we say that $f$ is strongly
 convex with respect to $\|\cdot\|$.) 
 Then $D_{f^*}(x' \| x) \leq \frac{1}{2}\|x-x'\|_{*}^2$.
 \end{lemma}
+
+%%% ALGORITHM 1 ANALYSIS %%%
+% Convergence proposition
 \begin{proposition}[Convergence of Algorithm 1]
 \label{prop:method-1}
 Consider the updates $\theta_t \in \arg\max_{\theta} \langle \theta, u_t \rangle - R(\theta)$ 
 and $u_{t+1} \in \arg\min_u h(u) + \langle \hat{\theta}_s, u \rangle$. 
 Then we have
 \begin{equation}
-\sup_{\theta} L(\hat{u}_T, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{1}{A_T} \sum_{t=1}^T A_tD_f(x_t \| x_{t+1}).
+\sup_{\theta} L(\hat{u}_T, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{1}{A_T} \sum_{t=1}^T A_tD_h(x_t \| x_{t+1}).
 \end{equation}
 \end{proposition}
 \begin{proof}
 Note that $L(u_t, \theta_t) = \max_{\theta} L(u_t, \theta)$ by construction. 
 Also note that, if we invoke Lemma~\ref{lem:bregman} with $f = h$ and 
-$z_t = \theta_t$, then we get the inequality
-\begin{equation}
-\frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u_t, \theta_t) \leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u^*, \theta_t) + \frac{1}{A_T} \sum_{t=1}^T A_tD_f(x_t \| x_{t+1}).
-\end{equation}
+$z_t = \theta_t$ then we get the inequality
+\begin{align}
+\frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u_t, \theta_t) 
+&\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u^*, \theta_t) \\
+&\quad + \frac{1}{A_T} \sum_{t=1}^T A_tD_h(x_t \| x_{t+1}). \nonumber
+\end{align}
 Combining these together, we get the string of inequalities
 \begin{align*}
 L(\hat{u}_T, \theta) &= L\left(\frac{1}{A_T} \sum_{t=1}^T \alpha_tu_t, \theta\right) \\
  &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u_t, \theta) \\
  &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u_t, \theta_t) \\
- &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u^*, \theta_t) + \frac{1}{A_T} \sum_{t=1}^T A_t D_f(u_t \| u_{t+1}) \\
- &\leq \sup_{\theta} L(u^*, \theta) + \frac{1}{A_T} \sum_{t=1}^T A_tD_f(u_t \| u_{t+1}),
+ &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u^*, \theta_t) + \frac{1}{A_T} \sum_{t=1}^T A_t D_h(u_t \| u_{t+1}) \\
+ &\leq \sup_{\theta} L(u^*, \theta) + \frac{1}{A_T} \sum_{t=1}^T A_tD_h(u_t \| u_{t+1}),
 \end{align*}
 as was to be shown.
 \end{proof}
-\begin{corollary}
-\label{cor:method-1}
+
+% Convergence rate theorem
+\begin{theorem}
+\label{thm:method-1}
 Suppose that $h$ is strongly convex with respect to a norm $\|\cdot\|$ 
 and let $r = \sup_{\theta} \|\theta\|_{*}$. Then 
 \[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}. \]
-In particular, for $\alpha_t = t$, we have
-\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T^2}. \]
-\end{corollary}
+\end{theorem}
 \begin{proof}
 By Lemma~\ref{lem:convexity}, we have 
 \begin{align*}
-D_f(x_t \| x_{t+1}) &= D_{f^*}(\hat{\theta}_{t+1} \| \hat{\theta}) \\
- &\leq \frac{1}{2}\|\theta_{t+1}-\theta\|_{*}^2 \\
+D_h(u_t \| u_{t+1}) &= D_{h^*}(\hat{\theta}_{t+1} \| \hat{\theta}_{t}) \\
+ &\leq \frac{1}{2}\|\hat\theta_{t+1}-\hat\theta_{t}\|_{*}^2 \\
  &= \frac{1}{2}\|\frac{\sum_{s \leq t}\alpha_s\theta_s}{\sum_{s \leq t} \alpha_s} - \frac{\sum_{s \leq t+1}\alpha_s\theta_s}{\sum_{s \leq t+1} \alpha_s}\|_{*}^2 \\
  &= \frac{1}{2}\|\frac{\alpha_{t+1}}{A_tA_{t+1}} \sum_{s \leq t} \alpha_s\theta_s - \frac{\alpha_{t+1}}{A_{t+1}} \theta_{t+1}\|_{*}^2 \\
  &\leq \frac{1}{2} \left(\frac{\alpha_{t+1}}{A_tA_{t+1}} \sum_{s \leq t} \alpha_s\|\theta_s\|_{*}^2 + \frac{\alpha_{t+1}}{A_{t+1}} \|\theta_{t+1}\|_{*}^2\right)^2 \\
@@ -208,16 +216,35 @@ D_f(x_t \| x_{t+1}) &= D_{f^*}(\hat{\theta}_{t+1} \| \hat{\theta}) \\
 \end{align*}
 It follows that 
 \begin{align*}
-\frac{1}{A_T} \sum_{t=1}^T A_tD_f(x_t \| x_{t+1}) &\leq \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}.
+\frac{1}{A_T} \sum_{t=1}^T A_tD_h(u_t \| u_{t+1}) &\leq \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}.
 \end{align*}
-In particular, if we let $\alpha_t = t$, then $A_t = \frac{t(t+1)}{2}$ and 
+\end{proof}
+
+% Convergence rate corollary 
+\begin{corollary} 
+\label{cor:method-1}
+Under the hypotheses of Theorem \ref{thm:method-1}, for $\alpha_{t} = 1$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2 (\log (T) + 1)}{T}. \]
+and for $\alpha_t = t$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T}. \]
+\end{corollary}
+\begin{proof}
+If we let $\alpha_t = 1$, then $A_t = t$ and $\frac{\alpha_{t+1}^2A_t}{A_{t+1}^2} = \frac{t}{(t+1)^{2}} \le \frac{1}{t}$.
+We therefore get
+\begin{equation}
+\frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2} \leq \frac{2r^2}{T} \sum_{t=1}^{T}\frac{1}{t} \leq \frac{2r^2(\log (T) + 1)}{T+1}.
+\end{equation}
+If we let $\alpha_t = t$, then $A_t = \frac{t(t+1)}{2}$ and 
 $\frac{\alpha_{t+1}^2A_t}{A_{t+1}^2} = \frac{2(t+1)^2t(t+1)}{(t+1)^2(t+2)^2} = \frac{2t(t+1)}{(t+2)^2} \leq 2$.
 We therefore get
 \begin{equation}
-\frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2} \leq \frac{8r^2}{T(T+1)},
+\frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2} \leq \frac{4r^2}{T(T+1)} \sum_{t=1}^{T}2 = \frac{8r^2}{T+1},
 \end{equation}
 which completes the proof.
 \end{proof}
+
+%%% ALGORITHM 2 ANALYSIS %%%
+% Convergence proposition
 \begin{proposition}[Convergence of Algorithm 2]
 \label{prop:method-2}
 Consider the updates $u_t \in \arg\min_{u} h(u) + \langle \theta_t, u \rangle$ 
@@ -230,9 +257,17 @@ Then we have
 \begin{proof}
 If we invoke Lemma~\ref{lem:bregman} with $f=R$ and $z_t=-u_t$, then we get 
 the inequality
-\[ \frac{1}{A_T} \sum_{t=1}^T -\alpha_t L(u_t, \theta_t) \leq \frac{1}{A_T} \sum_{t=1}^T -\alpha_t L(u_t, \theta^*) - \frac{1}{A_T} \sum_{t=1}^T A_tD_R(\theta_t \| \theta_{t+1}). \]
+\begin{align}
+\frac{1}{A_T} \sum_{t=1}^T -\alpha_t L(u_t, \theta_t) 
+&\leq \frac{1}{A_T} \sum_{t=1}^T -\alpha_t L(u_t, \theta^*) \\
+&\quad - \frac{1}{A_T} \sum_{t=1}^T A_tD_R(\theta_t \| \theta_{t+1}). \nonumber
+\end{align}
 Re-arranging yields
-\[ \frac{1}{A_T }\sum_{t=1}^T \alpha_t L(u_t, \theta^*) \leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u_t, \theta_t) + \frac{1}{A_T} \sum_{t=1}^T A_tD_R(\theta_t \| \theta_{t+1}). \]
+\begin{align}
+\frac{1}{A_T }\sum_{t=1}^T \alpha_t L(u_t, \theta^*) 
+&\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(u_t, \theta_t) \\
+&\quad+ \frac{1}{A_T} \sum_{t=1}^T A_tD_R(\theta_t \| \theta_{t+1}). 
+\end{align}
 Now, we have the following string of inequalities:
 \begin{align*}
 L(\hat{u}, \theta) &= L\left(\frac{1}{A_T} \sum_{t=1}^T \alpha_t u_t, \theta\right) \\
@@ -245,16 +280,23 @@ L(\hat{u}, \theta) &= L\left(\frac{1}{A_T} \sum_{t=1}^T \alpha_t u_t, \theta\rig
 \end{align*}
 as was to be shown.
 \end{proof}
-\begin{corollary}
-\label{cor:method-2}
+
+% Convergence rate theorem
+\begin{theorem}
+\label{thm:method-2}
 Suppose that $R$ is strongly convex with respect to a norm $\|\cdot\|$ 
 and let $r = \sup_{u} \|u\|_{*}$. Then 
 \[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}. \]
-In particular, for $\alpha_t = t$, we have
-\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T^2}. \]
+\end{theorem}
+\begin{corollary}
+\label{cor:method-2}
+Under the hypotheses of Theorem \ref{thm:method-2}, for $\alpha_t = 1$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2(\log(T) + 1)}{T} \]
+and for $\alpha_t = t$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T} \]
 \end{corollary}
-\begin{proof}
-The proof is identical to the previous corollary.
+\begin{proof}[Proofs]
+The proofs are identical to those for Algorithm 1.
 \end{proof}
 
 \section{Application to Herding}
@@ -262,22 +304,23 @@ The proof is identical to the previous corollary.
 
 \NA{JHH: Need to specify the spaces we are working with here.}
 Suppose we are given a family of features $\phi$ together 
-with a known value $\bar{\phi}$ for $\bE_{\mu}[\phi]$. We 
+with a known value $\bar{\phi}$ for $\bE_{u}[\phi]$. We 
 would like to construct a distribution that approximately 
 matches this distribution, i.e.~one for which 
-$\bE_{\hat{\mu}}[\phi] \approx \bar{\phi}$. A natural way 
+$\bE_{\hat{u}}[\phi] \approx \bar{\phi}$. A natural way 
 to do this is by using boosted mirror descent to minimize the 
 maximum mean discrepancy relative to $\phi$; 
 in other words, to minimize
-\[ L(\mu) = \max_{i \in \{1,\dots,d\}} |\bE_{\mu}[\phi_i]-\bar{\phi}_i|. \]
+\[ L(u) = \max_{i \in \{1,\dots,d\}} |\bE_{u}[\phi_i]-\bar{\phi}_i|. \]
 If we wish to write this more similarly to the original problem 
 formulation, we can write
-\[ L(\mu) = \sup_{\|\theta\|_1 \leq 1} \theta^T(\bE_{\mu}[\phi]-\bar{\phi}). \]
+\[ L(u) = \sup_{\|\theta\|_1 \leq 1} \theta^T(\bE_{u}[\phi]-\bar{\phi}). \]
 One issue is that $\|\theta\|_1$ is not strongly convex, so we relax $\|\theta\|_1$ 
 to $\|\theta\|_2$ and write our loss function in the Lagrangian form:
-\[ L(\mu, \theta) = \theta^T\bE_{\mu}[\phi] - \theta^T\bar{\phi} - \frac{1}{2}\|\theta\|_2^2. \]
+\[ L(u, \theta) = \theta^T\bE_{u}[\phi] - \theta^T\bar{\phi} - \frac{1}{2}\|\theta\|_2^2. \]
 Intriguingly, Algorithm 1 and Algorithm 2 are identical to each other for this choice of $L$ 
-(up to a change of index). In this case, $\mu_t = \delta_{x_t}$ for some $x_t$, and 
+<<<<<<< HEAD
+(up to a change of index). In this case, $u_t = \delta_{x_t}$ for some $x_t$, and 
 the updates are (for Algorithm 2):
 \begin{itemize}
 \item $x_t \in \arg\min_{x} \theta_t^T\phi(x)$
@@ -294,7 +337,7 @@ $r = \sup_{x} \|\phi(x)\|_2$, then Corollary~\ref{cor:method-2} gives us
 \end{align*}
 This is a slightly weaker version of the typical herding bound on MMD.
 Note that if we use $\alpha_t = t$, which corresponds to using a weighted 
-average, then we obtain a much stronger bound of $\frac{8r^2}{T^2}$ instead.
+average, then we obtain a stronger bound of $\frac{8r^2}{T}$ instead.
 
 \section{Herding in Infinite Dimensions}
 \label{sec:infinite-case}
