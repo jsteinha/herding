@@ -338,7 +338,7 @@ This is the same rate as the typical herding bound on MMD.
 Let us now consider the entropic regularizer $h(u) = \tau\bE_{u}[\log u(x)]$ with 
 \[ R(\theta) = \bE_{u}[\theta^T\bar{\phi}] + \left\{ \begin{array}{llc} \infty & : & \|\theta\|_1 > 1 \\ 0 & : & \|\theta\|_1 \leq 1 \end{array} \right.\]
 If we use Method 1, we then end up with 
-\[ u_{t}(x) \propto \exp\left\{-\frac{1}{\alpha}\overline{\theta}_{t}^T\phi(x)\right\}, \]
+\[ u_{t}(x) \propto \exp\left\{-\frac{1}{\tau}\overline{\theta}_{t}^T\phi(x)\right\}, \]
 where $\overline{\theta}_{t} = \frac{1}{t} \sum_{s \le t} \theta_{s}$. Hence, $h(u) + \bE_{u}[\theta^T\phi(x)] - R(\theta)$ is no longer maximized at the boundary (when $\tau > 0$). We can instead consider the following sequence of distributions:
 \begin{enumerate}
 \item $\theta_t \in \argmax_{\|\theta\|_1 \leq 1} \theta^T (\bE_{u_t}[\phi(x)]-\bar{\phi})$
