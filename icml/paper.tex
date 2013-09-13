@@ -278,14 +278,23 @@ to $\|\theta\|_2$ and write our loss function in the Lagrangian form:
 \[ L(\mu, \theta) = \theta^T\bE_{\mu}[\phi] - \theta^T\bar{\phi} - \frac{1}{2}\|\theta\|_2^2. \]
 Intriguingly, Algorithm 1 and Algorithm 2 are identical to each other for this choice of $L$ 
 (up to a change of index). In this case, $\mu_t = \delta_{x_t}$ for some $x_t$, and 
-the updates are the same as the standard herding updates. Let $r = \sup_{x} \|\phi(x)\|_2$; 
-then using the Algorithm 2 convergence bound gives us
+the updates are (for Algorithm 2):
+\begin{itemize}
+\item $x_t \in \arg\min_{x} \theta_t^T\phi(x)$
+\item $\theta_{t+1} = \frac{1}{A_t} \sum_{s=1}^t \alpha_s \phi(x)$.
+\end{itemize}
+These are the same as the standard herding updates when 
+$\alpha_t = 1$. Note that $R$ is strongly convex with respect to 
+$\|\cdot\|_2$, which is its own dual. Therefore, if we let
+$r = \sup_{x} \|\phi(x)\|_2$, then Corollary~\ref{cor:method-2} gives us
 \begin{align*}
-\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T \delta_{x_t}, \theta\right) &\leq \inf_{u^*} \sup_{\theta} L(u^*, \theta) + \frac{2R^2\log(T+1)}{T} \\
- &= \sup_{\theta} \inf_{u^*} L(u^*, \theta) + \frac{2R^2\log(T+1)}{T} \\
- &= \frac{2R^2\log(T+1)}{T}.
+\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T \delta_{x_t}, \theta\right) &\leq \inf_{u^*} \sup_{\theta} L(u^*, \theta) + \frac{2r^2\log(T+1)}{T} \\
+ &= \sup_{\theta} \inf_{u^*} L(u^*, \theta) + \frac{2r^2\log(T+1)}{T} \\
+ &= \frac{2r^2\log(T+1)}{T}.
 \end{align*}
 This is a slightly weaker version of the typical herding bound on MMD.
+Note that if we use $\alpha_t = t$, which corresponds to using a weighted 
+average, then we obtain a much stronger bound of $\frac{8r^2}{T^2}$ instead.
 
 \section{Herding in Infinite Dimensions}
 \label{sec:infinite-case}
@@ -293,43 +302,98 @@ This is a slightly weaker version of the typical herding bound on MMD.
 \section{Herding and Maximum Entropy}
 \label{sec:max-ent}
 
-Let us now consider the entropic regularizer $h(u) = \tau\bE_{u}[\log u(x)]$ with 
-\[ R(\theta) = \bE_{u}[\theta^T\bar{\phi}] + \left\{ \begin{array}{llc} \infty & : & \|\theta\|_1 > 1 \\ 0 & : & \|\theta\|_1 \leq 1 \end{array} \right.\]
-If we use Method 1, we then end up with 
-\[ u_{t}(x) \propto \exp\left\{-\frac{1}{\alpha}\overline{\theta}_{t}^T\phi(x)\right\}, \]
-where $\overline{\theta}_{t} = \frac{1}{t} \sum_{s \le t} \theta_{s}$. Hence, $h(u) + \bE_{\mu}[\theta^T\phi(x)] - R(\theta)$ is no longer maximized at the boundary (when $\tau > 0$). We can instead consider the following sequence of distributions:
-\begin{enumerate}
-\item $\theta_t \in \argmax_{\|\theta\|_1 \leq 1} \theta^T (\bE_{u_t}[\phi(x)]-\bar{\phi})$
-\item $u_{t+1}(x) = Z(\overline{\theta}_{t}, \tau)^{-1} \exp\left\{-\frac{1}{\tau}\overline{\theta}_{t}^T\phi(x)\right\}$
-\end{enumerate}
-Here $Z(\overline{\theta}_{t}, \tau) = \int\exp\left\{-\frac{1}{\tau}\overline{\theta}_{t}^T\phi(x)\right\} \dee x$. 
+Bach et al. have observed that herding appears to be approximately building 
+samples from the maximum entropy distribution for a given collection of moment 
+constraints. In this section we will make this connection more explicit 
+as well as draw other relationships between herding and maximum entropy.
 
-The entropic regularizer is not strongly convex but a more general analysis involving 
-Bregman divergence can nevertheless yield a convergence bound in this case. We thus 
-get something that looks like herding but actually gives us an exponential family 
-type distribution. In particular, we have a Gibbs distribution with temperature $\tau$, and 
-in the limit as the temperature goes to zero, we recover herding, since 
-\[ \lim_{\tau \to 0} u_{t+1}(x) = \delta_{x^{*}_{t+1}}, \]
-where $x^{*}_{t+1} = \argmin_{x} \overline{\theta}_{t}^T\phi(x)$. 
-This fact is reminiscent of Welling's original derivation of herding, in which 
-he took the zero temperature limit of the gradient descent algorithm for the optimization problem 
-\[ \argmin_{u} h(u) \quad \text{s.t.}~\bE_{u}[\phi(x)] - \bar\phi = 0. \]
-This optimization is quite similar to the entropic optimization considered here, which 
-we can write as 
+Suppose that instead of setting $h(u) = 0$ we set $h(u)$ to a small multiple of 
+the negative entropy: $h(u) = \eta \bE_{u}[\log u(x)]$. We will still use 
+$R(\theta) = \frac{1}{2}\|\theta\|_2^2$. In this case, Algorithm 2 gives the updates
+\begin{itemize}
+\item $u_t(x) \propto \exp\left(-\frac{1}{\eta}\theta_t^T\phi(x)\right)$
+\item $\theta_{t+1} = \bE_{\hat{u}_t}[\phi(x)]$.
+\end{itemize}
+Using Corollary~\ref{cor:method-2} gives us
 \begin{align*}
-\argmin_{u}& \argmax_{|\theta\|_1 \leq 1} h(u) + \theta^{T}(\bE_{u}[\phi(x)] - \bar \phi)  \\
-&= \argmin_{u} h(u) + \|\bE_{u}[\phi(x)] - \bar\phi\|_{2}. 
+\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T u_t, \theta\right) &\leq \inf_{u^*} \sup_{\theta} L(u^*, \theta) + \frac{2r^2\log(T+1)}{T} \\
+ &= \inf_{u^*} \left\{-\eta H(u^*) + \frac{1}{2}\|\bE_{u^*}[\phi(x)]-\bar{\phi}\|_2^2\right\} \\ &\phantom{=} + \frac{2r^2\log(T+1)}{T}.
 \end{align*}
-In the entropic formulation, the expectation constraint $\bE_{u}[\phi(x)] - \bar\phi = 0$ becomes
-soft, though the two optimizations are equivalent in the zero-temperature limit. 
+In particular, let $u^*$ be the maximum entropy distribution satisfying $\bE_{u^*}[\phi(x)] = \bar{\phi}$, 
+and let $H^*$ be the corresponding entropy. Then we have 
+\[ -\eta H(\hat{u}) + \|\bE_{\hat{u}}[\phi(x)]-\bar{\phi}\|_2^2 \leq -\eta H^* + \frac{2r^2\log(T+1)}{T}. \]
+Since $\|\cdot\|_2^2 \geq 0$, this implies that 
+\begin{equation}
+H(\hat{u}) \geq H^* - \frac{2r^2\log(T+1)}{\eta T},
+\end{equation}
+ and so asymptotically $\hat{u}$ has at least 
+as much entropy as $u^*$.
 
-We can view the entropic regularization
-with non-zero temperature as an alternative approximation to herding. If at each step we
-retain a sample $x_{t} \sim u_{t}$, then the sequence $(x_{t})_{t}$ converges to the 
-herding sample path as $\tau \to 0$. So $(x_{t})_{t}$ with non-zero temperature approximate
-herding samples. \NA{JHH: I'm not sure how useful this all is, other than to make contact with 
-the original paper, as I think the Gibbs distribution was exactly what Max was trying to 
-avoid by taking the zero-temperature limit.}
+Now, suppose that our state space has some finite size $S$, so 
+that no distribution has entropy greater than $\log(S)$. Then 
+we conclude that
+\begin{equation}
+\|\bE_{\hat{u}}[\phi(x)]-\bar{\phi}\|_2^2 \leq \eta[\log(S)-H^*] + \frac{2r^2\log(T+1)}{T}.
+\end{equation}
+
+If we let $\eta \to 0$ and $\eta T \to \infty$, then we obtain 
+a distribution $\hat{u}$ whose moments are arbitrarily close to 
+the moments of $u^*$, and whose entropy is almost as large as 
+(or larger than) the entropy of $u^*$. 
+
+% \begin{lemma}
+% blah
+% \end{lemma}
+% \begin{proof}
+% Let $L(u) = -H(u) + \sup_{\theta} \theta^T(\bE_{u}[\phi(x)]-\bar{\phi})$. 
+% Clearly $L$ is minimized at the maximum entropy distribution $u^*$ satisfying 
+% $\bE_{u}[\phi(x)] = \bar{\phi}$. Let $\theta^*$ be the natural parameters 
+% for $u^*$, then we can lower bound $L(u)$ by $-H(u^*) + (\theta^*)^T(\bE_{u}[\phi(x)]-\bar{\phi})$.
+% 
+% Since $-\lambda H(u) + \|\bE_{u}[\phi(x)]-\bar{\phi}\|_2^2$ is convex, we have
+% $-\lambda H(u) + \|\bE_{u}[\phi(x)]-\bar{\phi}\|_2^2 \geq -\lambda H(u_0) + \|\bE_{u_0}[\phi(x)]-\bar{\phi}\|_2^2 + (\bE_{u_0}[\phi(x)]-\bar{\phi})^T(u-u_0)$.
+% Setting $u = u^*$ yields
+% \[ -\lambda H(u_0) + \frac{1}{2} \|\bE_{u_0}[\phi(x)]-\bar{\phi}\|_2^2 + (\bE_{u_0}[\phi(x)]-\bar{\phi})^T(u-u_0) \leq -\lambda H(u^*). \]
+% 
+% \end{proof}
+
+%% Let us now consider the entropic regularizer $h(u) = \tau\bE_{u}[\log u(x)]$ with 
+%% \[ R(\theta) = \bE_{u}[\theta^T\bar{\phi}] + \left\{ \begin{array}{llc} \infty & : & \|\theta\|_1 > 1 \\ 0 & : & \|\theta\|_1 \leq 1 \end{array} \right.\]
+%% If we use Method 1, we then end up with 
+%% \[ u_{t}(x) \propto \exp\left\{-\frac{1}{\alpha}\overline{\theta}_{t}^T\phi(x)\right\}, \]
+%% where $\overline{\theta}_{t} = \frac{1}{t} \sum_{s \le t} \theta_{s}$. Hence, $h(u) + \bE_{\mu}[\theta^T\phi(x)] - R(\theta)$ is no longer maximized at the boundary (when $\tau > 0$). We can instead consider the following sequence of distributions:
+%% \begin{enumerate}
+%% \item $\theta_t \in \argmax_{\|\theta\|_1 \leq 1} \theta^T (\bE_{u_t}[\phi(x)]-\bar{\phi})$
+%% \item $u_{t+1}(x) = Z(\overline{\theta}_{t}, \tau)^{-1} \exp\left\{-\frac{1}{\tau}\overline{\theta}_{t}^T\phi(x)\right\}$
+%% \end{enumerate}
+%% Here $Z(\overline{\theta}_{t}, \tau) = \int\exp\left\{-\frac{1}{\tau}\overline{\theta}_{t}^T\phi(x)\right\} \dee x$. 
+%% 
+%% The entropic regularizer is not strongly convex but a more general analysis involving 
+%% Bregman divergence can nevertheless yield a convergence bound in this case. We thus 
+%% get something that looks like herding but actually gives us an exponential family 
+%% type distribution. In particular, we have a Gibbs distribution with temperature $\tau$, and 
+%% in the limit as the temperature goes to zero, we recover herding, since 
+%% \[ \lim_{\tau \to 0} u_{t+1}(x) = \delta_{x^{*}_{t+1}}, \]
+%% where $x^{*}_{t+1} = \argmin_{x} \overline{\theta}_{t}^T\phi(x)$. 
+%% This fact is reminiscent of Welling's original derivation of herding, in which 
+%% he took the zero temperature limit of the gradient descent algorithm for the optimization problem 
+%% \[ \argmin_{u} h(u) \quad \text{s.t.}~\bE_{u}[\phi(x)] - \bar\phi = 0. \]
+%% This optimization is quite similar to the entropic optimization considered here, which 
+%% we can write as 
+%% \begin{align*}
+%% \argmin_{u}& \argmax_{|\theta\|_1 \leq 1} h(u) + \theta^{T}(\bE_{u}[\phi(x)] - \bar \phi)  \\
+%% &= \argmin_{u} h(u) + \|\bE_{u}[\phi(x)] - \bar\phi\|_{2}. 
+%% \end{align*}
+%% In the entropic formulation, the expectation constraint $\bE_{u}[\phi(x)] - \bar\phi = 0$ becomes
+%% soft, though the two optimizations are equivalent in the zero-temperature limit. 
+%% 
+%% We can view the entropic regularization
+%% with non-zero temperature as an alternative approximation to herding. If at each step we
+%% retain a sample $x_{t} \sim u_{t}$, then the sequence $(x_{t})_{t}$ converges to the 
+%% herding sample path as $\tau \to 0$. So $(x_{t})_{t}$ with non-zero temperature approximate
+%% herding samples. \NA{JHH: I'm not sure how useful this all is, other than to make contact with 
+%% the original paper, as I think the Gibbs distribution was exactly what Max was trying to 
+%% avoid by taking the zero-temperature limit.}
 
 \section{Conclusion}
 \label{sec:conclusion}
