@@ -1,0 +1,178 @@
+\documentclass[reqno,oneside,a4paper]{amsart}
+%\usepackage{jhh-misc}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{epsfig}
+\usepackage{framed}
+\usepackage{natbib}
+\usepackage{subfig}
+\usepackage{xspace}
+\usepackage[normalem]{ulem}
+
+\input{latex-defs.tex}
+% inner product command
+\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
+\def\[#1\]{\begin{align}#1\end{align}}
+
+\begin{document}
+
+\title{Convex Optimization: A Very Short and Incomplete Summary} 
+\author{Jonathan Huggins}
+\date{\today}
+
+\maketitle
+
+\section{Introduction}
+
+Roughly speaking, we are interested in the following optimization problem:
+\[ 
+\max_{x} h(x) + f(x),
+\]
+where $h$ and $f$ are convex, and generally have other properties that aid in fast convergence of optimization algorithms. We assume throughout that all functions are convex. In this document we first outline key concepts. We then state some important lemmas. Finally we give a summary of some important convex optimization algorithms. These notes are based on S\'ebastian Bubeck's excellent notes for his Complexities of Optimization class\footnote{\url{https://blogs.princeton.edu/imabandit/orf523-the-complexities-of-optimization/}} and Francis Bach's ``Duality between subgradient and conditional gradient methods.''\footnote{\url{http://arxiv.org/abs/1211.6302}}
+
+\section{Key Concepts}
+
+\subsection{Conjugates and Gradients}
+
+When the domain of $f$ is Banach space, we can define the convex conjugate of $f$
+\[
+f^{*}(y) \defined \max_{x} \ip{x}{y} - f(x).
+\]
+If $f$ is lower semi-continuous, then by the Fenchel-Moreau theorem $f = f^{**}$, i.e.
+\[
+f(x) = \max_{y} \ip{x}{y} - f^{*}(y).
+\]
+Furthermore, the gradients of $f^{*}$ and $f$ can be defined as any argument that maximize the previous two equations:
+\[
+\partial f^{*}(y) &\in \argmax_{x} \ip{x}{y} - f(x) \\
+\partial f(x) &\in \argmax_{y} \ip{x}{y} - f^{*}(y).
+\]
+
+\subsection{Smoothness, Convexity, Distance} 
+We say a function $f$ is $\alpha$-strongly convex if 
+\[
+f(x)  - f(y) \le \ip{\partial f(x)}{x-y} - \frac{\alpha}{2}\|x - y\|^{2}.
+\]
+We say a (possibly non-convex) function $g$ is $\beta$-smooth if 
+\[
+\|\partial g(x) - \partial g(y) \| \le \beta \| x - y\|.
+\]
+
+
+Another useful notion is Bregman divergence: 
+\[
+D(x,y) \defined f(x) - f(y) - \ip{\partial f(y)}{x - y}.
+\]
+
+\NA{JHH: more on Bregman divergence}
+
+\section{Useful Facts}
+
+Here we gather a few useful lemmas.
+
+\blem
+If (possibly non-convex) $g$ is $\beta$-smooth, then 
+\[
+|g(x)  - g(y) - \ip{\partial g(y)}{x-y}| \le \frac{\beta}{2}\|x - y\|^{2}
+\]
+\elem
+\bprf \NA{JHH: prove this} \eprf
+\blem
+If $f$ is convex and $\beta$-smooth, then 
+\[
+f(x)  - f(y) \le \ip{\partial f(x)}{x-y} - \frac{1}{2\beta}\|\partial f(x) - \partial f(y)\|^{2}
+\]
+\elem
+\bprf \NA{JHH: prove this} \eprf
+\blem A convex function $f$ is $\alpha$-strongly convex $\iff$ $f^{*}$ is $(1/\alpha)$-smooth. \elem
+\bprf \NA{JHH: prove this} \eprf
+
+\section{Convex Optimization Algorithms}
+
+The algorithms, along with conditions on the functions and convergence rates, are summarized in the table on the next page. Here we define some of the notation used in specific algorithms. In projected gradient descent $\eta_{t} = 2/\alpha(t+1)$. In Nesterov's accelerated gradient descent,
+\[
+\lambda_{0} &= 0 \\
+\lambda_{t} &= \frac{1 + \sqrt{1 + 4\lambda_{t-1}^{2}}}{2} \\
+\gamma_{t}  &= \frac{1 - \lambda_{t}}{\lambda_{t+1}}.
+\]
+In mirror descent and conditional gradient descent $\rho_{t} = 2/(t + 1)$. Finally, in boosted mirror descent
+\[
+\alpha_{s} &= s \\
+A_{t} &= \sum_{s=1}^{t} \alpha_{s} = t(t+1)/2 \\
+\bar x_{t} &= A_{t}^{-1} \sum_{s=1}^{t} \alpha_{s}x_{s} \\
+\bar y_{t} &= A_{t}^{-1} \sum_{s=1}^{t} \alpha_{s}y_{s}
+\]
+
+\begin{landscape}
+
+\begin{table}[htdp]
+\begin{center}
+\begin{tabular}{|l|p{4.05cm}|p{4.05cm}|p{4.05cm}|p{4.05cm}|}
+\hline & Gradient Descent & Projected Subgrad. Desc. & Conditional Grad. Desc. & Nesterov's Accelerated Grad. Desc.   \\ 
+\hline
+Objective function  &
+$f(x)$ &
+$f(x)$ &
+$-h^{*}(y) - f^{*}(y)$ &
+$f(x)$ \\
+\hline
+Conditions & 
+$f$ is $\beta$-smooth &
+$f$ is $\alpha$-s.c., $\|\partial f\| \le L$, and space is compact. & 
+$f$ is L.c. and $h$ is $\alpha$-s.c. &
+$f$ is $\beta$-smooth \\
+\hline
+Update equations &
+$x_{t+1} = x_{t} - \frac{1}{\beta}\partial f(x_{t})$ &
+$y_{t+1} = x_{t} - \eta_{t}\partial f(x_{t})$ and $x_{t+1} = \argmax_{x} \| x - y_{t+1} \|$ &
+$x_{t} = \partial h^{*}(-y_{t})$ and $\bar y_{t} = \partial f(x_{t})$ and $y_{t+1} = (1 - \rho_{t})y_{t} + \rho_{t} \bar y_{t}$&
+$y_{t+1} = x_{t} - \frac{1}{\beta}\partial f(x_{t})$ and $x_{t+1} = (1- \gamma_{t})y_{t+1} + \gamma_{t}y_{t}$ \\
+\hline
+Convergence rate &
+$\beta R^{2}/t$ &
+$L^{2} / \alpha t$ &
+$R^{2} / \alpha t$ &
+$\beta R^{2}/t^{2}$ \\
+\hline
+\end{tabular}
+\caption{Convex optimization algorithms (gradient descent type). The function $f$ and $g$ are assumed to be convex. Constants are not given in convergence rates. Here $R$ is the radius of the metric space. Shorthands: L.c. = Lipschitz continuous, s.c. = strongly convex. }
+\label{table:gd-convex-opt-algs}
+\end{center}
+\end{table}
+
+\begin{table}[htdp]
+\begin{center}
+\begin{tabular}{|l|p{5.5cm}|p{5.5cm}|p{5.5cm}|}
+\hline & Mirror Descent & ``Primal'' Boosted Mirror Descent & ``Dual'' Boosted Mirror Descent  \\ 
+\hline
+Objective function & 
+$h(x) + f(x)$ & 
+$h(x) + f^{*}(x)$ & 
+$h(x) + f^{*}(x)$ \\
+\hline
+Conditions & 
+$h$ is smooth \& $\alpha$-s.c. and $f$ is L.c. & 
+$h$ is $\alpha$-s.c. and $f^{*}$ is convex& 
+$f^{*}$ is $\beta$-smooth and covex \\
+\hline
+Update equations & 
+$y_{t} = \partial f(x_{t})$ and 
+$x_{t+1} = \argmin_{x} h(x) - (1 - \rho_{t})\ip{\partial h(x_{t})}{x} + \rho_{t+1}\ip{y_{t}}{x}$ &
+$x_{t} = \partial h^{*}(-\bar y_{t})$ and $y_{t+1} = \partial f^{*}(x_{t})$ & 
+$x_{t} = \partial h^{*}(-y_{t})$ and $y_{t+1} = \partial f^{*}(\bar x_{t})$ \\
+\hline
+Convergence rate & 
+$R^{2}/\alpha t$ & 
+$R^{2}/\alpha t$ & 
+$\beta R^{2} / t$ \\
+\hline
+
+\end{tabular}
+\caption{Convex optimization algorithms (mirror descent type). See Table \ref{table:gd-convex-opt-algs} for conventions. \NA{JHH: should add ISTA and FISTA} }
+\end{center}
+\label{table:md-convex-opt-algs}
+\end{table}
+
+\end{landscape}
+\end{document}
+

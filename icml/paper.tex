@@ -323,7 +323,8 @@ Intriguingly, Algorithm 1 and Algorithm 2 are identical to each other for this c
 the updates are (for Algorithm 2):
 \begin{itemize}
 \item $x_t \in \arg\min_{x} \theta_t^T\phi(x)$
-\item $\theta_{t+1} = \frac{1}{A_t} \sum_{s=1}^t \alpha_s \phi(x)$.
+\item $\theta_{t+1} = \frac{1}{A_t} \sum_{s=1}^t \alpha_s \phi(x_{s}) - \bar \phi$.
+%\item $\theta_{t+1} = \frac{1}{A_t} \sum_{s=1}^t \alpha_s \phi(x)$.
 \end{itemize}
 These are the same as the standard herding updates when 
 $\alpha_t = 1$. Note that $R$ is strongly convex with respect to 
