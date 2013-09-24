@@ -40,20 +40,26 @@ TODO
 
 \NA{JHH: I'm thinking that from the beginning we should let $u$ be defined over a different space than $\theta$ and assume a linear map $u \mapsto \eta(u) \in \Theta$. Then write $\langle \theta, \eta(u) \rangle$ so the setup will align with the herding case, where $\eta(u) = \bE_{u}[\phi(x)]$. }
 
-Consider the following loss function:
+Let $U$ and $\Theta$ be convex subsets of two Hilbert spaces $\sH_{U}$ and $\sH_{\Theta}$ and 
+let $i : U \to \Theta$ be a linear map from 
+$U$ to $\Theta$ that preserves the inner product. Consider the following loss function 
+$L : U \to \bR$:
 \begin{equation}
-L(u) = h(u) + \max_{\theta \in \Theta} \left\{\langle \theta, u \rangle - R(\theta) \right\}.
+L(u) = h(u) + \max_{\theta \in \Theta} \left\{\langle \theta, i(u) \rangle - R(\theta) \right\}.
 \end{equation}
 We can think of $h$ as a \emph{primal regularizer} and $R$ as a \emph{dual regularizer}. 
 
 Examples:
 \begin{itemize}
-\item Let $h(u) = 0$ and $R(\theta) = \langle \theta, u_0 \rangle$. Then $L(u)$ is the 
-      \emph{maximum mean discrepancy} between $u$ and $u_0$ 
-      relative to $\Theta$.
-\item Let $h(u) = 0$ and $R(\theta) = S^*(\theta)$ where $S^*$ is the Fenchel conjugate of 
-      any strongly convex function $S$. Then $L(u) = S(u)$.
-\item Let $h(u) = \|u\|_1$, $R(u) = \langle \theta, u_0 \rangle + \frac{1}{2} \|\theta\|_2^2$. 
+\item Let $U$ be the probability simplex over a space $\sX$, let $\phi : \sX \to \bR^d$ be a collection 
+      of statistics, and let $\Theta$ be the unit $L^1$ ball in $\bR^d$. Let $h(u) = 0$, 
+      $\langle \theta, i(u) \rangle = \bE_u[\theta^T\phi(x)]$, and 
+      $R(\theta) = \langle \theta, i(u_0) \rangle$. Then $L(u)$ is the 
+      \emph{maximum mean discrepancy} between $u$ and $u_0$ relative to $\phi$.
+\item Let $h(u) = 0$ and $R(\theta) = S^*(i^{-1}(\theta))$ where $S^*$ is the 
+      Fenchel conjugate of any strongly convex function $S : U \to \bR$. Then $L(u) = S(u)$ 
+      as long as $i^{-1}(\Theta) = \sH_{U}$.
+\item Let $U = \Theta = \bR^d$. Let $h(u) = \|u\|_1$, $R(u) = \langle \theta, u_0 \rangle + \frac{1}{2} \|\theta\|_2^2$. 
       Then $L(u) = \|u\|_1 + \frac{1}{2} \|u-u_0\|_2^2$. 
 \end{itemize}
 
@@ -64,10 +70,10 @@ be interpreted as boosted mirror descent.
 First, let us generalize the setting 
 to consider a \emph{two-argument} loss function
 \begin{equation}
-L(u,\theta) = h(u) + \langle \theta, u \rangle - R(\theta).
+L(u,\theta) = h(u) + \langle \theta, i(u) \rangle - R(\theta).
 \end{equation}
 We will assume throughout that $h$ and $R$ are both convex functions, 
-and furthermore that $\arg\max_{u} h(u) + \theta^Tu$ can be efficiently 
+and furthermore that $\arg\max_{u} h(u) + \langle \theta, i(u) \rangle$ can be efficiently 
 computed for all values of $\theta$.
 
 Mirror descent, together with boosting, yields an algorithm for finding 
@@ -77,8 +83,8 @@ let $\hat{u}_t = \frac{\sum_{s=1}^t \alpha_su_s}{\sum_{s=1}^t \alpha_s}$ and let
 $\hat{\theta}_t = \frac{\sum_{s=1}^t \alpha_s\theta_s}{\sum_{s=1}^t \alpha_s}$.
 \begin{enumerate}
 \item $u_1 \in \arg\min_u h(u)$
-\item $\theta_{t} \in \arg\max_{\theta \in \Theta} \langle \theta, u_t \rangle - R(\theta)$
-\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \hat{\theta}_t, u \rangle$
+\item $\theta_{t} \in \arg\max_{\theta \in \Theta} \langle \theta, i(u_t) \rangle - R(\theta)$
+\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \hat{\theta}_t, i(u) \rangle$
 %\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$
 \end{enumerate}
 As long as $h$ is strongly convex, we obtain the 
@@ -91,9 +97,9 @@ However, it is often the case that $h$ is not strongly convex, whereas $R$ is st
 we may wish to use the following slightly different algorithm (called Algorithm 2):
 \begin{enumerate}
 \item $\theta_1 \in \arg\min_{\theta} R(\theta)$
-\item $u_t \in \arg\min_{u} h(u) + \langle \theta_t, u \rangle$
+\item $u_t \in \arg\min_{u} h(u) + \langle \theta_t, i(u) \rangle$
 %\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \frac{1}{t} \sum_{s \leq t} u_s \rangle - R(\theta)$
-\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \hat{u}_t \rangle - R(\theta)$
+\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, i(\hat{u}_t) \rangle - R(\theta)$
 \end{enumerate}
 We then obtain the following bound 
 when $R$ is strongly convex (see Corollary~\ref{cor:method-2}):
@@ -101,6 +107,9 @@ when $R$ is strongly convex (see Corollary~\ref{cor:method-2}):
 Algorithm 1 and Algorithm 2 are closely related; indeed, they are dual to each other 
 (performing Algorithm 1 on $L(u,\theta)$ is the same as performing Algorithm 2 on 
 $-L(\theta,u)$).
+
+For convenience, we will abuse notation and use $\langle \theta, u \rangle$ in place of 
+$\langle \theta, i(u) \rangle$ when the map $i$ is clear from context.
 
 \section{Convergence Proofs}
 \label{sec:proofs}
