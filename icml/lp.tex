@@ -1,0 +1,81 @@
+\documentclass[reqno,oneside,a4paper]{amsart}
+%\usepackage{jhh-misc}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{epsfig}
+\usepackage{framed}
+\usepackage{natbib}
+\usepackage{subfig}
+\usepackage{xspace}
+\usepackage[normalem]{ulem}
+
+\input{latex-defs.tex}
+% inner product command
+\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
+\def\[#1\]{\begin{align}#1\end{align}}
+
+\begin{document}
+
+\title{Herding convergence for $L^p$ norm} 
+\author{Jacob Steinhardt}
+\date{\today}
+
+\maketitle
+
+Suppose that we have the loss function $L(u) = \frac{1}{p} \|u-u^*\|_p^p$, where $p > 1$. 
+We will show that a modified herding algorithm approaches $u^*$ at a rate of $O(1/T)$.
+
+First, note that $L(u) = \sup_{\theta \in \bR^d} \ip{u-u^*}{\theta} - \frac{1}{q} \|\theta\|_q^q$, 
+for $\frac{1}{p} + \frac{1}{q} = 1$ (see Lemma 1).
+
+Now, if we perform herding updates with $R(\theta) = \ip{u^*}{\theta} + \frac{1}{q}\|\theta\|_q^q$, we 
+get a convergence rate of
+\[ \sum_{t=1}^T \alpha_t D_{R^*}(\hat{u}_{t+1} \| \hat{u}_t). \]
+The key part of our argument is to analyze $D_{R^*}(\hat{u}_{t+1} \| \hat{u}_t)$. For convenience, 
+let $x = \hat{u}_{t+1}-u^*$, $y = \hat{u}_t-u^*$, and $z = u_{t+1}-u^*$.
+First, note that 
+\begin{align*}
+D_{R^*}(\hat{u}_{t+1} \| \hat{u}_t) &= \frac{1}{p} \sum_{i=1}^d x_i^p-py_i^{p-1}(x_i-y_i)-y_i^p \\
+ &= \frac{1}{p} \sum_{i=1}^d (x_i-y_i)\left(\sum_{r=0}^{p-2} y_i^rx_i^{p-r-1}-y_i^{p-1}\right) \\
+ &= \frac{1}{p} \sum_{i=1}^d (x_i-y_i)^2 \left(\sum_{r=0}^{p-2} \sum_{s=0}^{p-r-2} y_i^ry_i^sx_i^{p-(r+s)-2}\right) \\
+ &= \frac{1}{p} \sum_{i=1}^d (x_i-y_i)^2 \left(\sum_{r+s=0}^{p-2} y_i^{r+s}x_i^{p-(r+s)-2}\right) \\
+ &= \frac{1}{p} \sum_{i=1}^d (x_i-y_i)^2 \left(\sum_{t=0}^{p-2} (t+1)y_i^{t}x_i^{p-t-2}\right).
+\end{align*}
+Now as a side calculation, we have $y_i = \frac{1}{A_t}\sum_{s \leq t} \alpha_s (u_{i,s}-u^*)$ 
+and $x_i = \frac{1}{A_{t+1}} \sum_{s \leq t+1} \alpha_s (u_{i,s}-u^*)$. If we simplify we get
+$(x_i-y_i)^2 = \frac{\alpha_{t+1}^2}{A_{t+1}^2} (y_i-z_i)^2$. Therefore, we have
+\begin{align*}
+\lefteqn{\frac{1}{p} \sum_{i=1}^d (x_i-y_i)^2 \left(\sum_{t=0}^{p-2} (t+1)y_i^{t}x_i^{p-t-2}\right)} \\
+ &\leq \frac{\alpha_{t+1}^2}{p A_{t+1}^2} \sum_{t=0}^{p-2} \sum_{i=1}^d 2(t+1)(y_i^2+z_i^2)y_i^{t}x_i^{p-t-2}.
+\end{align*}
+This latter sum has $4\binom{p}{2}$ terms in it, each of the form $\sum_{i=1}^d x_i^ay_i^bz_i^c$ where $a+b+c=p$. 
+But we have $x_i^ay_i^bz_i^c \leq \frac{ax_i^p+by_i^p+cz_i^p}{p}$, so $\sum_{i=1}^d x_i^ay_i^bz_i^c \leq \max(\|x\|_p^p, \|y\|_p^p, \|z\|_p^p)$.
+Therefore, we obtain the bound
+\begin{align*}
+\lefteqn{\frac{1}{p} \sum_{i=1}^d (x_i-y_i)^2 \left(\sum_{t=0}^{p-2} (t+1)y_i^{t}x_i^{p-t-2}\right)} \\
+ &\leq \frac{4\alpha_{t+1}^2}{p A_{t+1}^2}\binom{p}{2} \sup_{u \in U} \|u-u^*\|_p^p \\
+ &= \frac{2\alpha_{t+1}^2(p-1)(2r_p)^p}{A_{t+1}^2}.
+\end{align*}
+This yields an overall bound of $\frac{8(p-1)(2r_p)^p}{T}$ for the step size $\alpha_t = t$.
+\begin{remark}
+We can probably shave the $2r_p$ down to just $r_p$ if we're more careful with this argument.
+\end{remark}
+\begin{remark}
+This appears to work for any $p > 1$.
+\end{remark}
+
+\section{Proof of Lemma 1}
+We want to compute $\sup_{\theta \in \bR^d} \ip{u-u^*}{\theta} - \frac{1}{q} \|\theta\|_q^q$. To do this, 
+we will take the derivative with respect to $\theta_i$ and set it to $0$, which yields:
+\[ u_i - u_i^* = \theta_i^{q-1}. \]
+Therefore, we have
+\[ \theta_i = \left(u_i-u_i^*\right)^{\frac{1}{q-1}}. \]
+Plugging back in, we get
+\begin{align*}
+\ip{u-u^*}{\theta} - \frac{1}{q} \|\theta\|_q^q &= \sum_{i=1}^d (u_i-u_i^*)^{\frac{q}{q-1}} \cdot \left(1-\frac{1}{q}\right) \\
+ &= \frac{1}{p} \|u-u^*\|_p^p,
+\end{align*}
+as was to be shown.
+
+\end{document}
+
