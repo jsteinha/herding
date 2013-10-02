@@ -99,8 +99,8 @@ In mirror descent and conditional gradient descent $\rho_{t} = 2/(t + 1)$. Final
 \[
 \alpha_{s} &= s \\
 A_{t} &= \sum_{s=1}^{t} \alpha_{s} = t(t+1)/2 \\
-\bar x_{t} &= A_{t}^{-1} \sum_{s=1}^{t} \alpha_{s}x_{s} \\
-\bar y_{t} &= A_{t}^{-1} \sum_{s=1}^{t} \alpha_{s}y_{s}
+\bar u_{t} &= A_{t}^{-1} \sum_{s=1}^{t} \alpha_{s}u_{s} \\
+\bar \theta_{t} &= A_{t}^{-1} \sum_{s=1}^{t} \alpha_{s}\theta_{s}
 \]
 
 \begin{landscape}
@@ -113,7 +113,7 @@ A_{t} &= \sum_{s=1}^{t} \alpha_{s} = t(t+1)/2 \\
 Objective function  &
 $f(x)$ &
 $f(x)$ &
-$-h^{*}(y) - f^{*}(y)$ &
+$h^{*}(y) + f^{*}(y)$ &
 $f(x)$ \\
 \hline
 Conditions & 
@@ -125,7 +125,7 @@ $f$ is $\beta$-smooth \\
 Update equations &
 $x_{t+1} = x_{t} - \frac{1}{\beta}\partial f(x_{t})$ &
 $y_{t+1} = x_{t} - \eta_{t}\partial f(x_{t})$ and $x_{t+1} = \argmax_{x} \| x - y_{t+1} \|$ &
-$x_{t} = \partial h^{*}(-y_{t})$ and $\bar y_{t} = \partial f(x_{t})$ and $y_{t+1} = (1 - \rho_{t})y_{t} + \rho_{t} \bar y_{t}$&
+$x_{t} = \partial h^{*}(-\bar y_{t})$ and $y_{t+1} = \partial f(x_{t})$ and $\bar y_{t+1} = (1 - \rho_{t})\bar y_{t} + \rho_{t} y_{t+1}$&
 $y_{t+1} = x_{t} - \frac{1}{\beta}\partial f(x_{t})$ and $x_{t+1} = (1- \gamma_{t})y_{t+1} + \gamma_{t}y_{t}$ \\
 \hline
 Convergence rate &
@@ -147,19 +147,19 @@ $\beta R^{2}/t^{2}$ \\
 \hline
 Objective function & 
 $h(x) + f(x)$ & 
-$h(x) + f^{*}(x)$ & 
-$h(x) + f^{*}(x)$ \\
+$g(x) + R^{*}(x)$ & 
+$g(x) + R^{*}(x)$ \\
 \hline
 Conditions & 
 $h$ is smooth \& $\alpha$-s.c. and $f$ is L.c. & 
-$h$ is $\alpha$-s.c. and $f^{*}$ is convex& 
-$f^{*}$ is $\beta$-smooth and covex \\
+$g$ is $\alpha$-s.c.& 
+$R^{*}$ is $\beta$-smooth \\
 \hline
 Update equations & 
 $y_{t} = \partial f(x_{t})$ and 
-$x_{t+1} = \argmin_{x} h(x) - (1 - \rho_{t})\ip{\partial h(x_{t})}{x} + \rho_{t+1}\ip{y_{t}}{x}$ &
-$x_{t} = \partial h^{*}(-\bar y_{t})$ and $y_{t+1} = \partial f^{*}(x_{t})$ & 
-$x_{t} = \partial h^{*}(-y_{t})$ and $y_{t+1} = \partial f^{*}(\bar x_{t})$ \\
+$x_{t+1} = \argmin_{x} h(x) - (1 - \rho_{t+1})\ip{\partial h(x_{t})}{x} + \rho_{t+1}\ip{y_{t}}{x}$ &
+$u_{t} = \partial g^{*}(-\bar \theta_{t})$ and $\theta_{t+1} = \partial R^{*}(u_{t})$ & 
+$u_{t} = \partial g^{*}(-\theta_{t})$ and $\theta_{t+1} = \partial R^{*}(\bar u_{t})$ \\
 \hline
 Convergence rate & 
 $R^{2}/\alpha t$ & 
@@ -174,5 +174,25 @@ $\beta R^{2} / t$ \\
 \end{table}
 
 \end{landscape}
+
+
+\section{CGD, MD, and Boosted MD}
+
+The Boosted Mirror Descent algorithms are very closely related to Conditional Gradient Descent and Mirror Descent. Dual BMD and CGD are related as follows. BMD minimizes $g + R^{*}$ while CGD minimizes $h^{*} + f^{*}$. Make the identifications $h^{*} = R^{*}$ and $f^{*} = g$. Note that $R^{*}$ is $\beta$-smooth $\iff R$ is $(1/\beta)$-strongly convex $\iff h$ is $(1/\beta)$-strongly convex, so the conditions on the functions being optimized are equivalent. Then with $\rho_{t} = \alpha_{t+1}/A_{t+1}$, we can rewrite the CGD updates  as 
+\[
+x_{t} &= \partial R^{*}(-\bar y_{t})  \\
+y_{t} &= \partial g^{*}(x_{t}) \\
+\bar y_{t+1} &= A_{t+1}^{-1}\sum_{s \le t+1} \alpha_{t} y_{t},
+\]
+which is identical to the dual BMD if we make the substitutions $x_{t} \to -\theta_{t}$ and $y_{t} \to -u_{t}$. 
+
+We similarly relate Primal BMD and Mirror Descent. BMD minimizes $g + R^{*}$ while CGD minimizes $h + f$. Make the identifications $h = g$ and $f = R^{*}$ and note the conditions of $h$ and $g$ are the same. Letting $\rho_{t+1} = \alpha_{t}/A_{t}$, we can rewrite the Mirror Descent updates as 
+\[
+y_{t} &= \partial R^{*}(x_{t}) \\
+x_{t+1} &= \partial g^{*}((1 - \rho_{t+1})\partial g(x_{t}) - \rho_{t+1}y_{t}) \\
+&= \partial g^{*}(-\bar y_{t}), 
+\]
+where $\bar y_{t}$ is the same as above. Making the substitutions $y_{t} \to \theta_{t}$ and $x_{t} \to u_{t}$ completes the identification of the two methods. 
+
 \end{document}
 
