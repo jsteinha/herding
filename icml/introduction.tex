@@ -1,0 +1,77 @@
+\documentclass[paper.tex]{subfiles}
+\begin{document}
+\section{Boosted Mirror Descent}
+\label{sec:algorithm}
+
+Let $U$ and $\Theta$ be convex subsets of two Banach spaces $\sB_{U}$ and $\sB_{\Theta}$ and 
+let $\imath : U \to \Theta$ be a linear map from 
+$U$ to $\Theta$ that preserves the inner product. Consider the following loss function 
+$L : U \to \bR$:
+\begin{equation}
+L(u) = h(u) + \max_{\theta \in \Theta} \left\{\langle \theta, \imath(u) \rangle - R(\theta) \right\}.
+\end{equation}
+We can think of $h$ as a \emph{primal regularizer} and $R$ as a \emph{dual regularizer}. 
+
+Examples:
+\begin{itemize}
+\item Let $U$ be the probability simplex over a space $\sX$, let $\phi : \sX \to \bR^d$ be a collection 
+      of statistics, and let $\Theta$ be the unit $L^1$ ball in $\bR^d$. Let $h(u) = 0$, 
+      $\langle \theta, \imath(u) \rangle = \bE_u[\theta^T\phi(x)]$, and 
+      $R(\theta) = \langle \theta, \imath(u_0) \rangle$. Then $L(u)$ is the 
+      \emph{maximum mean discrepancy} between $u$ and $u_0$ relative to $\phi$.
+\item Let $h(u) = 0$ and $R(\theta) = S^*(i^{-1}(\theta))$ where $S^*$ is the 
+      Fenchel conjugate of any strongly convex function $S : U \to \bR$. Then $L(u) = S(u)$ 
+      as long as $i^{-1}(\Theta) = \sB_{U}$.
+\item Let $U = \Theta = \bR^d$. Let $h(u) = \|u\|_1$, $R(u) = \langle \theta, u_0 \rangle + \frac{1}{2} \|\theta\|_2^2$. 
+      Then $L(u) = \|u\|_1 + \frac{1}{2} \|u-u_0\|_2^2$. 
+\end{itemize}
+
+In this paper we will consider a family of methods for minimizing $L(u)$, 
+which are based on Bach's generalization of the Frank-Wolfe algorithm and can 
+be interpreted as boosted mirror descent.
+
+First, let us generalize the setting 
+to consider a \emph{two-argument} loss function
+\begin{equation}
+L(u,\theta) = h(u) + \langle \theta, \imath(u) \rangle - R(\theta).
+\end{equation}
+We will assume throughout that $h$ and $R$ are both convex functions, 
+and furthermore that $\arg\max_{u} h(u) + \langle \theta, \imath(u) \rangle$ can be efficiently 
+computed for all values of $\theta$.
+
+Mirror descent, together with boosting, yields an algorithm for finding 
+``saddle points'' of $L$. It is the following algorithm (called Algorithm 1).
+For notational convenience, for a sequence of weights $\alpha_1,\alpha_2,\ldots$ 
+let $\hat{u}_t = \frac{\sum_{s=1}^t \alpha_su_s}{\sum_{s=1}^t \alpha_s}$ and let 
+$\hat{\theta}_t = \frac{\sum_{s=1}^t \alpha_s\theta_s}{\sum_{s=1}^t \alpha_s}$.
+\begin{enumerate}
+\item $u_1 \in \arg\min_u h(u)$
+\item $\theta_{t} \in \arg\max_{\theta \in \Theta} \langle \theta, \imath(u_t) \rangle - R(\theta)$
+\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \hat{\theta}_t, \imath(u) \rangle$
+%\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$
+\end{enumerate}
+As long as $h$ is strongly convex, we obtain the 
+bound (see Corollary~\ref{cor:method-1}):
+\begin{equation}
+\sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/T).
+\end{equation}
+In other words, $\hat{u}_T$ is close to being a global minimum of $L$.
+However, it is often the case that $h$ is not strongly convex, whereas $R$ is strongly convex. In this case 
+we may wish to use the following slightly different algorithm (called Algorithm 2):
+\begin{enumerate}
+\item $\theta_1 \in \arg\min_{\theta} R(\theta)$
+\item $u_t \in \arg\min_{u} h(u) + \langle \theta_t, \imath(u) \rangle$
+%\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \frac{1}{t} \sum_{s \leq t} u_s \rangle - R(\theta)$
+\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \imath(\hat{u}_t) \rangle - R(\theta)$
+\end{enumerate}
+We then obtain the following bound 
+when $R$ is strongly convex (see Corollary~\ref{cor:method-2}):
+\[ \sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/T). \]
+Algorithm 1 and Algorithm 2 are closely related; indeed, they are dual to each other 
+(performing Algorithm 1 on $L(u,\theta)$ is the same as performing Algorithm 2 on 
+$-L(\theta,u)$).
+
+For convenience, we will abuse notation and use $\langle \theta, u \rangle$ in place of 
+$\langle \theta, \imath(u) \rangle$ when the map $i$ is clear from context.
+
+\end{document}

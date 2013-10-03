@@ -1,0 +1,88 @@
+\documentclass[paper.tex]{subfiles}
+\begin{document}
+\section{Application to Herding}
+\label{sec:herding}
+
+\NA{JHH: Need to specify the spaces we are working with here.}
+Suppose we are given a family of features $\phi$ together 
+with a known value $\bar{\phi}$ for $\bE_{u}[\phi]$. We 
+would like to construct a distribution that approximately 
+matches this distribution, i.e.~one for which 
+$\bE_{\hat{u}}[\phi] \approx \bar{\phi}$. A natural way 
+to do this is by using boosted mirror descent to minimize the 
+maximum mean discrepancy relative to $\phi$; 
+in other words, to minimize
+\[ L(u) = \max_{i \in \{1,\dots,d\}} |\bE_{u}[\phi_i]-\bar{\phi}_i|. \]
+If we wish to write this more similarly to the original problem 
+formulation, we can write
+\[ L(u) = \sup_{\|\theta\|_1 \leq 1} \theta^T(\bE_{u}[\phi]-\bar{\phi}). \]
+One issue is that $\|\theta\|_1$ is not strongly convex, so we relax $\|\theta\|_1$ 
+to $\|\theta\|_2$ and write our loss function in the Lagrangian form:
+\[ L(u, \theta) = \theta^T\bE_{u}[\phi] - \theta^T\bar{\phi} - \frac{1}{2}\|\theta\|_2^2. \]
+Intriguingly, Algorithm 1 and Algorithm 2 are identical to each other for this choice of $L$ 
+(up to a change of index). In this case, $u_t = \delta_{x_t}$ for some $x_t$, and 
+the updates are (for Algorithm 2):
+\begin{itemize}
+\item $x_t \in \arg\min_{x} \theta_t^T\phi(x)$
+\item $\theta_{t+1} = \frac{1}{A_t} \sum_{s=1}^t \alpha_s \phi(x_{s}) - \bar \phi$.
+%\item $\theta_{t+1} = \frac{1}{A_t} \sum_{s=1}^t \alpha_s \phi(x)$.
+\end{itemize}
+These are the same as the standard herding updates when 
+$\alpha_t = 1$. Note that $R$ is strongly convex with respect to 
+$\|\cdot\|_2$, which is its own dual. Therefore, if we let
+$r = \sup_{x} \|\phi(x)\|_2$, then Corollary~\ref{cor:method-2} gives us
+\begin{align*}
+\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T \delta_{x_t}, \theta\right) &\leq \inf_{u^*} \sup_{\theta} L(u^*, \theta) + \frac{2r^2\log(T+1)}{T} \\
+ &= \sup_{\theta} \inf_{u^*} L(u^*, \theta) + \frac{2r^2\log(T+1)}{T} \\
+ &= \frac{2r^2\log(T+1)}{T}.
+\end{align*}
+This is a slightly weaker version of the typical herding bound on MMD.
+Note that if we use $\alpha_t = t$, which corresponds to using a weighted 
+average, then we obtain a stronger bound of $\frac{8r^2}{T}$ instead.
+
+\subsection{Herding in Infinite Dimensions}
+\label{sec:infinite-case}
+
+\subsection{Herding and Maximum Entropy}
+\label{sec:max-ent}
+
+Bach et al.~have observed that herding appears to be approximately building 
+samples from the maximum entropy distribution for a given collection of moment 
+constraints. In this section we will make this connection more explicit 
+as well as draw other relationships between herding and maximum entropy.
+
+Suppose that instead of setting $h(u) = 0$ we set $h(u)$ to a small multiple of 
+the negative entropy: $h(u) = \eta \bE_{u}[\log u(x)]$. We will still use 
+$R(\theta) = \frac{1}{2}\|\theta\|_2^2$. In this case, Algorithm 2 gives the updates
+\begin{itemize}
+\item $u_t(x) \propto \exp\left(-\frac{1}{\eta}\theta_t^T\phi(x)\right)$
+\item $\theta_{t+1} = \bE_{\hat{u}_t}[\phi(x)] - \bar\phi$.
+\end{itemize}
+Corollary~\ref{cor:method-2} implies that for all $u^{*}$,
+\begin{align*}
+\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T u_t, \theta\right) &\leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2\log(T+1)}{T} \\
+ &= -\eta H(u^*) + \frac{1}{2}\|\bE_{u^*}[\phi(x)]-\bar{\phi}\|_2^2 \\ &\phantom{=} + \frac{8r^2}{T}.
+\end{align*}
+In particular, let $u^*$ be the maximum entropy distribution satisfying $\bE_{u^*}[\phi(x)] = \bar{\phi}$, 
+and let $H^*$ be the corresponding entropy. Then we have 
+\[ -\eta H(\hat{u}) + \|\bE_{\hat{u}}[\phi(x)]-\bar{\phi}\|_2^2 \leq -\eta H^* + \frac{8r^2}{T}. \]
+Since $\|\cdot\|_2^2 \geq 0$, this implies that 
+\begin{equation}
+H(\hat{u}) \geq H^* - \frac{8r^2}{\eta T},
+\end{equation}
+and so asymptotically $\hat{u}$ has at least 
+as much entropy as $u^*$.
+
+Now, suppose that our state space has some finite size $S$, so 
+that no distribution has entropy greater than $\log(S)$. Then 
+we conclude that
+\begin{equation}
+\|\bE_{\hat{u}}[\phi(x)]-\bar{\phi}\|_2^2 \leq \eta[\log(S)-H^*] + \frac{8r^2}{T}.
+\end{equation}
+
+If we let $\eta \to 0$ and $\eta T \to \infty$, then we obtain 
+a distribution $\hat{u}$ whose moments are arbitrarily close to 
+the moments of $u^*$, and whose entropy is almost as large as 
+(or larger than) the entropy of $u^*$. 
+
+\end{document}
