@@ -14,7 +14,7 @@ x_{t} &\in \argmin_{x \in \sX} \ip{\theta_{t}}{\phi(x)} \\
 
 An alternative interpretation of herding \citep{Chen:2010a,Huszar:2012,Bach:2012a} is as a moment matching algorithm. In particular, it generates a set of pseudosamples $\{ x_{t} \}$  which match the moments $\bar\phi$. That is, the squared error $\sE_{T}^{2} \eqdef \| \bar\phi - T^{-1}\sum_{t=1}^{T} \phi(x_{t})\|^{2} \to 0$ as $T \to \infty$.  If $\sB_{\Theta}$ is a reproducing kernel Hilbert space (RKHS) with feature map $\phi$, $\sE_{T}^{2}$ is equivalent to the maximum mean discrepancy (MMD) between $p$ and the empirical distribution $\hat p_{T} \eqdef T^{-1}\sum_{t=1}^{T} \delta_{x_{t}}$ \citep{Huszar:2012}:
 \(
-\sE_{T}^{2} &= \text{MMD}^{2}(p, \hat p_{T})  \\
+\sE_{T}^{2} &= \MMD^{2}(p, \hat p_{T})  \\
 &\eqdef \sup_{\theta \in \Theta} \left|\bE_{p}\ip{\theta}{\phi(x)} - \bE_{\hat p_{T}}\ip{\theta}{\phi(x)} \right|,
 \)
 where $\Theta = \{ \theta \in \sB_{\Theta} \ | \  \|\theta\| = 1 \}$.
