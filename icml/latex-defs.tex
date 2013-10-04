@@ -1,6 +1,7 @@
 \usepackage{hyperref,url}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{tikz}
+\usepackage{xspace}
 %\usepackage{float,subcaption,graphicx}
 \usepackage{stmaryrd,wasysym,clrscode}
 \usepackage{etex,etoolbox}
@@ -14,7 +15,6 @@
 \definecolor{NAColor}{rgb}{.75,0,.75}
 \newcommand{\NA}[1]{\textcolor{NAColor}{($\star$) #1}}
 \newcommand{\dee}{\mathrm{d}}
-\newcommand{\algname}[1]{\textsc{\lowercase{#1}}}
 \def\argmax{\operatornamewithlimits{arg\,max}}
 \def\argmin{\operatornamewithlimits{arg\,min}}
 \newcommand{\defined}{\ensuremath{\triangleq}}
@@ -24,6 +24,13 @@
 \newcommand{\elem}{\end{lemma}}
 \newcommand{\eps}{\epsilon}
 %%% End added by Jonathan %%%
+
+\newcommand{\algname}[1]{\textsc{\lowercase{#1}}\xspace}
+\newcommand{\bmd}{\algname{bmd}}
+\newcommand{\primal}{\algname{pbmd}}
+\newcommand{\dual}{\algname{DBMD}}
+\newcommand{\cgd}{\algname{CGD}}
+\newcommand{\md}{\algname{MD}}
 
 \newcommand{\lc}[1]{#1_{\mathrm{loc}}}
 \newcommand{\eq}[1]{\stackrel{\mathrm{#1}}{=}}
