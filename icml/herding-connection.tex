@@ -35,14 +35,13 @@ This does not change the algorithm as $\bE_{\mu}[\theta_t^T\phi(x)]$ will
 always be minimized at an extreme point of $\Delta_{\sX}$, which corresponds 
 to a point mass.
 
-The above updates correspond to \dual for $U = \sX$, $\Theta = \sH$, 
-$\alpha_t = 1$, $h \equiv 0$, 
-$R(\theta) = \ip{\bar{\phi}}{\theta} + \frac{1}{2}\|\theta\|_{\sH}^2$, 
-and $\imath(u)$ the canonical extension of $\phi$ from $\sX$ to $\Delta_{\sX}$.
+The above updates correspond to \dual for $U = \Delta_{\sX}$, $\Theta = \sH$, 
+$\ip{u}{\theta} = \ip{\bE_u[\phi(x)]}{\theta}_{\sH}$, $\alpha_t = 1$, $h \equiv 0$, and
+$R(\theta) = \ip{\bar{\phi}}{\theta}_{\sH} + \frac{1}{2}\|\theta\|_{\sH}^2$.
 To see this, note that 
 \begin{align}
-\lefteqn{\arg\min_{\theta \in \sH} \ip{\imath(u)}{\theta} - R(\theta)} \\
- &= \arg\min_{\theta \in \sH} \ip{\bE_{u}[\phi(x)]-\bar{\phi}}{\theta} - \frac{1}{2}\|\theta\|_{\sH}^2 \\
+\lefteqn{\arg\min_{\theta \in \sH} \ip{u}{\theta} - R(\theta)} \\
+ &= \arg\min_{\theta \in \sH} \ip{\bE_{u}[\phi(x)]-\bar{\phi}}{\theta}_{\sH} - \frac{1}{2}\|\theta\|_{\sH}^2 \\
  &= \bE_u[\phi(x)] - \bar{\phi}.
 \end{align}
 For $u = 0$, this gives us the first bullet point. For $u = \hat{u}_t$, 
@@ -61,10 +60,10 @@ where $r \eqdef \sup_{m \in \sM} \|m\|_2$. This is a slightly weaker
 version of the typical herding bound on MMD.
 
 If we do not restrict $\alpha_{t}$ to be 1, we obtain a class of algorithms
-we call {\em $\alpha_{t}$-weighted herding}. For the $t$-weighted herding 
-algorithm with we obtain a stronger bound of $\frac{8r^2}{T}$ instead.
+we call {\em $\alpha_{t}$-weighted herding}. For the $\alpha_t = t$ we obtain 
+a stronger bound of $\frac{8r^2}{T}$.
 
-\subsection{Herding in Infinite Dimensions}
+\subsection{$q$-herding}
 \label{sec:infinite-case}
 
 The convergence bound for herding implicitly assumes that 
