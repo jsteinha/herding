@@ -6,20 +6,22 @@
 
 It has been an open question whether it is possible to achieve the fast $O(1/T^{2})$ convergence of finite-dimensional herding in the infinite-dimensional case. We now show that this is not in general possible. In particular, the upper bounds in the previous section for herding and herding-like algorithms have matching lower bounds for at least some combinations of distributions and feature functions. 
 
-Let $\sX$ be the set of vectors $(x_{1},x_{2},\dots) \in [0,1]^{\infty}$ such that $\sum_{n=1}^{\infty} x_{n} = 1$ and a finite number of the $x_{n}$ are non-zero. Define the infinite feature vector $\phi$ to be the imbedding of $\sX$ into $\ell^{1}$. Let the target distribution $p(x)$ be chosen such that $\bar\phi_{n} = c_{\alpha}/\alpha(n)$, where $\alpha(n)$ is any superlinear function (that is, $\alpha \in \omega(n)$) and $c_{\alpha}^{-1} = \sum_{n=1}^{\infty} \alpha(n) < \infty$. We will consider the standard $\ell^{2}$ herding loss function $L(\theta) = \|\theta - \bar \phi\|_2^2$. 
-
-Define a {\em sparse update method} to be any method that produces an estimator of $\bar \phi$ at iteration $t$ of the form 
+For the matching $O(1/T)$ lower bound we analyze sparse update methods. Formally, define a {\em sparse update method} to be any method that produces an estimator of $\bar \phi$ at iteration $t$ of the form 
 \[
 \theta_{t} = \sum_{s =1}^{t}w_{t} \phi(x_{t}).
 \]
-In other words, the $t$-th estimator will have at most $t$ non-zero entries, and so 
+Sparse update methods can be viewed as characterizing ``herding-like'' algorithms, including the generalized herding and \cgd with line search. These sparse methods -- which only operate on the extreme points of the simplex -- are of interest because they provide (weighted) ``samples'' matching the moments of the distribution of interest. 
+
+The bound setup is as follows. Let $\sX$ be the set of vectors $(x_{1},x_{2},\dots) \in [0,1]^{\infty}$ such that $\sum_{n=1}^{\infty} x_{n} = 1$ and a finite number of the $x_{n}$ are non-zero. Define the infinite feature vector $\phi$ to be the imbedding of $\sX$ into $\ell^{1}$. Let the target distribution $p(x)$ be chosen such that $\bar\phi_{n} = c/\alpha(n)$, where $\alpha(n)$ is any superlinear function and $c^{-1} = \sum_{n=1}^{\infty} \alpha(n) < \infty$. Without loss of generality we can assume that $\alpha$ is monotonically increasing. We will consider the standard $\ell^{2}$ herding loss function $L(\theta) = \|\theta - \bar \phi\|_2^2$. 
+
+Since we are only considering sparse update methods, the $t$-th estimator will have at most $t$ non-zero entries, and so 
 \[
-\|x-x^{*}\|_2^2 \ge c_{\alpha}^{2}\sum_{n > t} 1/\alpha(n)^{2} = \Theta(1/\beta(t)) \label{eq:convergence-lb}
+\|x-x^{*}\|_2^2 \ge c^{2}\sum_{n > t} 1/\alpha(n)^{2} = \Theta(1/\beta(t)) \label{eq:convergence-lb}
 \]
-for some $\beta \in \omega(t)$. But for any $\beta \in \omega(t)$ we can choose some $\alpha \in \omega(n)$ to obtain \eqref{eq:convergence-lb}. Therefore, any sparse update method must have convergence rate no faster than $\Theta(1/\beta(t))$ for all superlinear $\beta$, and hence no faster than $\Theta(1/t)$. 
+for some (monotonically increasing) superlinear function $\beta$. But for any such $\beta$ we can choose some $\alpha$ to obtain \eqref{eq:convergence-lb}. In particular, let $1/\gamma(t) = \frac{\dee}{\dee t}\frac{1}{\beta(t)}$, where $\gamma(t) \in \omega(t^{2})$. Then we can choose $\alpha = \sqrt \gamma \in \omega(t)$ to satisfy \eqref{eq:convergence-lb}. 
 
-Sparse update methods can be viewed as charactering ``herding-like algorithms,'' including the set of generalized herding algorithms based on \dual and \cgd with line search. Those sparse methods are of interest because they provide (weighted) ``samples'' matching the moments of the distribution of interest. Since they only operate on the extreme points of the simplex, the optimization problems required to use them are more tractable. 
+Therefore, any sparse update method must have convergence rate no faster than $\Theta(1/\beta(t))$ for all superlinear $\beta$, and hence no faster than $\Theta(1/t)$. 
 
-\NA{JH: move definition and discussion of sparse update method to beginning}
+
 
 \end{document}

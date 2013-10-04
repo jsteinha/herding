@@ -16,7 +16,7 @@ is minimized for some given $\bar{\phi} \in \sM$.
 
 The herding algorithm uses the following updates\footnote{The original 
 algorithm includes an additional $\bar{\phi}$ term in the third bullet 
-point and indexes $x_t$ as $x_{t+1}$.} [\cite{chen}, equations (1) and (2)]:
+point and indexes $x_t$ as $x_{t+1}$.} [\cite{Chen:2010}, equations (1) and (2)]:
 \begin{itemize}
 \item $w_1 = \bar{\phi}$
 \item $x_t \in \arg\max_{x \in \sX} \ip{w_t}{\phi(x)}$
@@ -33,7 +33,7 @@ This does not change the algorithm as $\bE_{\mu}[\theta_t^T\phi(x)]$ will
 always be minimized at an extreme point of $\Delta_{\sX}$, which corresponds 
 to a point mass.
 
-The above updates correspond to Algorithm 2 for $U = \sX$, $\Theta = \sH$, 
+The above updates correspond to \dual for $U = \sX$, $\Theta = \sH$, 
 $\alpha_t = 1$, $h \equiv 0$, 
 $R(\theta) = \ip{\bar{\phi}}{\theta} + \frac{1}{2}\|\theta\|_{\sH}^2$, 
 and $\imath(u)$ the canonical extension of $\phi$ from $\sX$ to $\Delta_{\sX}$.
@@ -45,7 +45,7 @@ To see this, note that
 \end{align}
 For $u = 0$, this gives us the first bullet point. For $u = \hat{u}_t$, 
 this gives us the third bullet point. Finally, the second bullet point 
-is already in the form given in Algorithm 2.
+is already in the form given in \dual.
 
 Note that $R$ is convex with respect to $\|\cdot\|_2$ and that 
 $R^*(u) = \frac{1}{2}\|\bar{\phi}-\bE_{u}[\phi(x)]\|_2^2$. We can 
@@ -104,26 +104,27 @@ By Proposition~\ref{prop:method-2}, we know that
 \frac{1}{p}\|\bar{\phi}-\frac{1}{T}\sum_{t=1}^T \phi(x_t)\|_p^p \leq \frac{1}{A_T} \sum_{t=1}^T A_tD_{R^*}(\hat{u}_{t+1}\|\hat{u}_t).
 \end{align}
 We can no longer use Corollary~\ref{cor:method-2} since $\|\cdot\|_p^p$ is not strongly convex. 
-Instead, we use the following two inequalities (proved in Appendix~\ref{apx:inequalities}):
+Instead, we use the following two inequalities (proofs are given in the Supplementary Material):
 \begin{lemma}
 Let $x, y \in \bR_{\geq 0}$. Then:
-\begin{equation}
+\begin{equation*}
 x^p-py^{p-1}x+(p-1)y^p \leq \binom{p}{2}(x-y)^2\max(x,y)^{p-2}
-\end{equation}
+\end{equation*}
 and
-\begin{equation}
+\begin{equation*}
 (y-z)^2\max(x,y)^{p-2} \leq 4\max(x,y,z)^p
-\end{equation}
+\end{equation*}
 \end{lemma}
 Using these, we obtain the bound
-\begin{align}
-D_{R*}(\hat{u}_{t+1} \| \hat{u}_t) &= \frac{1}{p} \sum_{i} \hat{u}_{t+1,i}^p - p\hat{u}_{t+1,i}\hat{u}_{t,i}^{p-1} + (p-1)\hat{u}_{t,i}^{p} \\
+\(
+\lefteqn{D_{R*}(\hat{u}_{t+1} \| \hat{u}_t)} \\
+ &= \frac{1}{p} \sum_{i} \hat{u}_{t+1,i}^p - p\hat{u}_{t+1,i}\hat{u}_{t,i}^{p-1} + (p-1)\hat{u}_{t,i}^{p} \\
  &\leq \frac{1}{p}\binom{p}{2} \sum_i (\hat{u}_{t+1,i}-\hat{u}_{t,i})^2\max(\hat{u}_{t+1,i},\hat{u}_{t,i})^{p-2} \\
  &= \frac{1}{p}\binom{p}{2}\frac{\alpha_{t+1}^2}{A_{t+1}^2} \sum_i (u_{t+1,i}-\hat{u}_{t})^2\max(\hat{u}_{t+1,i},\hat{u}_{t,i})^{p-2} \\
  &\leq 2(p-1)\frac{\alpha_{t+1}^2}{A_{t+1}^2} \sum_i \max(\hat{u}_{t,i},\hat{u}_{t+1,i},u_{t+1,i})^p \\
  &\leq 2(p-1)\frac{\alpha_{t+1}^2}{A_{t+1}^2} \sum_i \hat{u}_{t,i}^p+\hat{u}_{t+1,i}^p+u_{t+1,i}^p \\
  &\leq 6(p-1)\frac{\alpha_{t+1}^2}{A_{t+1}^2} r_p^p
-\end{align}
+\)
 Plugging back in yields a convergence rate of $\frac{6(p-1)r_p^p(\log(T)+1)}{T}$ for $\alpha_t = 1$ 
 and $\frac{24(p-1)r_p^p}{T}$ for $\alpha_t = t$. We therefore obtain a convergence rate of $O(T^{-1/p})$ 
 in the $l^p$ norm, even if $\sM$ is not bounded in the $l^2$ norm.
@@ -131,7 +132,7 @@ in the $l^p$ norm, even if $\sM$ is not bounded in the $l^2$ norm.
 \subsection{Herding and Maximum Entropy}
 \label{sec:max-ent}
 
-Bach et al.~have observed that herding appears to be approximately building 
+\citet{Welling:2009a} and \citet{Bach:2012b} have observed that herding appears to be approximately building 
 samples from the maximum entropy distribution for a given collection of moment 
 constraints. In this section we present a herding-style algorithm that more 
 explicitly yields a maximum-entropy distribution. Our hope is that comparing 
@@ -141,7 +142,7 @@ entropy more explicit.
 The key idea is to use the primal regularizer $h(u) = -\eta H(u)$, where 
 $H(u)$ is the entropy of $u$ and $\eta \in \bR_{>0}$. We will still use 
 $R(\theta) = \ip{\bar{\phi}}{\theta} + \frac{1}{2} \|\theta\|_{\sH}^2$.
-In this case, Algorithm 2 gives the updates
+In this case, the \dual updates are
 \begin{itemize}
 \item $\theta_1 = -\bar{\phi}$
 \item $u_t(x) \propto \exp\left(-\frac{1}{\eta}\ip{\theta_t}{\phi(x)}\right)$
@@ -156,5 +157,7 @@ $\hat{u}_T = \frac{1}{T} \sum_{t=1}^T u_t$, we have
 \end{align*}
 where $H_{\max}(\bar{\phi})$ is the maximum entropy of any distribution whose 
 moments are $\bar{\phi}$.
+
+Note that as $\eta \to 0$, $u_{t}$ concentrates around its mode, converging to delta function, which is the herding sample. 
 
 \end{document}
