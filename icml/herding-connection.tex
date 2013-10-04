@@ -3,39 +3,60 @@
 \section{Application to Herding}
 \label{sec:herding}
 
-\NA{JHH: Need to specify the spaces we are working with here.}
-Suppose we are given a family of features $\phi$ together 
-with a known value $\bar{\phi}$ for $\bE_{u}[\phi]$. We 
-would like to construct a distribution that approximately 
-matches this distribution, i.e.~one for which 
-$\bE_{\hat{u}}[\phi] \approx \bar{\phi}$. A natural way 
-to do this is by using boosted mirror descent to minimize the 
-maximum mean discrepancy relative to $\phi$; 
-in other words, to minimize
-\[ L(u) = \max_{i \in \{1,\dots,d\}} |\bE_{u}[\phi_i]-\bar{\phi}_i|. \]
-If we wish to write this more similarly to the original problem 
-formulation, we can write
-\[ L(u) = \sup_{\|\theta\|_1 \leq 1} \theta^T(\bE_{u}[\phi]-\bar{\phi}). \]
-One issue is that $\|\theta\|_1$ is not strongly convex, so we relax $\|\theta\|_1$ 
-to $\|\theta\|_2$ and write our loss function in the Lagrangian form:
-\[ L(u, \theta) = \theta^T\bE_{u}[\phi] - \theta^T\bar{\phi} - \frac{1}{2}\|\theta\|_2^2. \]
-Intriguingly, Algorithm 1 and Algorithm 2 are identical to each other for this choice of $L$ 
-(up to a change of index). In this case, $u_t = \delta_{x_t}$ for some $x_t$, and 
-the updates are (for Algorithm 2):
+The standard setup for herding is as follows: we are given a 
+space $\sX$ and a feature mapping $\phi : \sX \to \sH$ for some 
+reproducing kernel Hilbert space $\sH$ \cite{RKHS}. 
+We define $\Delta_{\sX}$ to be the simplex 
+of probability distributions over $\sX$ and the marginal polytope 
+$\sM \eqdef \{\bE_{\mu}[\phi(x)] \mid \mu \in \Delta_{\sX}\}$.
+
+The goal of herding is to construct samples $x_1,\ldots,x_T \in \sX$ 
+such that $\|\frac{1}{T}\sum_{t=1}^T \phi(x_t)-\bar{\phi}\|_{\sH}^2$ 
+is minimized for some given $\bar{\phi} \in \sM$.
+
+The herding algorithm uses the following updates\footnote{The original 
+algorithm includes an additional $\bar{\phi}$ term in the third bullet 
+point and indexes $x_t$ as $x_{t+1}$.} [\cite{chen}, equations (1) and (2)]:
 \begin{itemize}
-\item $x_t \in \arg\min_{x} \theta_t^T\phi(x)$
-\item $\theta_{t+1} = \frac{1}{A_t} \sum_{s=1}^t \alpha_s \phi(x_{s}) - \bar \phi$.
-%\item $\theta_{t+1} = \frac{1}{A_t} \sum_{s=1}^t \alpha_s \phi(x)$.
+\item $w_1 = \bar{\phi}$
+\item $x_t \in \arg\max_{x \in \sX} \ip{w_t}{\phi(x)}$
+\item $w_{t+1} = \sum_{s=1}^t [\bar{\phi}-\phi(x_s)]$
 \end{itemize}
-These are the same as the standard herding updates when 
-$\alpha_t = 1$. Note that $R$ is strongly convex with respect to 
-$\|\cdot\|_2$, which is its own dual. Therefore, if we let
-$r = \sup_{x} \|\phi(x)\|_2$, then Corollary~\ref{cor:method-2} gives us
+If we define $\theta_t = -w_t/t$, then these updates are equivalent to
+\begin{itemize}
+\item $\theta_1 = -\bar{\phi}$
+\item $\mu_t \in \arg\min_{\mu \in \Delta_{\sX}} \ip{\theta_t}{\bE_{\mu}[\phi(x)]}$
+\item $\theta_{t+1} = \frac{1}{t} \sum_{s=1}^t [\bE_{\mu_s}[\phi(x)] - \bar{\phi}]$
+\end{itemize}
+Note that we have replaced the point $x_t$ with a distribution $\mu_t$. 
+This does not change the algorithm as $\bE_{\mu}[\theta_t^T\phi(x)]$ will 
+always be minimized at an extreme point of $\Delta_{\sX}$, which corresponds 
+to a point mass.
+
+The above updates correspond to Algorithm 2 for $U = \sX$, $\Theta = \sH$, 
+$\alpha_t = 1$, $h \equiv 0$, 
+$R(\theta) = \ip{\bar{\phi}}{\theta} + \frac{1}{2}\|\theta\|_{\sH}^2$, 
+and $\imath(u)$ the canonical extension of $\phi$ from $\sX$ to $\Delta_{\sX}$.
+To see this, note that 
+\begin{align}
+\lefteqn{\arg\min_{\theta \in \sH} \ip{\imath(u)}{\theta} - R(\theta)} \\
+ &= \arg\min_{\theta \in \sH} \ip{\bE_{u}[\phi(x)]-\bar{\phi}}{\theta} - \frac{1}{2}\|\theta\|_{\sH}^2 \\
+ &= \bE_u[\phi(x)] - \bar{\phi}.
+\end{align}
+For $u = 0$, this gives us the first bullet point. For $u = \hat{u}_t$, 
+this gives us the third bullet point. Finally, the second bullet point 
+is already in the form given in Algorithm 2.
+
+Note that $R$ is convex with respect to $\|\cdot\|_2$ and that 
+$R^*(u) = \frac{1}{2}\|\bar{\phi}-\bE_{u}[\phi(x)]\|_2^2$. We can 
+therefore apply Corollary~\ref{thm:method-2} to obtain the bound
 \begin{align*}
-\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T \delta_{x_t}, \theta\right) &\leq \inf_{u^*} \sup_{\theta} L(u^*, \theta) + \frac{2r^2\log(T+1)}{T} \\
- &= \sup_{\theta} \inf_{u^*} L(u^*, \theta) + \frac{2r^2\log(T+1)}{T} \\
- &= \frac{2r^2\log(T+1)}{T}.
+\lefteqn{\frac{1}{2}\|\bar{\phi}-\frac{1}{T}\sum_{t=1}^T \phi(x_t)\|_2^2} \\
+ &\leq \inf_{u^*} \frac{1}{2}\|\bar{\phi}-\bE_{u^*}[\phi(x)]\|_2^2 + \frac{2r^2\log(T+1)}{T} \\
+ &= \frac{2r^2\log(T+1)}{T},
 \end{align*}
+where $r \eqdef \sup_{m \in \sM} \|m\|_2$.
+
 This is a slightly weaker version of the typical herding bound on MMD.
 Note that if we use $\alpha_t = t$, which corresponds to using a weighted 
 average, then we obtain a stronger bound of $\frac{8r^2}{T}$ instead.
@@ -43,46 +64,69 @@ average, then we obtain a stronger bound of $\frac{8r^2}{T}$ instead.
 \subsection{Herding in Infinite Dimensions}
 \label{sec:infinite-case}
 
+The convergence bound for herding implicitly assumes that 
+$\sM$ is bounded in the $l^2$ norm. Assuming that $\sH$ is 
+finite-dimensional, this will always be true. However, in 
+the infinite-dimensional case this may no longer be true. 
+For instance, consider $\sX = \{1,\ldots,N\}$ and let 
+$\phi : \sX \to l^2(\bZ_{\geq 0})$ be
+defined by $\phi(n)_i = \frac{1}{\sqrt{n+i}}$. Then 
+$\|\phi(n)\|_2 = \infty$ for each $n \in \sX$, and so herding 
+yields no convergence guarantees. Indeed, the algorithm 
+does not even necessarily make sense: since $\theta$ is 
+no longer guaranteed to have finite $l^2$ norm, the 
+inner product $\ip{\imath(u)}{\theta}$ may not be defined.
+
+Note, however, that in this case
+$\|\phi(n)\|_3 = \sqrt[3]{\sum_{i=0}^{\infty} (n+i)^{-3/2}} < \infty$.
+(In fact, the maximum is equal to
+$\|\phi(1)\|_3 = \sqrt[3]{\zeta(3/2)} < 1.378$.) This motivates 
+a generalization of herding in which we minimize 
+$\|\bE_{u}[\phi(x)]-\bar{\phi}\|_3^3$ instead of 
+$\|\bE_{u}[\phi(x)]-\bar{\phi}\|_2^2$.
+
+More generally, for any 
+$p \geq 2$ and $q$ such that $\frac{1}{p} + \frac{1}{q} = 1$, we can take 
+$h \equiv 0$, $R(\theta) = \ip{\bar{\phi}}{\theta} + \frac{1}{q}\|\theta\|_q^q$. 
+Then $R^*(u) = \frac{1}{p}\|\bE_{u}[\phi(x)]-\bar{\phi}\|_p^p$. Define the 
+``correction function'' $C_q$ by
+\begin{equation}
+C_q(x)_i \eqdef \sign(x_i) \cdot |x_i|^{\frac{1}{q-1}}.
+\end{equation}
+We obtain the following \emph{generalized herding} updates:
+\begin{itemize}
+\item $\theta_{1} = C_q(-\bar{\phi})$
+\item $x_{t} \in \arg\min_{x \in \sX} \ip{\phi(x)}{\theta_t}$
+\item $\theta_{t+1} = C_q\left(\frac{1}{t} \sum_{s=1}^t [\phi(x_s)-\bar{\phi}]\right)$
+\end{itemize}
+
 \subsection{Herding and Maximum Entropy}
 \label{sec:max-ent}
 
 Bach et al.~have observed that herding appears to be approximately building 
 samples from the maximum entropy distribution for a given collection of moment 
-constraints. In this section we will make this connection more explicit 
-as well as draw other relationships between herding and maximum entropy.
+constraints. In this section we present a herding-style algorithm that more 
+explicitly yields a maximum-entropy distribution. Our hope is that comparing 
+the two algorithms may help to make the connection between herding and maximum 
+entropy more explicit.
 
-Suppose that instead of setting $h(u) = 0$ we set $h(u)$ to a small multiple of 
-the negative entropy: $h(u) = \eta \bE_{u}[\log u(x)]$. We will still use 
-$R(\theta) = \frac{1}{2}\|\theta\|_2^2$. In this case, Algorithm 2 gives the updates
+The key idea is to use the primal regularizer $h(u) = -\eta H(u)$, where 
+$H(u)$ is the entropy of $u$ and $\eta \in \bR_{>0}$. We will still use 
+$R(\theta) = \ip{\bar{\phi}}{\theta} + \frac{1}{2} \|\theta\|_{\sH}^2$.
+In this case, Algorithm 2 gives the updates
 \begin{itemize}
-\item $u_t(x) \propto \exp\left(-\frac{1}{\eta}\theta_t^T\phi(x)\right)$
+\item $\theta_1 = -\bar{\phi}$
+\item $u_t(x) \propto \exp\left(-\frac{1}{\eta}\ip{\theta_t}{\phi(x)}\right)$
 \item $\theta_{t+1} = \bE_{\hat{u}_t}[\phi(x)] - \bar\phi$.
 \end{itemize}
-Corollary~\ref{cor:method-2} implies that for all $u^{*}$,
+Corollary~\ref{cor:method-2} implies that, for 
+$\hat{u}_T = \frac{1}{T} \sum_{t=1}^T u_t$, we have
 \begin{align*}
-\sup_{\theta} L\left(\frac{1}{T} \sum_{t=1}^T u_t, \theta\right) &\leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2\log(T+1)}{T} \\
- &= -\eta H(u^*) + \frac{1}{2}\|\bE_{u^*}[\phi(x)]-\bar{\phi}\|_2^2 \\ &\phantom{=} + \frac{8r^2}{T}.
+\lefteqn{-\eta H(\hat{u}_T) + \|\bar{\phi}-\bE_{\hat{u}_T}[\phi(x)]\|_{\sH}^2} \\
+ &\leq \inf_{u} -\eta H(u) + \|\bar{\phi}-\bE_{u}[\phi(x)]\|_{\sH}^2 + \frac{2r^2\log(T+1)}{T} \\
+ &\leq -\eta H_{\max}(\bar{\phi}) + \frac{2r^2\log(T+1)}{T},
 \end{align*}
-In particular, let $u^*$ be the maximum entropy distribution satisfying $\bE_{u^*}[\phi(x)] = \bar{\phi}$, 
-and let $H^*$ be the corresponding entropy. Then we have 
-\[ -\eta H(\hat{u}) + \|\bE_{\hat{u}}[\phi(x)]-\bar{\phi}\|_2^2 \leq -\eta H^* + \frac{8r^2}{T}. \]
-Since $\|\cdot\|_2^2 \geq 0$, this implies that 
-\begin{equation}
-H(\hat{u}) \geq H^* - \frac{8r^2}{\eta T},
-\end{equation}
-and so asymptotically $\hat{u}$ has at least 
-as much entropy as $u^*$.
-
-Now, suppose that our state space has some finite size $S$, so 
-that no distribution has entropy greater than $\log(S)$. Then 
-we conclude that
-\begin{equation}
-\|\bE_{\hat{u}}[\phi(x)]-\bar{\phi}\|_2^2 \leq \eta[\log(S)-H^*] + \frac{8r^2}{T}.
-\end{equation}
-
-If we let $\eta \to 0$ and $\eta T \to \infty$, then we obtain 
-a distribution $\hat{u}$ whose moments are arbitrarily close to 
-the moments of $u^*$, and whose entropy is almost as large as 
-(or larger than) the entropy of $u^*$. 
+where $H_{\max}(\bar{\phi})$ is the maximum entropy of any distribution whose 
+moments are $\bar{\phi}$.
 
 \end{document}
