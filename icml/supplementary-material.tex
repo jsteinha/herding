@@ -22,7 +22,7 @@
 
 \section{CGD, MD, and Boosted MD}
 
-The \bmd algorithms are very closely related to \cgd and \md. \dual and \cgd are related as follows. \dual minimizes $g + R^{*}$ while \cgd minimizes $h^{*} + f^{*}$. Make the identifications $h^{*} = R^{*}$ and $f^{*} = g$. Note that $R^{*}$ is $\beta$-smooth $\iff R$ is $(1/\beta)$-strongly convex $\iff h$ is $(1/\beta)$-strongly convex, so the conditions on the functions being optimized are equivalent. Then with $\rho_{t} = \alpha_{t+1}/A_{t+1}$, we can rewrite the \cgd updates  s 
+The \bmd algorithms are very closely related to \cgd and \md. \dual and \cgd are related as follows. \dual minimizes $g + R^{*}$ while \cgd minimizes $h^{*} + f^{*}$. Make the identifications $h^{*} = R^{*}$ and $f^{*} = g$ and note the conditions on the functions being optimized are equivalent. Then with $\rho_{t} = \alpha_{t+1}/A_{t+1}$, we can rewrite the \cgd updates as 
 \[
 x_{t} &= \partial R^{*}(-\bar y_{t})  \\
 y_{t} &= \partial g^{*}(x_{t}) \\
@@ -33,12 +33,32 @@ which is identical to the \dual if we make the substitutions $x_{t} \to -\theta_
 We similarly relate \primal and \md. \primal minimizes $g + R^{*}$ while \md minimizes $h + f$. Make the identifications $h = g$ and $f = R^{*}$ and note the conditions of $h$ and $g$ are the same. Letting $\rho_{t+1} = \alpha_{t}/A_{t}$, we can rewrite the \md updates as 
 \[
 y_{t} &= \partial R^{*}(x_{t}) \\
-x_{t+1} &= \partial g^{*}((1 - \rho_{t+1})\partial g(x_{t}) - \rho_{t+1}y_{t}) \\
-&= \partial g^{*}(-\bar y_{t}), 
+\bar y_{t} &= \partial g^{*}((1 - \rho_{t+1})\partial g(x_{t}) - \rho_{t+1}y_{t}) \\
+x_{t+1} &= \partial g^{*}(-\bar y_{t}), 
 \]
 where $\bar y_{t}$ is the same as above. Making the substitutions $y_{t} \to \theta_{t}$ and $x_{t} \to u_{t}$ completes the identification of the two methods. 
 
 Finally, note that if we write $\alpha_{t} = \rho_{t}/\prod_{s=1}^{t} (1 - \rho_{s})$, we have $A_{t} = \prod_{s=1}^{t} (1 - \rho_{s})$ and hence $\alpha_{t} / A_{t} = \rho_{t}$. Hence, up to a change in index, we have a bijection between the $\rho_{t}$ and the $\alpha_{t}$. 
+
+\section{Proof Lemma used in $q$-Herding Convergence Proof}
+
+Two simple equalities were used in the proof of the convergence rate of $q$-herding. We now provide proofs. Using the fact that $x^{n} - y^{n} = (x - y)\sum_{i=0}^{n-1}x^{i-1}y^{n-i-1}$, for the first inequality we have
+\(
+x^{p} - py^{p-1}x + (p-1)y^{p}
+&= x^{p} - y^{p} - py^{p-1}x + py^{p} \\
+&= (x - y)\sum_{r=0}^{p-2} (y^{r}x^{p-r-1} - y^{p-1}) \\
+&= (x - y)^{2}\sum_{r=0}^{p-2}\sum_{s=0}^{p-r-2}x^{p-r-s-2}y^{r+s} \\
+&\le (x - y)^{2}\sum_{r=0}^{p-2}\sum_{s=0}^{p-r-2}\max(x, y)^{p-2} \\
+&= {p \choose 2}(x - y)^{2}\max(x, y)^{p-2}.
+\)
+For the second inequality we have
+\(
+(y-z)^{2}\max(x,y)^{p-2} 
+&\le 4\max(y,z)^{2}\max(x,y)^{p-2} \\
+&\le 4\max(x,y,z)^{p}.
+\)
+
+
 
 \end{document}
 
