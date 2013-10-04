@@ -12,13 +12,13 @@ to any given collection of feasible moments. Moreover, \emph{only} the moments
 are required; a full posterior is not needed.
 
 Since its introduction, herding has been shown to have many desirable properties.
-For instance, Chen et al showed that the moments converge at a rate of $O(1/T)$ for 
-$T$ samples, which is even faster than the $O(1/\sqrt{T})$ that would be obtained 
+For instance, Chen et al showed that the moments converge at a rate of $O(1/T^{2})$ for 
+$T$ samples, which is even faster than the $O(1/T)$ that would be obtained 
 by sampling the exact posterior. Furthermore, Bach et al show that herding is 
-equivalent to conditional gradient, and Husz\'{a}r and Duvenaud show that 
+equivalent to conditional gradient, and \citet{Huszar:2012} show that 
 herding is Bayesian quadrature. Herding was originally conceived of as a method 
 for inference in MRF, and this line of work has been further explored in 
-\citet{Welling:2009a,Gelfand:2010,Bornn:2013}.
+\citet{Welling:2009a}, \citet{Gelfand:2010} and \citet{Bornn:2013}.
 
 In order to define herding, let $\sX$ be an observation space, $\phi : \sX \to \sB_{\Theta}$ a 
 feature map to an inner product space, and $\bar\phi = \bE_{x \sim p}[\phi(x)]$ the empirical 
@@ -46,10 +46,10 @@ generalization has several advantages:
       conditional gradient methods more clear. 
 \end{itemize}
 In particular, while it was known that herding was a form of conditional 
-gradient \cite{TODO} and hence (via the relationship in \cite{TODO}) also 
+gradient \cite{Bach:2012a} and hence (via the relationship in \cite{Bach:2012b}) also 
 a form of subgradient descent, our framework exposes all three algorithms 
 as special cases. A full table of the relationships for various choices of 
-$h$ and $R$ is given in Figure~\ref{fig:table}.
+$h$ and $R$ is given in Table~\ref{tab:connections}.
 % -- Doesn't seem relevant enough to justify the amount of technical detail
 %An alternative interpretation of herding \citep{Chen:2010a,Huszar:2012,Bach:2012a} is as a moment matching algorithm. In particular, it generates a set of pseudosamples $\{ x_{t} \}$  which match the moments $\bar\phi$. That is, the squared error $\sE_{T}^{2} \eqdef \| \bar\phi - T^{-1}\sum_{t=1}^{T} \phi(x_{t})\|^{2} \to 0$ as $T \to \infty$.  If $\sB_{\Theta}$ is a reproducing kernel Hilbert space (RKHS) with feature map $\phi$, $\sE_{T}^{2}$ is equivalent to the maximum mean discrepancy (MMD) between $p$ and the empirical distribution $\hat p_{T} \eqdef T^{-1}\sum_{t=1}^{T} \delta_{x_{t}}$ \citep{Huszar:2012}:
 %\(
