@@ -30,7 +30,7 @@ and that a (possibly non-convex) function $g$ is $\beta$-smooth if
 \[
 \|\partial g(x) - \partial g(y) \| \le \beta \| x - y\|.
 \]
-Strong convexity and smoothness are dual to each in the sense that a convex function $f$ is $\alpha$-strongly convex if and only if $f^{*}$ is $(1/\alpha)$-smooth.
+Strong convexity and smoothness are dual to each in the sense that a convex function $f$ is $\alpha$-strongly convex if and only if $f^{*}$ is $(1/\alpha)$-smooth. \NA{JH: should double check that we actually need smoothness}
 
 \subsection{The Boosted Mirror Descent Algorithms}
 
@@ -38,13 +38,13 @@ We can now define the \bmd  algorithms. Let $U$ and $\Theta$ be convex subsets o
 \[
 L(u,\theta) = h(u) + \ip{\theta}{\imath(u)} - R(\theta)
 \]
-for which we wish to find arguments that obtain $L_{*} = \min_{u}\max_{\theta} L(u, \theta)$. Taking only max, we have the one-argument loss function:
+for which we wish to find arguments that obtain $L_{*} = \min_{u}\max_{\theta} L(u, \theta)$. Taking only the maximum, we have the one-argument loss function
 \[
 L(u)
 &= h(u) + \max_{\theta \in \Theta} \left\{\ip{\theta}{\imath(u)} - R(\theta) \right\} \\
 &= h(u) + R^{*}(\imath(u)).
 \]
-We can think of $h$ as a \emph{primal regularizer} and $R$ as a \emph{dual regularizer}.  The pair of regularization functions $h$ and $R$ provides flexible optimization framework, as seen from the following examples:
+We can think of $h$ as a \emph{primal regularizer} and $R$ as a \emph{dual regularizer}.  The pair of regularization functions $h$ and $R$ define a flexible class of functions of optimize, as seen from the following examples:
 \begin{enumerate}
 \item Let $U$ be the probability simplex over a space $\sX$, let $\phi : \sX \to \bR^d$ be a collection 
       of statistics, and let $\Theta$ be the unit $L^1$ ball in $\bR^d$. Let $h(u) = 0$, 
@@ -69,10 +69,15 @@ computed for all values of $\theta$.
 %be interpreted as boosted mirror descent.
 
 Mirror descent, together with boosting, yields an algorithm for finding 
-``saddle points'' of $L$. 
+``saddle points'' of $L(u, \theta)$. 
 For notational convenience, for a sequence of weights $\alpha_1,\alpha_2,\ldots$ 
-let $\hat{u}_t = \frac{\sum_{s=1}^t \alpha_su_s}{\sum_{s=1}^t \alpha_s}$ and let 
-$\hat{\theta}_t = \frac{\sum_{s=1}^t \alpha_s\theta_s}{\sum_{s=1}^t \alpha_s}$. Then 
+let 
+\(
+\hat{u}_t = \frac{\sum_{s=1}^t \alpha_su_s}{\sum_{s=1}^t \alpha_s} 
+\quad \text{and} \quad 
+\hat{\theta}_t = \frac{\sum_{s=1}^t \alpha_s\theta_s}{\sum_{s=1}^t \alpha_s}.
+\)
+Then 
 the {\em primal boosted mirror descent} (\primal) algorithm is:
 \begin{enumerate}
 \item $u_1 \in \arg\min_u h(u)$
@@ -85,7 +90,7 @@ bound (see Corollary~\ref{cor:method-1}):
 \sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq L_{*} + O(1/T).
 \end{equation}
 In other words, $\hat{u}_T$ is close to being a global minimum of $L(u)$.
-However, it is often the case that $h$ is not strongly convex, whereas $R$ is strongly convex. As we shall see, this will be the case for our application to herding.
+However, it is often the case that $h$ is not strongly convex but $R$ is strongly convex. As we shall see, this will be the case for our application to herding.
 In this case we may wish to use the following slightly different algorithm, which we call {\em dual boosted mirror descent} (\dual):
 \begin{enumerate}
 \item $\theta_1 \in \arg\min_{\theta} R(\theta)$
@@ -107,32 +112,33 @@ performing \primal on $L(u,\theta)$ is the same as performing \dual on $-L(\thet
 \theta_{t} &= \partial R^{*}(u_{t}) & \theta_{t+1} &= \partial R^{*}(\hat u_{t}) \\
 u_{t+1} &= \partial h^{*}(-\hat\theta_{t}) & u_t &= \partial h^{*}(-\theta_{t})
 \)
-This duality is analogous to that between mirror descent and conjugate gradient descent \citep{Bach:2012b}. \md minimizes $g(x) + f(x)$ and requires that $g$ be $\alpha$-strongly convex while \cgd minimizes $g^{*}(x) + f^{*}(x)$ and requires that $g$ be $\alpha$-strongly convex. The update equations are
+This duality is analogous to that between mirror descent and conjugate gradient descent \citep{Bach:2012b}. \md minimizes $g(x) + f(x)$ and requires that $g$ be $\alpha$-strongly convex while \cgd minimizes $g^{*}(x) + f^{*}(x)$ and requires that $g$ be $\alpha$-strongly convex. The update equations for \md are
 \(
 y_{t} &= \partial f(x_{t})  \\
 \bar y_{t} &=  (1 - \rho_{t+1})\partial g(x_{t}) - \rho_{t+1}y_{t}  \\
 x_{t+1} &=  \partial g^{*}(\bar y_{t}) 
 \)
-for \md and
+and for \cgd are
 \(
  y_{t+1} &= \partial f(x_{t}) \\
 \bar y_{t+1} &= (1 - \rho_{t})\bar y_{t} + \rho_{t} y_{t+1}  \\
-x_{t} &= \partial g^{*}(-\bar y_{t})
+x_{t} &= \partial g^{*}(-\bar y_{t}).
 \)
-for \cgd. 
 In fact, the \bmd algorithms are very closely related to \cgd and \md: \cgd can be obtained from \dual and \md obtained from \primal. The relationships are given in Table~\ref{tab:connections}. The table also shows how generalized herding and $q$-herding --- which are discussed in the next section --- are obtained from \bmd. 
 
 \renewcommand{\arraystretch}{1.5}
 \begin{center}
 \begin{table*}[t]
-\caption{Formulation of herding and convex optimization algorithms in terms of \bmd. Full details relating \md and \cgd to \bmd are given in the Supplementary Material.}
+\caption{Formulation of herding and convex optimization algorithms in terms of \bmd. Full details relating \md and \cgd to \bmd are given in the Supplementary Material. See also \citet{Bach:2012b}.}
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
 \begin{tabularx}{\textwidth}{L|lllLL}
 Algorithm 			& $h(u)$ 	& $R(\theta)$ & $\alpha_{t}$ & \bmd Algorithm & Notes 
 \\ \hline
+herding 			& 0			& $\ip{\bar\phi}{\theta} + \frac{1}{2} \| \theta \|_{\sH}^{2}$ 	& 1				 	& \dual &
+\\
 generalized herding & 0			& $\ip{\bar\phi}{\theta} + \frac{1}{2} \| \theta \|_{\sH}^{2}$ 	& unconstrained 	& \dual &
 \\ 
-$q$-herding			& 0			& $\ip{\bar\phi}{\theta} + \frac{1}{q} \| \theta \|_{q}^{q}$ 	& unconstrained 	& \dual & $q \ge 2$
+$q$-herding			& 0			& $\ip{\bar\phi}{\theta} + \frac{1}{q} \| \theta \|_{q}^{q}$ 	& unconstrained 	& \dual & $1 \le q \le 2$
 \\ 
 \md					& $g(x)$	& $f^{*}(y)$				& $\rho_{t}/\prod_{s=1}^{t} (1 - \rho_{s})$				& \primal & 
 \\ 

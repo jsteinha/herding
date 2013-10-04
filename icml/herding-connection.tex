@@ -3,7 +3,7 @@
 \section{Application to Herding}
 \label{sec:herding}
 
-The standard setup for herding is as follows: we are given a 
+We now derive herding as a special case of \dual. The standard setup for herding is as follows: we are given a 
 space $\sX$ and a feature mapping $\phi : \sX \to \sH$ for some 
 reproducing kernel Hilbert space $\sH$ \cite{RKHS}. 
 We define $\Delta_{\sX}$ to be the simplex 
@@ -12,11 +12,13 @@ $\sM \eqdef \{\bE_{\mu}[\phi(x)] \mid \mu \in \Delta_{\sX}\}$.
 
 The goal of herding is to construct samples $x_1,\ldots,x_T \in \sX$ 
 such that $\|\frac{1}{T}\sum_{t=1}^T \phi(x_t)-\bar{\phi}\|_{\sH}^2$ 
-is minimized for some given $\bar{\phi} \in \sM$.
+is minimized for some given $\bar{\phi} \in \sM$. One can typically
+think of $\bar \phi$ as being the expected value of $\phi$ under some 
+distribution $p \in \Delta_{\sX}$. 
 
 The herding algorithm uses the following updates\footnote{The original 
 algorithm includes an additional $\bar{\phi}$ term in the third bullet 
-point and indexes $x_t$ as $x_{t+1}$.} [\cite{Chen:2010}, equations (1) and (2)]:
+point and indexes $x_t$ as $x_{t+1}$.} \citep[][equations (1) and (2)]{Chen:2010a}:
 \begin{itemize}
 \item $w_1 = \bar{\phi}$
 \item $x_t \in \arg\max_{x \in \sX} \ip{w_t}{\phi(x)}$

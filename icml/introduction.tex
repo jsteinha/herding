@@ -4,20 +4,20 @@
 \section{Introduction} 
 \label{sec:intro}
 
-Many algorithms, such as SMC \cite{smc} and MCMC \cite{mcmc}, approximate a 
+Many algorithms, such as SMC \citep{smc} and MCMC \citep{mcmc}, approximate a 
 distribution by samples. Most such algorithms require access to a full posterior and 
 may be prone to local optima. In contrast, the herding algorithm introduced in 
-\cite{Welling:2009a} generates samples whose moments are guaranteed to converge 
+\citet{Welling:2009a} generates samples whose moments are guaranteed to converge 
 to any given collection of feasible moments. Moreover, \emph{only} the moments 
 are required; a full posterior is not needed.
 
 Since its introduction, herding has been shown to have many desirable properties.
 For instance, Chen et al showed that the moments converge at a rate of $O(1/T^{2})$ for 
 $T$ samples, which is even faster than the $O(1/T)$ that would be obtained 
-by sampling the exact posterior. Furthermore, Bach et al show that herding is 
+by sampling independently from the exact posterior. Furthermore, \citet{Bach:2012a} show that herding is 
 equivalent to conditional gradient, and \citet{Huszar:2012} show that 
-herding is Bayesian quadrature. Herding was originally conceived of as a method 
-for inference in MRF, and this line of work has been further explored in 
+herding is equivalent to Bayesian quadrature. Herding was originally conceived of as a method 
+for inference in Markov random fields, and this line of work has been further explored in 
 \citet{Welling:2009a}, \citet{Gelfand:2010} and \citet{Bornn:2013}.
 
 In order to define herding, let $\sX$ be an observation space, $\phi : \sX \to \sB_{\Theta}$ a 
@@ -46,7 +46,7 @@ generalization has several advantages:
       conditional gradient methods more clear. 
 \end{itemize}
 In particular, while it was known that herding was a form of conditional 
-gradient \cite{Bach:2012a} and hence (via the relationship in \cite{Bach:2012b}) also 
+gradient \cite{Bach:2012a} and hence (via the relationship in \citet{Bach:2012b}) also 
 a form of subgradient descent, our framework exposes all three algorithms 
 as special cases. A full table of the relationships for various choices of 
 $h$ and $R$ is given in Table~\ref{tab:connections}.
