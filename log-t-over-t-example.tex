@@ -1,0 +1,58 @@
+\documentclass[reqno,oneside,a4paper]{amsart}
+\usepackage{jhh-misc}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{epsfig}
+\usepackage{framed}
+\usepackage{natbib}
+\usepackage{subfig}
+\usepackage{xspace}
+\usepackage[normalem]{ulem}
+
+% inner product command
+\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
+\def\[#1\]{\begin{align}#1\end{align}}
+
+\begin{document}
+
+\title[$1/T$ counterexample?]{Counterexample to $1/T$ convergence of herding in infinite dimensions?} 
+\author{Jonathan Huggins}
+\date{\today}
+
+\maketitle
+
+We build off the same counterexample that shows $O(1/T)$ sparse convergence in infinite dimensions. The state space is $\naturals$ and the features are of the form $\phi_{n} = \delta_{n}$. Let the target distribution be $p(n) = \frac{c}{n^{1+\eps}}$, where $c$ is the normalizing constant, which is approximately $\eps$ as $\eps \to 0$. Let $k(n)$ be the number of herding samples equal to $n$, let $\bar n = \max \{ n \given k(n) \ge 1 \}$ be the largest $n$ that has been sampled, and let $t = \sum_{n=1}^{\bar n} k(n)$ be the total number of samples. Then 
+\begin{align*}
+\theta_{t} = \left(\frac{k(1)}{t} - c, \frac{k(2)}{t} - \frac{c}{2^{1+\eps}}, \dots, \frac{k(n)}{t} - \frac{c}{n^{1+\eps}}, \dots, \frac{k(\bar n)}{t} - \frac{c}{\bar n^{1+\eps}}, - \frac{c}{(\bar n + 1)^{1+\eps}},\dots\right)\
+\end{align*}
+The $k(n)$ are chosen by the herding algorithm such that 
+\[
+k(n) &= \min\left\{ k~\bigg|~\frac{k}{t} - \frac{c}{n^{1+\eps}} > -\frac{c}{(\bar n + 1)^{1+\eps}} \right\} \\
+&= \left\lceil ct\left(\frac{1}{n^{1+\eps}} - \frac{1}{\bar n^{1+\eps}}\right)\right\rceil. \label{eq:k}
+\]
+
+The goal is to find $\bar n$ for a fixed $t$. If the convergence rate is $O(\log t / t)$, then herding should have only put mass on the first $O(t / \log t)$ elements since the error will then be $O((\log t / t)^{1 - 2\eps})$. Hence, $\bar n$ should be roughly $O(t / \log t)$. 
+
+Now, let $m(k) = \max\{ n \given k(n) = k \}$ be the maximum $n$ with $k$ samples and let $\bar k = k(1)$ be the maximum number of samples for any $n$. In this case we have the relationship
+\[
+t = \sum_{k=1}^{\bar k} m(k).
+\]
+We can approximate $m(k)$ by solving for $n$ in \eqref{eq:k}, replacing the ceiling with $+ 1$, which should be a tight upper bound:
+\[
+k &\approx  ct\left(\frac{1}{m(k)^{1+\eps}} - \frac{1}{\bar n^{1+\eps}}\right)  + 1\\
+\implies m(k) &\approx \left(\frac{c t \bar n^{1+\eps}}{(k-1) \bar n^{1+\eps} + c t}\right)^{1/(1 + \eps)} \\
+\implies m(k) &\approx \frac{(c t)^{1/(1 + \eps)} \bar n}{(k-1)^{1/(1 + \eps)} \bar n + (c t)^{1/(1 + \eps)}}.
+\]
+Note also that $\bar k \approx ct\left(1 - \frac{1}{\bar n^{1+\eps}}\right) + 1$.
+
+To first order, we have $c \approx \eps$. Making this substitution, we want to solve
+\[
+t &=  \sum_{k=1}^{\bar k} m(k) \\
+&= \sum_{k=1}^{\bar k} \frac{(\eps t)^{1/(1 + \eps)} \bar n}{(k-1)^{1/(1 + \eps)} \bar n + (\eps t)^{1/(1 + \eps)}} \\
+&\approx \int_{1}^{\bar k} \frac{(\eps t)^{1/(1 + \eps)} \bar n}{(x-1)^{1/(1 + \eps)} \bar n + (\eps t)^{1/(1 + \eps)}}\,dx
+\]
+
+
+
+\end{document}
+
