@@ -14,9 +14,18 @@ For simplicity
 we will focus on the case $\alpha_t = 1$. Then we have 
 the following bound:
 \begin{theorem}
-TODO
+\label{thm:chen}
+Suppose that $R$ is strongly convex with respect to the norm $\|\cdot\|$ and 
+let $r_* \eqdef \sup_{u \in U} \|u\|_*$. Also suppose that $h \equiv 0$ and 
+that $R_0$ exhibits quadratic scaling as above. Define 
+\[ \gamma^* \eqdef \inf_{\theta \in \Theta} \sup_{u \in U} \frac{\ip{-\theta}{u-u_0}}{\sqrt{R(\theta)}}. \]
+Then $R(\theta_{t+1}) \leq \frac{2r_*^2+(2r_*^2/\gamma_*)^2}{t^2}$ as long 
+as $\gamma^* > 0$.
 \end{theorem}
-\begin{proof}
+This corresponds to Proposition 1 of \citet{Chen:2010b} for $R(\theta) = \frac{1}{2}\|\theta\|_2^2$. Note that if there is an $l^2$ ball of radius $\epsilon$ 
+around $u_0$ that is contained in $u$ then $\gamma^* \geq \frac{\epsilon}{r_*}$ 
+in this case, which is how Chen's result follows from ours.
+\begin{proof}[Proof of Theorem~\ref{thm:chen}]
 The key quantity we will analyze is $(t-1)^2R(\theta_t)$. Note that we have
 \begin{align*}
 \lefteqn{(t-1)^2R(\theta_t) - t^2R(\theta_{t+1})} \\
@@ -28,9 +37,28 @@ The key quantity we will analyze is $(t-1)^2R(\theta_t)$. Note that we have
  &\geq (t-1)^2\left[\ip{\theta_t}{-\frac{1}{t-1}(u_t-z)}-\frac{1}{2}\left\|\frac{u_t-z}{t-1}\right\|_*^2\right] \\
  &= -(t-1)\ip{\theta_t}{u_t-z}-\frac{1}{2}\|u_t-z\|_*^2 \\
  &= -(t-1)\left[\inf_{u \in U} \ip{\theta_t}{u} - \ip{\theta_t}{z}\right]-\frac{1}{2}\|u_t-z\|_*^2 \\
- &\geq -(t-1)\left[\sup_{\theta} \inf_{u \in U} \ip{\theta}{u-z}\right]-2r_*^2.
+ &\geq (t-1)\sqrt{R(\theta_t)}\left[\inf_{\theta} \sup_{u \in U} \ip{-\theta}{u-u_0}\right]-2r_*^2 \\
+ &= \sqrt{(t-1)^2R(\theta_t)}\gamma^*-2r_*^2.
 \end{align*}
-
+There are now two possibilities for each $t$:
+\begin{enumerate}
+\item $t^2R(\theta_{t+1}) < (t-1)^2R(\theta_t)$, or
+\item $(t-1)^2R(\theta_t) \leq \frac{4r_*^4}{(\gamma^*)^2}$.
+\end{enumerate}
+In particular, consider the value of $t$ for which 
+$t^2R(\theta_{t+1})$ is maximized. Then by assumption 
+case $1$ cannot hold and so $(t-1)^2R(\theta_t) \leq \frac{4r_*^4}{(\gamma^*)^2}$.
+But then by applying the above sequence of inequalities 
+we also have 
+\begin{align*}
+\lefteqn{t^2R(\theta_{t+1}) - (t-1)^2R(\theta_t)} \\
+ &\leq 2r_*^2 - \sqrt{(t-1)^2R(\theta_t)}\gamma^* \\
+ &\leq 2r_*^2,
+\end{align*}
+hence $t^2R(\theta_{t+1}) \leq 2r_*^2 + \frac{4r_*^4}{(\gamma_*)^2}$. 
+Since $t^2R(\theta_{t+1})$ was maximal by assumption, we have
+$R(\theta_{t+1}) \leq \frac{2r_*^2+(2r_*/\gamma_*)^2}{t^2}$, which 
+completes the proof.
 \end{proof}
 
 \end{document}
