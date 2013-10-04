@@ -8,9 +8,13 @@
 \usetikzlibrary{patterns,positioning}
 
 %%% Added by Jonathan %%%
+\def\[#1\]{\begin{align}#1\end{align}}
+\def\(#1\){\begin{align*}#1\end{align*}}
+\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
 \definecolor{NAColor}{rgb}{.75,0,.75}
 \newcommand{\NA}[1]{\textcolor{NAColor}{($\star$) #1}}
 \newcommand{\dee}{\mathrm{d}}
+\newcommand{\algname}[1]{\textsc{\lowercase{#1}}}
 \def\argmax{\operatornamewithlimits{arg\,max}}
 \def\argmin{\operatornamewithlimits{arg\,min}}
 \newcommand{\defined}{\ensuremath{\triangleq}}
@@ -35,6 +39,7 @@
 \newcommand{\sF}{\mathcal{F}}
 \newcommand{\sH}{\mathcal{H}}
 \newcommand{\sC}{\mathcal{C}}
+\newcommand{\sE}{\mathcal{E}}
 \newcommand{\C}{\mathcal{C}}
 \newcommand{\sB}{\mathcal{B}}
 \newcommand{\bR}{\mathbb{R}}
