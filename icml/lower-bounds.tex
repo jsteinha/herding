@@ -1,0 +1,20 @@
+\documentclass[paper.tex]{subfiles}
+
+\begin{document}
+\section{Lower Bounds on Convergence Rates}
+\label{sec:lower-bounds}
+
+It is an open question whether it is possible to achieve the fast $O(1/T^{2})$ convergence of finite-dimensional herding in the infinite-dimensional case. We now show that this is not in general possible. In particular, the upper bounds in the previous section for herding and herding-like algorithms have matching lower bounds for at least some combinations of distributions and feature functions. 
+
+Let $\sX$ be the set of vectors $(x_{1},x_{2},\dots) \in [0,1]^{\infty}$ such that $\sum_{n=1}^{\infty} x_{n} = 1$ and a finite number of the $x_{n}$ are non-zero. Define the infinite feature vector $\phi$ to be the imbedding of $\sX$ into $\ell^{1}$. Let the target distribution $p(x)$ be chosen such that $\bar\phi_{n} = \alpha/n^{1+\eps}$, where the normalization constant $\alpha = 1/\zeta(1 + \eps)$ is the reciprocal of the Riemann zeta function. Note that as $\eps \to 0$, $\alpha \approx \eps$. We will consider the standard $\ell^{2}$ herding loss function $L(\theta) = \|\theta - \bar \phi\|_2^2$. 
+
+Define a {\em sparse update method} to be any method that produces an estimator of $\bar \phi$ at iteration $t$ of the form 
+\[
+\theta_{t} = \sum_{s =1}^{t}w_{t} \phi(x_{t}).
+\]
+In other words, the $t$-th estimator will have at most $t$ non-zero entries, and so $\|x-x^{*}\|_2^2 \ge \alpha^{2}\sum_{n > t} n^{-2-2\eps} = O(\alpha^{2}n^{-1-2\eps})$. Therefore, any sparse update method must have convergence rate no faster than $n^{-1-2\eps}$, for every $\eps > 0$. 
+
+Sparse update methods can be viewed as charactering ``herding-like algorithms,'' including the set of generalized herding algorithms based on \algname{DBMD} and \algname{CGD} with line search. Those sparse methods are of interest because they provide (weighted) ``samples'' matching the moments of the distribution of interest. Since they only operate on the extreme points of the simplex, the optimization problems required to use them are more tractable. 
+
+
+\end{document}
