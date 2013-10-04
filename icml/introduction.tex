@@ -5,7 +5,7 @@
 \label{sec:intro}
 
 Many algorithms, such as SMC \citep{smc} and MCMC \citep{mcmc}, approximate a 
-distribution by samples. Most such algorithms require access to a full posterior and 
+distribution with samples. Most such algorithms require access to a full posterior and 
 may be prone to becoming stuck in local modes. In contrast, the herding algorithm introduced in 
 \citet{Welling:2009a} generates samples whose moments are guaranteed to converge 
 to any given collection of feasible moments. Moreover, \emph{only} the moments 
@@ -28,7 +28,7 @@ generate pseudosamples from $\sX$:
 x_{t} &\in \argmin_{x \in \sX} \ip{\theta_{t}}{\phi(x)} \\
 \theta_{t} &= \theta_{t-1}  + \bar \phi - \phi(x_{t}).
 \]
-In this paper we generalize the herding algorithm to the following set of updates, which 
+In this paper we generalize the herding algorithm to minimize $h(h) + R^{*}(u)$ via the following set of updates, which 
 require only the convexity of $h$ and $R$:
 \[
 u_t &\in \argmin_{u} h(u) + \ip{\theta_t}{u} \\
