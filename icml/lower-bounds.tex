@@ -14,7 +14,7 @@ Define a {\em sparse update method} to be any method that produces an estimator 
 \]
 In other words, the $t$-th estimator will have at most $t$ non-zero entries, and so $\|x-x^{*}\|_2^2 \ge \alpha^{2}\sum_{n > t} n^{-2-2\eps} = O(\alpha^{2}n^{-1-2\eps})$. Therefore, any sparse update method must have convergence rate no faster than $n^{-1-2\eps}$, for every $\eps > 0$. 
 
-Sparse update methods can be viewed as charactering ``herding-like algorithms,'' including the set of generalized herding algorithms based on \algname{DBMD} and \algname{CGD} with line search. Those sparse methods are of interest because they provide (weighted) ``samples'' matching the moments of the distribution of interest. Since they only operate on the extreme points of the simplex, the optimization problems required to use them are more tractable. 
+Sparse update methods can be viewed as charactering ``herding-like algorithms,'' including the set of generalized herding algorithms based on \dual and \cgd with line search. Those sparse methods are of interest because they provide (weighted) ``samples'' matching the moments of the distribution of interest. Since they only operate on the extreme points of the simplex, the optimization problems required to use them are more tractable. 
 
 
 \end{document}

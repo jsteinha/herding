@@ -19,92 +19,16 @@ An alternative interpretation of herding \citep{Chen:2010a,Huszar:2012,Bach:2012
 \)
 where $\Theta = \{ \theta \in \sB_{\Theta} \ | \  \|\theta\| = 1 \}$.
 
-If we are interested in generating samples from $p$ (or some distribution with the same moments as $p$), herding provides an attractive alternative to standard i.i.d. sampling for two reasons. First, it is deterministic, so we do not have to worry about getting ``unlucky'' and generating a set of samples that poorly represent  $p$. Second, in the case where $\sB_{\theta}$ is finite dimensional, the squared error of the herding estimator converges to zero at a rate of $O(1/T^{2})$ whereas the convergence rate of i.i.d.~sampling is $O(1/T)$ \citep{Chen:2010a}. The infinite dimensional case, however, is not as well understood. \citet{Bach:2012a} recently showed that the $O(1/T^{2})$ convergence proof of \citet{Chen:2010a} does not apply in the infinite dimensional case. In addition, \citet{Bach:2012a} introduced an interpretation of herding as a special case of conditional gradient descent (\algname{CGD}) minimizing the square norm of an RKHS. They showed that \algname{CGD} with line search leads to faster convergence rates: $O(1/T)$ in the infinite dimensional case and exponential in the finite dimensional case. However, they found  empirically that line search had poor approximation properties since led to distributions far from the maximum entropy distribution. 
+If we are interested in generating samples from $p$ (or some distribution with the same moments as $p$), herding provides an attractive alternative to standard i.i.d. sampling for two reasons. First, it is deterministic, so we do not have to worry about getting ``unlucky'' and generating a set of samples that poorly represent  $p$. Second, in the case where $\sB_{\theta}$ is finite dimensional, the squared error of the herding estimator converges to zero at a rate of $O(1/T^{2})$ whereas the convergence rate of i.i.d.~sampling is $O(1/T)$ \citep{Chen:2010a}. The infinite dimensional case, however, is not as well understood. \citet{Bach:2012a} recently showed that the $O(1/T^{2})$ convergence proof of \citet{Chen:2010a} does not apply in the infinite dimensional case. In addition, \citet{Bach:2012a} introduced an interpretation of herding as a special case of conditional gradient descent (\cgd) minimizing the square norm of an RKHS. They showed that \cgd with line search leads to faster convergence rates: $O(1/T)$ in the infinite dimensional case and exponential in the finite dimensional case. However, they found  empirically that line search had poor approximation properties since led to distributions far from the maximum entropy distribution. 
 
 In this paper, we use a novel gradient descent algorithm to investigate herding and its generalizations:
 \begin{itemize}
-\item In Section \ref{sec:algorithm} we introduce a novel pair of convex optimization algorithms, which we call primal and dual boosted mirror descent (\algname{PBMD} and \algname{DBMD}). We show how \algname{PBMD} and \algname{DBMD} relate to \algname{CGD} and mirror descent (\algname{MD}). 
-\item We then use \algname{DBMD} in Section \ref{sec:herding} to define a class of generalized herding algorithms. Connections with the ``learning'' interpretation are made by showing how to obtain herding as the limit of an entropically normalized case of \algname{BMD}. 
-\item Section \ref{sec:proofs} presents convergence rates for $\algname{PBMD}$ and $\algname{DBMD}$. As special cases, we recover a $O(\log T/ T)$ convergence rate for herding and a $O(1/T)$ rate for a herding-like algorithm that uses unequally weighted samples. Both of these results apply to the infinite dimensional case. 
+\item In Section \ref{sec:algorithm} we introduce a novel pair of convex optimization algorithms, which we call primal and dual boosted mirror descent (\primal and \dual). We show how \primal and \dual relate to \cgd and mirror descent (\md). 
+\item We then use \dual in Section \ref{sec:herding} to define a class of generalized herding algorithms. Connections with the ``learning'' interpretation are made by showing how to obtain herding as the limit of an entropically normalized case of \dual. 
+\item Section \ref{sec:proofs} presents convergence rates for \primal and \dual. As special cases, we recover a $O(\log T/ T)$ convergence rate for herding and a $O(1/T)$ rate for a herding-like algorithm that uses unequally weighted samples. Both of these results apply to the infinite dimensional case. 
 \item In Section \ref{sec:lower-bounds} we prove matching lower bounds to the upper bounds given in Section \ref{sec:proofs}, showing that any ``sparse'' herding-like method cannot converge faster than $O(1/T)$ in the the infinite dimensional case and that herding converges at the slower $O(\log T / T)$ rate.
-\item Finally, in section \ref{sec:chen} we generalize the $O(1/T^{2})$ convergence proof of \citet{Chen:2010a} to a class of herding-like algorithms derived from \algname{BMD}. 
+\item Finally, in section \ref{sec:chen} we generalize the $O(1/T^{2})$ convergence proof of \citet{Chen:2010a} to a class of herding-like algorithms derived from \bmd. 
 \end{itemize}
 
-
-
-
-\section{Boosted Mirror Descent}
-\label{sec:algorithm}
-
-Let $U$ and $\Theta$ be convex subsets of two Banach spaces $\sB_{U}$ and $\sB_{\Theta}$ and 
-let $\imath : U \to \Theta$ be a linear map from 
-$U$ to $\Theta$ that preserves the inner product. Consider the following loss function 
-$L : U \to \bR$:
-\begin{equation}
-L(u) = h(u) + \max_{\theta \in \Theta} \left\{\langle \theta, \imath(u) \rangle - R(\theta) \right\}.
-\end{equation}
-We can think of $h$ as a \emph{primal regularizer} and $R$ as a \emph{dual regularizer}. 
-
-Examples:
-\begin{itemize}
-\item Let $U$ be the probability simplex over a space $\sX$, let $\phi : \sX \to \bR^d$ be a collection 
-      of statistics, and let $\Theta$ be the unit $L^1$ ball in $\bR^d$. Let $h(u) = 0$, 
-      $\langle \theta, \imath(u) \rangle = \bE_u[\theta^T\phi(x)]$, and 
-      $R(\theta) = \langle \theta, \imath(u_0) \rangle$. Then $L(u)$ is the 
-      \emph{maximum mean discrepancy} between $u$ and $u_0$ relative to $\phi$.
-\item Let $h(u) = 0$ and $R(\theta) = S^*(i^{-1}(\theta))$ where $S^*$ is the 
-      Fenchel conjugate of any strongly convex function $S : U \to \bR$. Then $L(u) = S(u)$ 
-      as long as $i^{-1}(\Theta) = \sB_{U}$.
-\item Let $U = \Theta = \bR^d$. Let $h(u) = \|u\|_1$, $R(u) = \langle \theta, u_0 \rangle + \frac{1}{2} \|\theta\|_2^2$. 
-      Then $L(u) = \|u\|_1 + \frac{1}{2} \|u-u_0\|_2^2$. 
-\end{itemize}
-
-In this paper we will consider a family of methods for minimizing $L(u)$, 
-which are based on Bach's generalization of the Frank-Wolfe algorithm and can 
-be interpreted as boosted mirror descent.
-
-First, let us generalize the setting 
-to consider a \emph{two-argument} loss function
-\begin{equation}
-L(u,\theta) = h(u) + \langle \theta, \imath(u) \rangle - R(\theta).
-\end{equation}
-We will assume throughout that $h$ and $R$ are both convex functions, 
-and furthermore that $\arg\max_{u} h(u) + \langle \theta, \imath(u) \rangle$ can be efficiently 
-computed for all values of $\theta$.
-
-Mirror descent, together with boosting, yields an algorithm for finding 
-``saddle points'' of $L$. It is the following algorithm (called Algorithm 1).
-For notational convenience, for a sequence of weights $\alpha_1,\alpha_2,\ldots$ 
-let $\hat{u}_t = \frac{\sum_{s=1}^t \alpha_su_s}{\sum_{s=1}^t \alpha_s}$ and let 
-$\hat{\theta}_t = \frac{\sum_{s=1}^t \alpha_s\theta_s}{\sum_{s=1}^t \alpha_s}$.
-\begin{enumerate}
-\item $u_1 \in \arg\min_u h(u)$
-\item $\theta_{t} \in \arg\max_{\theta \in \Theta} \langle \theta, \imath(u_t) \rangle - R(\theta)$
-\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \hat{\theta}_t, \imath(u) \rangle$
-%\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \frac{1}{t} \sum_{s \leq t} \theta_s, u \rangle$
-\end{enumerate}
-As long as $h$ is strongly convex, we obtain the 
-bound (see Corollary~\ref{cor:method-1}):
-\begin{equation}
-\sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/T).
-\end{equation}
-In other words, $\hat{u}_T$ is close to being a global minimum of $L$.
-However, it is often the case that $h$ is not strongly convex, whereas $R$ is strongly convex. In this case 
-we may wish to use the following slightly different algorithm (called Algorithm 2):
-\begin{enumerate}
-\item $\theta_1 \in \arg\min_{\theta} R(\theta)$
-\item $u_t \in \arg\min_{u} h(u) + \langle \theta_t, \imath(u) \rangle$
-%\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \frac{1}{t} \sum_{s \leq t} u_s \rangle - R(\theta)$
-\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \imath(\hat{u}_t) \rangle - R(\theta)$
-\end{enumerate}
-We then obtain the following bound 
-when $R$ is strongly convex (see Corollary~\ref{cor:method-2}):
-\[ \sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq \sup_{\theta \in \Theta} L(u^*, \theta) + O(1/T). \]
-Algorithm 1 and Algorithm 2 are closely related; indeed, they are dual to each other 
-(performing Algorithm 1 on $L(u,\theta)$ is the same as performing Algorithm 2 on 
-$-L(\theta,u)$).
-
-For convenience, we will abuse notation and use $\langle \theta, u \rangle$ in place of 
-$\langle \theta, \imath(u) \rangle$ when the map $i$ is clear from context.
 
 \end{document}
