@@ -4,71 +4,83 @@
 \section{Boosted Mirror Descent}
 \label{sec:algorithm}
 
-Our results primarily rely on a pair of novel convex optimization algorithms we call primal and dual boosted mirror descent. 
+Our results primarily rely on a pair of novel convex optimization algorithms we call primal and dual boosted mirror descent. They are inspired by the decomposition used in \cite{Bach:2012b}.
 
 \subsection{Convex Optimization}
 
-Before introducing the boosted mirror descent (\bmd) algorithms, we recall some basic definitions related convex optimization. Let $f$ be a real function whose domain is a Banach space. The {\em convex conjugate} $f^{*}$ of $f$ is defined as
+Before introducing the boosted mirror descent (\bmd) algorithms, we recall some basic definitions related to convex optimization. Let $f$ be a real function whose domain is a Banach space. The {\em convex conjugate} $f^{*}$ of $f$ is defined as
 \[
 f^{*}(y) \eqdef \max_{x} \ip{x}{y} - f(x).
 \]
-If $f$ is lower semi-continuous, then by the Fenchel-Moreau theorem $f = f^{**}$, i.e.
+If $f$ is lower semi-continuous and convex, then by the 
+Fenchel-Moreau theorem $f = f^{**}$, i.e.
 \[
 f(x) = \max_{y} \ip{x}{y} - f^{*}(y).
 \]
-Throughout the paper, we will assume without further notice that functions are lower semi-continuous when required. The gradients of $f^{*}$ and $f$ can be defined as any argument that maximizes the previous two equations:
+Throughout the paper, we will assume without further notice that functions are lower semi-continuous when required. The (sub)gradients of $f^{*}$ and $f$ can be defined as any argument that maximizes the previous two equations:
 \[
 \partial f^{*}(y) &\in \argmax_{x} \ip{x}{y} - f(x) \\
 \partial f(x) &\in \argmax_{y} \ip{x}{y} - f^{*}(y).
 \]
 
-In order to prove fast convergence, we will require additional assumptions beyond convexity. We say a function $f$ is {\em $\alpha$-strongly convex} if 
+In order to prove fast convergence, we will require additional assumptions beyond convexity. 
+Define the \emph{Bregman divergence} of a convex function to be
+\[ D_f(x \| y) = f(x)-\ip{\partial f(y), y-x} - f(y), \]
+which is a measure of ``how convex'' $f$ is between $x$ and $y$. 
+We say that a function $f$ is \emph{strongly convex} with respect 
+to a norm $\|\cdot\|$ if
 \[
-f(x)  - f(y) \le \ip{\partial f(x)}{x-y} - \frac{\alpha}{2}\|x - y\|^{2}.
+D_f(x \| y) \geq \frac{1}{2}\|x-y\|^2
 \]
-%and that a (possibly non-convex) function $g$ is $\beta$-smooth if 
-%\[
-%\|\partial g(x) - \partial g(y) \| \le \beta \| x - y\|.
-%\]
-%Strong convexity and smoothness are dual to each in the sense that a convex function $f$ is $\alpha$-strongly convex if and only if $f^{*}$ is $(1/\alpha)$-smooth. \NA{JH: should double check that we actually need smoothness}
+A related notion is \emph{strong smoothness}: a convex function $f$ 
+is \emph{strongly smooth} with respect to $\|\cdot\|$ if
+\[ D_f(x \| y) \leq \frac{1}{2}\|x-y\|^2 \]
+An important result is that $f$ is strongly convex with respect to $\|\cdot\|$ 
+if and only if its Fenchel conjugate $f^*$ is strongly smooth with respect 
+to the dual norm $\|\cdot\|_*$.
 
 \subsection{The Boosted Mirror Descent Algorithms}
 
-We can now define the \bmd  algorithms. Let $U$ and $\Theta$ be convex subsets of the Banach spaces $\sB_{U}$ and $\sB_{\Theta}$, respectively, and let $\imath : U \to \Theta$ be a linear imbedding from $U$ to $\Theta$ that preserves the inner product. Consider the two-argument loss function $L : U \times \Theta \to \bR$ 
+We can now define the \bmd  algorithms. Let $U$ and $\Theta$ be convex subsets 
+of the Banach spaces $\sB_{U}$ and $\sB_{\Theta}$, respectively, and let 
+$\ip{\cdot}{\cdot}$ be a bilinear map on $\sB_U \times \sB_{\Theta}$; typically 
+$\ip{\cdot}{\cdot}$ will correspond to an inner product but we will use the 
+bracket notation for convenience even when this is not the case.
+Consider the two-argument loss function $L : U \times \Theta \to \bR$ 
+defined as
 \[
-L(u,\theta) = h(u) + \ip{\theta}{\imath(u)} - R(\theta)
+L(u,\theta) = h(u) + \ip{u}{\theta} - R(\theta)
 \]
 for which we wish to find arguments that obtain $L_{*} = \min_{u}\max_{\theta} L(u, \theta)$. Taking only the maximum, we have the one-argument loss function
 \[
 L(u)
-&= h(u) + \max_{\theta \in \Theta} \left\{\ip{\theta}{\imath(u)} - R(\theta) \right\} \\
-&= h(u) + R^{*}(\imath(u)).
+&= h(u) + \max_{\theta \in \Theta} \left\{\ip{u}{\theta} - R(\theta) \right\} \\
+&= h(u) + R^{*}(u).
 \]
-We can think of $h$ as a \emph{primal regularizer} and $R$ as a \emph{dual regularizer}.  The pair of regularization functions $h$ and $R$ define a flexible class of functions of optimize, as seen from the following examples:
+We can think of $h$ as a \emph{primal regularizer} and $R$ as a \emph{dual regularizer}.  The pair of regularization functions $h$ and $R$ define a flexible class of functions to optimize, as seen from the following examples:
 \begin{enumerate}
 \item Let $U$ be the probability simplex over a space $\sX$, let $\phi : \sX \to \bR^d$ be a collection 
       of statistics, and let $\Theta$ be the unit $L^1$ ball in $\bR^d$. Let $h(u) = 0$, 
-      $\langle \theta, \imath(u) \rangle = \bE_u[\theta^T\phi(x)]$, and 
-      $R(\theta) = \langle \theta, \imath(u_0) \rangle$. Then $L(u)$ is the 
+      $\langle u, \theta \rangle = \bE_u[\theta^T\phi(x)]$, and 
+      $R(\theta) = \langle u_0, \theta \rangle$. Then $L(u)$ is the 
       \emph{maximum mean discrepancy} between $u$ and $u_0$ relative to $\phi$.
 \item Let $h(u) = 0$ and $R(\theta) = S^*(i^{-1}(\theta))$ where $S^*$ is the 
       convex conjugate of any strongly convex function $S : U \to \bR$. Then $L(u) = S(u)$ 
       as long as $i^{-1}(\Theta) = \sB_{U}$.
-\item Let $U = \Theta = \bR^d$ and $\imath$ the identity map. Let $h(u) = \|u\|_1$, $R(u) = \langle \theta, u_0 \rangle + \frac{1}{2} \|\theta\|_2^2$. 
+\item Let $U = \Theta = \bR^d$. Let $h(u) = \|u\|_1$, $R(u) = \langle u_0, \theta \rangle + \frac{1}{2} \|\theta\|_2^2$. 
       Then $L(u) = \|u\|_1 + \frac{1}{2} \|u-u_0\|_2^2$. 
 \end{enumerate}
 
-Going forward, for convenience we will abuse notation and use $\ip{\theta}{u}$ in place of 
-$\ip{\theta}{\imath(u)}$ when the map $\imath$ is clear from context. We will assume 
+We will assume 
 throughout that $h$ and $R$ are both convex functions, and furthermore that 
-$\arg\max_{u} h(u) + \ip{\theta}{u}$ can be efficiently 
+$\arg\max_{u} h(u) + \ip{u}{\theta}$ can be efficiently 
 computed for all values of $\theta$.
 
 %In this paper we will consider a family of methods for minimizing $L(u)$, 
 %which are based on Bach's generalization of the Frank-Wolfe algorithm and can 
 %be interpreted as boosted mirror descent.
 
-Mirror descent, together with boosting, yields an algorithm for finding 
+Mirror descent, combined with boosting, yields an algorithm for finding 
 ``saddle points'' of $L(u, \theta)$. 
 For notational convenience, for a sequence of weights $\alpha_1,\alpha_2,\ldots$ 
 let 
@@ -106,13 +118,13 @@ when $R$ is strongly convex (see Corollary~\ref{cor:method-2}):
 \subsection{Connections to Other Gradient Descent Algorithms}
 
 As suggested by their names, the \bmd algorithms are closely related: they are dual to each other in the sense that 
-performing \primal on $L(u,\theta)$ is the same as performing \dual on $-L(\theta,u)$. This relationship is obvious by inspection of the update equations:
+performing \primal on $L(u,\theta)$ is the same as performing \dual on $L'(\theta, u) \eqdef -L(u,\theta)$. This relationship is obvious by inspection of the update equations:
 \(
 \text{Primal} && \text{Dual} \\
 \theta_{t} &= \partial R^{*}(u_{t}) & \theta_{t+1} &= \partial R^{*}(\hat u_{t}) \\
 u_{t+1} &= \partial h^{*}(-\hat\theta_{t}) & u_t &= \partial h^{*}(-\theta_{t})
 \)
-This duality is analogous to that between mirror descent and conjugate gradient descent \citep{Bach:2012b}. \md minimizes $g(x) + f(x)$ and requires that $g$ be $\alpha$-strongly convex while \cgd minimizes $g^{*}(x) + f^{*}(x)$ and requires that $g$ be $\alpha$-strongly convex. The update equations for \md are
+This duality is analogous to that between mirror descent and conjugate gradient descent \citep{Bach:2012b}. \md minimizes $g(x) + f(x)$ and requires that $g$ be $\alpha$-strongly convex while \cgd minimizes $f^{*}(x) + g^{*}(x)$ and requires that $g$ be $\alpha$-strongly convex. The update equations for \md are
 \(
 y_{t} &= \partial f(x_{t})  \\
 \bar y_{t} &=  (1 - \rho_{t+1})\partial g(x_{t}) - \rho_{t+1}y_{t}  \\
