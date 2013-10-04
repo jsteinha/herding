@@ -11,7 +11,7 @@ We further require that $A_t > 0$ for all $t$.
 Also recall that the Bregman divergence is defined by 
 $D_f(x_2 \| x_1) \eqdef f(x_2) - \langle \nabla f(x_1), x_2-x_1 \rangle - f(x_1)$.
 
-Our proofs hinge on the following key lemma:
+Our proofs hinge on the following key lemma, whose proof is given in the Supplementary Material:
 %%% MAIN LEMMA %%%
 \begin{lemma}
 \label{lem:bregman}
@@ -25,35 +25,7 @@ Then for any $x^*$ we have
 \phantom{+} &\leq f(x^*) + \langle \hat{z}_t, x^* \rangle + \frac{1}{A_T} \sum_{t=1}^T A_t D_{f}(x_t \| x_{t+1}). 
 \end{align*}
 \end{lemma}
-\begin{proof}
-First note that, if $x_0 = \arg\min f(x) + \langle z, x \rangle$, 
-then $\nabla f(x_0) = -z$.
 
-%\NA{JNS: In the following proof, (2) is by the update formula for $x_{t+1}$ together with the preceding observation.  (3) is applying (2). (4) and (5) are re-arranging the sum. (6) is definition of Bregman divergence. (7) is the observation again. (8) is the definition of $x_{T+1}$.}
-
-Now note that
-\begin{align}
-\alpha_{t}z_{t} 
-&= A_{t}\hat z_{t} - A_{t-1}\hat z_{t-1} \\
-&= - A_{t}\nabla f(x_{t+1}) + A_{t-1} \nabla f(x_{t}),
-\end{align}
-so we have
-\begin{align}
-\lefteqn{\sum_{t=1}^T \{\alpha_t(f(x_t) + \langle z_t, x_t \rangle)\}} \\
- &= \sum_{t=1}^T \{\alpha_t f(x_t) + \langle A_{t-1} \nabla f(x_t) - A_t \nabla f(x_{t+1}), x_t \rangle\} \\
- &= \sum_{t=1}^T \{\alpha_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle\} \\
- & \quad - A_{T}\langle \nabla f(x_{T+1}), x_{T+1} \rangle
-\end{align}
-\begin{align}
- &= \sum_{t=1}^T \{A_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle - A_t f(x_{t+1})\}  \\
- &\quad+ A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
- &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\}  \\
- &\quad+ A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
- &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x_{T+1}) + \langle \hat{z}_T, x_{T+1} \rangle) \\
- &\leq \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x^*) + \langle \hat{z}_T, x^* \rangle). 
-\end{align}
-Dividing both sides by $A_T$ completes the proof.
-\end{proof}
 We also note that $D_f(x_t \| x_{t+1}) = D_{f^*}(\hat{z}_{t+1} \| z_t)$, where $f^*(z) = \sup_x \langle z,x\rangle - f(x)$. 
 This form of the bound will often be more useful to us.
 \begin{lemma}
@@ -63,6 +35,7 @@ norm $\|\cdot\|$. (In this case we say that $f$ is strongly
 convex with respect to $\|\cdot\|$.) 
 Then $D_{f^*}(x' \| x) \leq \frac{1}{2}\|x-x'\|_{*}^2$.
 \end{lemma}
+
 
 %%% ALGORITHM 1 ANALYSIS %%%
 % Convergence proposition
