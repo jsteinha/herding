@@ -6,7 +6,7 @@
 
 Many algorithms, such as SMC \citep{smc} and MCMC \citep{mcmc}, approximate a 
 distribution by samples. Most such algorithms require access to a full posterior and 
-may be prone to local optima. In contrast, the herding algorithm introduced in 
+may be prone to becoming stuck local modes. In contrast, the herding algorithm introduced in 
 \citet{Welling:2009a} generates samples whose moments are guaranteed to converge 
 to any given collection of feasible moments. Moreover, \emph{only} the moments 
 are required; a full posterior is not needed.
@@ -46,9 +46,9 @@ generalization has several advantages:
       conditional gradient methods more clear. 
 \end{itemize}
 In particular, while it was known that herding was a form of conditional 
-gradient \cite{Bach:2012a} and hence (via the relationship in \citet{Bach:2012b}) also 
+gradient descent \cite{Bach:2012a} and hence (via the relationship in \citet{Bach:2012b}) also 
 a form of subgradient descent, our framework exposes all three algorithms 
-as special cases. A full table of the relationships for various choices of 
+as special cases. A full table outlining the relationships for various choices of 
 $h$ and $R$ is given in Table~\ref{tab:connections}.
 % -- Doesn't seem relevant enough to justify the amount of technical detail
 %An alternative interpretation of herding \citep{Chen:2010a,Huszar:2012,Bach:2012a} is as a moment matching algorithm. In particular, it generates a set of pseudosamples $\{ x_{t} \}$  which match the moments $\bar\phi$. That is, the squared error $\sE_{T}^{2} \eqdef \| \bar\phi - T^{-1}\sum_{t=1}^{T} \phi(x_{t})\|^{2} \to 0$ as $T \to \infty$.  If $\sB_{\Theta}$ is a reproducing kernel Hilbert space (RKHS) with feature map $\phi$, $\sE_{T}^{2}$ is equivalent to the maximum mean discrepancy (MMD) between $p$ and the empirical distribution $\hat p_{T} \eqdef T^{-1}\sum_{t=1}^{T} \delta_{x_{t}}$ \citep{Huszar:2012}:
@@ -60,12 +60,12 @@ $h$ and $R$ is given in Table~\ref{tab:connections}.
 
 %If we are interested in generating samples from $p$ (or some distribution with the same moments as $p$), herding provides an attractive alternative to standard i.i.d. sampling for two reasons. First, it is deterministic, so we do not have to worry about getting ``unlucky'' and generating a set of samples that poorly represent  $p$. Second, in the case where $\sB_{\theta}$ is finite dimensional, the squared error of the herding estimator converges to zero at a rate of $O(1/T^{2})$ whereas the convergence rate of i.i.d.~sampling is $O(1/T)$ \citep{Chen:2010a}. The infinite dimensional case, however, is not as well understood. \citet{Bach:2012a} recently showed that the $O(1/T^{2})$ convergence proof of \citet{Chen:2010a} does not apply in the infinite dimensional case. In addition, \citet{Bach:2012a} introduced an interpretation of herding as a special case of conditional gradient descent (\cgd) minimizing the square norm of an RKHS. They showed that \cgd with line search leads to faster convergence rates: $O(1/T)$ in the infinite dimensional case and exponential in the finite dimensional case. However, they found  empirically that line search had poor approximation properties since led to distributions far from the maximum entropy distribution. 
 
-In summary, we introduce a novel gradient descent algorithm to investigate herding and its generalizations:
+In summary, we introduce a novel gradient descent algorithm to investigate herding and its generalizations, and make the following contributions:
 \begin{itemize}
 \item In Section \ref{sec:algorithm} we introduce a pair of convex optimization algorithms, which we call primal and dual boosted mirror descent (\primal and \dual). We show how \primal and \dual relate to \cgd and mirror descent (\md). 
-\item We then use \dual in Section \ref{sec:herding} to define a class of generalized herding algorithms. Connections with the ``learning'' interpretation of herding are made by showing how to obtain herding as the limit of an entropically normalized case of \dual. 
+\item We then use \dual in Section \ref{sec:herding} to define two classes of generalized herding algorithms. Connections with the ``learning'' interpretation of herding are made by showing how to obtain herding as the limit of an entropically normalized case of \dual. 
 \item Section \ref{sec:proofs} presents convergence rates for \primal and \dual. As special cases, we recover a $O(\log T/ T)$ convergence rate for classical herding and a $O(1/T)$ rate for weighted herding. Both of these results apply to the infinite dimensional case. 
-\item In Section \ref{sec:lower-bounds} we prove matching lower bounds to the upper bounds given in Section \ref{sec:proofs}, showing that any ``sparse'' herding-like method cannot converge faster than $O(1/T)$ in the the infinite dimensional case and that herding converges at the slower $O(\log T / T)$ rate.
+\item In Section \ref{sec:lower-bounds} we prove a matching lower bound to the upper bound given in Section \ref{sec:proofs}, showing that any ``sparse'' herding-like method cannot converge faster than $O(1/T)$ in the the infinite dimensional case.% and that herding converges at the slower $O(\log T / T)$ rate.
 \item Finally, in section \ref{sec:chen} we generalize the $O(1/T^{2})$ convergence proof of \citet{Chen:2010a} to a class of herding-like algorithms derived from \bmd. 
 \end{itemize}
 

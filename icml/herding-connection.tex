@@ -5,7 +5,7 @@
 
 We now derive herding as a special case of \dual. The standard setup for herding is as follows: we are given a 
 space $\sX$ and a feature mapping $\phi : \sX \to \sH$ for some 
-reproducing kernel Hilbert space $\sH$ \cite{RKHS}. 
+reproducing kernel Hilbert space $\sH$ \cite{Hofmann:2008}. 
 We define $\Delta_{\sX}$ to be the simplex 
 of probability distributions over $\sX$ and define the marginal polytope 
 $\sM \eqdef \{\bE_{\mu}[\phi(x)] \mid \mu \in \Delta_{\sX}\}$.
@@ -57,11 +57,12 @@ therefore apply Corollary~\ref{thm:method-2} to obtain the bound
  &\leq \inf_{u^*} \frac{1}{2}\|\bar{\phi}-\bE_{u^*}[\phi(x)]\|_2^2 + \frac{2r^2\log(T+1)}{T} \\
  &= \frac{2r^2\log(T+1)}{T},
 \end{align*}
-where $r \eqdef \sup_{m \in \sM} \|m\|_2$.
+where $r \eqdef \sup_{m \in \sM} \|m\|_2$. This is a slightly weaker 
+version of the typical herding bound on MMD.
 
-This is a slightly weaker version of the typical herding bound on MMD.
-Note that if we use $\alpha_t = t$, which corresponds to using a weighted 
-average, then we obtain a stronger bound of $\frac{8r^2}{T}$ instead.
+If we do not restrict $\alpha_{t}$ to be 1, we obtain a class of algorithms
+we call {\em $\alpha_{t}$-weighted herding}. For the $t$-weighted herding 
+algorithm with we obtain a stronger bound of $\frac{8r^2}{T}$ instead.
 
 \subsection{Herding in Infinite Dimensions}
 \label{sec:infinite-case}
@@ -96,7 +97,7 @@ Therefore, define the ``correction function'' $C_p$ by
 \begin{equation}
 C_p(u)_i \eqdef \sign(u_i) \cdot |u_i|^{p-1}.
 \end{equation}
-We obtain the following \emph{generalized herding} updates:
+We obtain the following \emph{$q$-herding} updates:
 \begin{itemize}
 \item $\theta_{1} = C_p(-\bar{\phi})$
 \item $x_{t} \in \arg\min_{x \in \sX} \ip{\phi(x)}{\theta_t}$
@@ -106,6 +107,8 @@ Note that $\|C_p(u)\|_q^q = \sum_{i} |u_i|^{q(p-1)} = \sum_{i} |u_i|^p = \|u\|_p
 Therefore, $C_p(u) \in l^q(\bZ_{\geq 0})$ whenever $u \in l^p(\bZ_{\geq 0})$. By 
 H\"{o}lder's inequality, it follows that $\ip{u}{\theta_t}$ exists for all 
 $u \in l^p(\bZ_{\geq 0})$ and hence the $q$-herding updates are well-defined.
+
+\NA{JH: make this into a theorem?}
 
 By Proposition~\ref{prop:method-2}, we know that
 \begin{align}
@@ -166,6 +169,6 @@ $\hat{u}_T = \frac{1}{T} \sum_{t=1}^T u_t$, we have
 where $H_{\max}(\bar{\phi})$ is the maximum entropy of any distribution whose 
 moments are $\bar{\phi}$.
 
-Note that as $\eta \to 0$, $u_{t}$ concentrates around its mode, converging to delta function, which is the herding sample. 
+Note that as $\eta \to 0$, $u_{t}$ concentrates around its mode, converging to a delta function at the herding sample location. It is thus possible that, under the proper regularity conditions, it can be shown using entropically regularized \bmd that herding converges to a distribution that is close to the maximum entropy distribution. However, we leave this line of investigation for future work. 
 
 \end{document}

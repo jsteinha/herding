@@ -26,11 +26,11 @@ In order to prove fast convergence, we will require additional assumptions beyon
 \[
 f(x)  - f(y) \le \ip{\partial f(x)}{x-y} - \frac{\alpha}{2}\|x - y\|^{2}.
 \]
-and that a (possibly non-convex) function $g$ is $\beta$-smooth if 
-\[
-\|\partial g(x) - \partial g(y) \| \le \beta \| x - y\|.
-\]
-Strong convexity and smoothness are dual to each in the sense that a convex function $f$ is $\alpha$-strongly convex if and only if $f^{*}$ is $(1/\alpha)$-smooth. \NA{JH: should double check that we actually need smoothness}
+%and that a (possibly non-convex) function $g$ is $\beta$-smooth if 
+%\[
+%\|\partial g(x) - \partial g(y) \| \le \beta \| x - y\|.
+%\]
+%Strong convexity and smoothness are dual to each in the sense that a convex function $f$ is $\alpha$-strongly convex if and only if $f^{*}$ is $(1/\alpha)$-smooth. \NA{JH: should double check that we actually need smoothness}
 
 \subsection{The Boosted Mirror Descent Algorithms}
 
@@ -124,19 +124,19 @@ and for \cgd are
 \bar y_{t+1} &= (1 - \rho_{t})\bar y_{t} + \rho_{t} y_{t+1}  \\
 x_{t} &= \partial g^{*}(-\bar y_{t}).
 \)
-In fact, the \bmd algorithms are very closely related to \cgd and \md: \cgd can be obtained from \dual and \md obtained from \primal. The relationships are given in Table~\ref{tab:connections}. The table also shows how generalized herding and $q$-herding --- which are discussed in the next section --- are obtained from \bmd. 
+In fact, the \bmd algorithms are very closely related to \cgd and \md: \cgd can be obtained from \dual and \md obtained from \primal. The relationships are given in Table~\ref{tab:connections}. The table also shows how $\alpha_{t}$-weighted herding and $q$-herding --- which are discussed in the next section --- are obtained from \bmd. 
 
 \renewcommand{\arraystretch}{1.5}
 \begin{center}
 \begin{table*}[t]
 \caption{Formulation of herding and convex optimization algorithms in terms of \bmd. Full details relating \md and \cgd to \bmd are given in the Supplementary Material. See also \citet{Bach:2012b}.}
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
-\begin{tabularx}{\textwidth}{L|lllLL}
+\begin{tabularx}{\textwidth}{L|lllcL}
 Algorithm 			& $h(u)$ 	& $R(\theta)$ & $\alpha_{t}$ & \bmd Algorithm & Notes 
 \\ \hline
-herding 			& 0			& $\ip{\bar\phi}{\theta} + \frac{1}{2} \| \theta \|_{\sH}^{2}$ 	& 1				 	& \dual &
+herding 			& 0			& $\ip{\bar\phi}{\theta} + \frac{1}{2} \| \theta \|_{\sH}^{2}$ 	& 1				 	& \dual & 
 \\
-generalized herding & 0			& $\ip{\bar\phi}{\theta} + \frac{1}{2} \| \theta \|_{\sH}^{2}$ 	& unconstrained 	& \dual &
+$\alpha_{t}$-weighted herding 	& 0	& $\ip{\bar\phi}{\theta} + \frac{1}{2} \| \theta \|_{\sH}^{2}$ 	& unconstrained 	& \dual & $\sum_{s =1}^{t} \alpha_{t} > 0~\forall t$
 \\ 
 $q$-herding			& 0			& $\ip{\bar\phi}{\theta} + \frac{1}{q} \| \theta \|_{q}^{q}$ 	& unconstrained 	& \dual & $1 \le q \le 2$
 \\ 

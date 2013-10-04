@@ -1,18 +1,16 @@
 \documentclass[paper.tex]{subfiles}
 
 \begin{document}
-\section{Lower Bounds on Convergence Rates}
+\section{A General Lower Bound on Convergence Rates}
 \label{sec:lower-bounds}
 
-It has been an open question whether it is possible to achieve the fast $O(1/T^{2})$ convergence of finite-dimensional herding in the infinite-dimensional case. We now show that this is not in general possible. In particular, the upper bounds in the previous section for herding and herding-like algorithms have matching lower bounds for at least some combinations of distributions and feature functions. 
-
-For the matching $O(1/T)$ lower bound we analyze sparse update methods. Formally, define a {\em sparse update method} to be any method that produces an estimator of $\bar \phi$ at iteration $t$ of the form 
+Although it is possible to achieve the fast $O(1/T^{2})$ convergence rate for finite-dimensional herding, \citet{Bach:2012a} note that without further assumptions herding has only a $O(1/T)$ convergence rate in the infinite-dimensional case. We now provide an example showing rate is tight for {\em any} herding-like algorithm.  By ``herding-like,'' we mean algorithms that approximate the distribution with at most one additional sample at each step. We formalize this idea by defining a {\em sparse update method} to be any method that produces an estimator of $\bar \phi$ at iteration $t$ of the form 
 \[
 \theta_{t} = \sum_{s =1}^{t}w_{t} \phi(x_{t}).
 \]
-Sparse update methods can be viewed as characterizing ``herding-like'' algorithms, including the generalized herding and \cgd with line search. These sparse methods -- which only operate on the extreme points of the simplex -- are of interest because they provide (weighted) ``samples'' matching the moments of the distribution of interest. 
+Sparse update methods include $\alpha_{t}$-weighted herding and \cgd with line search. These sparse methods -- which only operate on the extreme points of the simplex -- are of interest because they provide (weighted) ``samples'' matching the moments of the distribution of interest. 
 
-The bound setup is as follows. Let $\sX$ be the set of vectors $(x_{1},x_{2},\dots) \in [0,1]^{\infty}$ such that $\sum_{n=1}^{\infty} x_{n} = 1$ and a finite number of the $x_{n}$ are non-zero. Define the infinite feature vector $\phi$ to be the imbedding of $\sX$ into $\ell^{1}$. Let the target distribution $p(x)$ be chosen such that $\bar\phi_{n} = c/\alpha(n)$, where $\alpha(n)$ is any superlinear function and $c^{-1} = \sum_{n=1}^{\infty} \alpha(n) < \infty$. Without loss of generality we can assume that $\alpha$ is monotonically increasing. We will consider the standard $\ell^{2}$ herding loss function $L(\theta) = \|\theta - \bar \phi\|_2^2$. 
+Our example is as follows. Let $\sX$ be the set of vectors $(x_{1},x_{2},\dots) \in [0,1]^{\infty}$ such that $\sum_{n=1}^{\infty} x_{n} = 1$ and a finite number of the $x_{n}$ are non-zero. Define the infinite feature vector $\phi$ to be the imbedding of $\sX$ into $\ell^{1}$. Let the target distribution $p(x)$ be chosen such that $\bar\phi_{n} = c/\alpha(n)$, where $\alpha(n)$ is any superlinear function and $c^{-1} = \sum_{n=1}^{\infty} \alpha(n) < \infty$. Without loss of generality we can assume that $\alpha$ is monotonically increasing. We will consider the standard $\ell^{2}$ herding loss function $L(\theta) = \|\theta - \bar \phi\|_2^2$. 
 
 Since we are only considering sparse update methods, the $t$-th estimator will have at most $t$ non-zero entries, and so 
 \[
