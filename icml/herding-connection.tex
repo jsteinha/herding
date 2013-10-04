@@ -7,7 +7,7 @@ The standard setup for herding is as follows: we are given a
 space $\sX$ and a feature mapping $\phi : \sX \to \sH$ for some 
 reproducing kernel Hilbert space $\sH$ \cite{RKHS}. 
 We define $\Delta_{\sX}$ to be the simplex 
-of probability distributions over $\sX$ and the marginal polytope 
+of probability distributions over $\sX$ and define the marginal polytope 
 $\sM \eqdef \{\bE_{\mu}[\phi(x)] \mid \mu \in \Delta_{\sX}\}$.
 
 The goal of herding is to construct samples $x_1,\ldots,x_T \in \sX$ 
@@ -47,8 +47,8 @@ For $u = 0$, this gives us the first bullet point. For $u = \hat{u}_t$,
 this gives us the third bullet point. Finally, the second bullet point 
 is already in the form given in \dual.
 
-Note that $R$ is convex with respect to $\|\cdot\|_2$ and that 
-$R^*(u) = \frac{1}{2}\|\bar{\phi}-\bE_{u}[\phi(x)]\|_2^2$. We can 
+Note that $R$ is strongly convex with respect to $\|\cdot\|_{\sH}$ and that 
+$R^*(u) = \frac{1}{2}\|\bar{\phi}-\bE_{u}[\phi(x)]\|_{\sH}^2$. We can 
 therefore apply Corollary~\ref{thm:method-2} to obtain the bound
 \begin{align*}
 \lefteqn{\frac{1}{2}\|\bar{\phi}-\frac{1}{T}\sum_{t=1}^T \phi(x_t)\|_2^2} \\
@@ -65,11 +65,11 @@ average, then we obtain a stronger bound of $\frac{8r^2}{T}$ instead.
 \label{sec:infinite-case}
 
 The convergence bound for herding implicitly assumes that 
-$\sM$ is bounded in the $l^2$ norm. Assuming that $\sH$ is 
-finite-dimensional, this will always be true. However, in 
+$\sM$ is bounded in norm. Assuming that $\sX$ is compact 
+and that $\sH$ is finite-dimensional, this will always be true. However, in 
 the infinite-dimensional case this may no longer be true. 
 For instance, consider $\sX = \{1,\ldots,N\}$ and let 
-$\phi : \sX \to l^2(\bZ_{\geq 0})$ be
+$\phi : \sX \to l^3(\bZ_{\geq 0})$ be
 defined by $\phi(n)_i = \frac{1}{\sqrt{n+i}}$. Then 
 $\|\phi(n)\|_2 = \infty$ for each $n \in \sX$, and so herding 
 yields no convergence guarantees. Indeed, the algorithm 
@@ -88,17 +88,23 @@ $\|\bE_{u}[\phi(x)]-\bar{\phi}\|_2^2$.
 More generally, for any 
 $p \geq 2$ and $q$ such that $\frac{1}{p} + \frac{1}{q} = 1$, we can take 
 $h \equiv 0$, $R(\theta) = \ip{\bar{\phi}}{\theta} + \frac{1}{q}\|\theta\|_q^q$. 
-Then $R^*(u) = \frac{1}{p}\|\bE_{u}[\phi(x)]-\bar{\phi}\|_p^p$. Define the 
-``correction function'' $C_q$ by
+Then $R^*(u) = \frac{1}{p}\|\bE_{u}[\phi(x)]-\bar{\phi}\|_p^p$. And 
+$\left(\frac{\partial R^*}{\partial u}\right)_i = \sign(u_i) \cdot |u_i|^{p-1}$. 
+Therefore, define the ``correction function'' $C_p$ by
 \begin{equation}
-C_q(x)_i \eqdef \sign(x_i) \cdot |x_i|^{\frac{1}{q-1}}.
+C_p(u)_i \eqdef \sign(u_i) \cdot |u_i|^{p-1}.
 \end{equation}
 We obtain the following \emph{generalized herding} updates:
 \begin{itemize}
-\item $\theta_{1} = C_q(-\bar{\phi})$
+\item $\theta_{1} = C_p(-\bar{\phi})$
 \item $x_{t} \in \arg\min_{x \in \sX} \ip{\phi(x)}{\theta_t}$
-\item $\theta_{t+1} = C_q\left(\frac{1}{t} \sum_{s=1}^t [\phi(x_s)-\bar{\phi}]\right)$
+\item $\theta_{t+1} = C_p\left(\frac{1}{t} \sum_{s=1}^t [\phi(x_s)-\bar{\phi}]\right)$
 \end{itemize}
+Note that $\|C_p(u)\|_q^q = \sum_{i} |u_i|^{q(p-1)} = \sum_{i} |u_i|^p = \|u\|_p^p$. 
+Therefore, $C_p(u) \in l^q(\bZ_{\geq 0})$ whenever $u \in l^p(\bZ_{\geq 0})$. By 
+H\"{o}lder's inequality, it follows that $\ip{u}{\theta_t}$ exists for all 
+$u \in l^p(\bZ_{\geq 0})$ and hence the $q$-herding updates are well-defined.
+
 By Proposition~\ref{prop:method-2}, we know that
 \begin{align}
 \frac{1}{p}\|\bar{\phi}-\frac{1}{T}\sum_{t=1}^T \phi(x_t)\|_p^p \leq \frac{1}{A_T} \sum_{t=1}^T A_tD_{R^*}(\hat{u}_{t+1}\|\hat{u}_t).
