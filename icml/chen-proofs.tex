@@ -1,0 +1,36 @@
+\documentclass[paper.tex]{subfiles}
+
+\begin{document}
+\section{An Upper Bound in Infinite Dimensions}
+\label{sec:chen-proofs}
+
+An intriguing aspect of classical herding is that it is known to have a convergence rate of 
+$O(1/T^2)$ under suitable conditions, as was shown in \citet{Chen:2010b}. In this section, 
+we will need to assume that $h(x)$ is the indicator function for $U$ (i.e. $0$ on $U$ and 
+$\infty$ outside of it) and that $R(\theta) = \ip{u_0}{\theta} + R_0(\theta)$, where 
+$R_0$ exhibits \emph{quadratic scaling}: $R_0(s\theta) = s^2R_0(\theta)$. Note that 
+this implies that $R_0^*(u-u_0) = R^*(u)$.
+For simplicity 
+we will focus on the case $\alpha_t = 1$. Then we have 
+the following bound:
+\begin{theorem}
+TODO
+\end{theorem}
+\begin{proof}
+The key quantity we will analyze is $(t-1)^2R(\theta_t)$. Note that we have
+\begin{align*}
+\lefteqn{(t-1)^2R(\theta_t) - t^2R(\theta_{t+1})} \\
+ &= (t-1)^2R^*(\hat{u}_{t-1})-t^2R^*(\hat{u}_t) \\
+ &= (t-1)^2R_0^*(\hat{u}_{t-1})-t^2R_0^*(\hat{u}_t-z) \\
+ &= (t-1)^2\left[R^*(\hat{u}_{t-1})-R_0^*((t/(t-1))(\hat{u}_t-z))\right] \\
+ &= (t-1)^2\left[R^*(\hat{u}_{t-1})-R^*\left(\frac{t\hat{u}_t-z}{t-1}\right)\right] \\
+ &= (t-1)^2\left[\ip{\frac{\partial R^*}{\partial \hat{u}_{t-1}}}{\hat{u}_{t-1}-\frac{t\hat{u}_t-z}{t-1}}-D_{R^*}\left(\frac{t\hat{u}_t-z}{t-1} \middle\| \hat{u}_{t-1}\right)\right] \\
+ &\geq (t-1)^2\left[\ip{\theta_t}{-\frac{1}{t-1}(u_t-z)}-\frac{1}{2}\left\|\frac{u_t-z}{t-1}\right\|_*^2\right] \\
+ &= -(t-1)\ip{\theta_t}{u_t-z}-\frac{1}{2}\|u_t-z\|_*^2 \\
+ &= -(t-1)\left[\inf_{u \in U} \ip{\theta_t}{u} - \ip{\theta_t}{z}\right]-\frac{1}{2}\|u_t-z\|_*^2 \\
+ &\geq -(t-1)\left[\sup_{\theta} \inf_{u \in U} \ip{\theta}{u-z}\right]-2r_*^2.
+\end{align*}
+
+\end{proof}
+
+\end{document}
