@@ -1,5 +1,6 @@
 \documentclass[reqno,oneside,a4paper]{amsart}
 %\usepackage{jhh-misc}
+\usepackage{tabularx}
 \usepackage{hyperref}
 \usepackage{pdflscape}
 \usepackage{epsfig}
@@ -10,9 +11,6 @@
 \usepackage[normalem]{ulem}
 
 \input{latex-defs.tex}
-% inner product command
-\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
-\def\[#1\]{\begin{align}#1\end{align}}
 
 \begin{document}
 
@@ -105,9 +103,12 @@ A_{t} &= \sum_{s=1}^{t} \alpha_{s} = t(t+1)/2 \\
 
 \begin{landscape}
 
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
 \begin{table}[htdp]
 \begin{center}
-\begin{tabular}{|l|p{4.05cm}|p{4.05cm}|p{4.05cm}|p{4.05cm}|}
+\caption{Convex optimization algorithms (gradient descent type). The function $f$ and $g$ are assumed to be convex. Constants are not given in convergence rates. Here $R$ is the radius of the metric space. Shorthands: L.c. = Lipschitz continuous, s.c. = strongly convex. }
+\begin{tabularx}{8in}{|l|L|L|L|L|}
 \hline & Gradient Descent & Projected Subgrad. Desc. & Conditional Grad. Desc. & Nesterov's Accelerated Grad. Desc.   \\ 
 \hline
 Objective function  &
@@ -134,15 +135,15 @@ $L^{2} / \alpha t$ &
 $R^{2} / \alpha t$ &
 $\beta R^{2}/t^{2}$ \\
 \hline
-\end{tabular}
-\caption{Convex optimization algorithms (gradient descent type). The function $f$ and $g$ are assumed to be convex. Constants are not given in convergence rates. Here $R$ is the radius of the metric space. Shorthands: L.c. = Lipschitz continuous, s.c. = strongly convex. }
+\end{tabularx}
 \label{table:gd-convex-opt-algs}
 \end{center}
 \end{table}
 
 \begin{table}[htdp]
 \begin{center}
-\begin{tabular}{|l|p{5.5cm}|p{5.5cm}|p{5.5cm}|}
+\caption{Convex optimization algorithms (mirror descent type). See Table \ref{table:gd-convex-opt-algs} for conventions. \NA{JHH: should add ISTA and FISTA} }
+\begin{tabularx}{8in}{|l|L|L|L|}
 \hline & Mirror Descent & ``Primal'' Boosted Mirror Descent & ``Dual'' Boosted Mirror Descent  \\ 
 \hline
 Objective function & 
@@ -166,9 +167,8 @@ $R^{2}/\alpha t$ &
 $R^{2}/\alpha t$ & 
 $\beta R^{2} / t$ \\
 \hline
+\end{tabularx}
 
-\end{tabular}
-\caption{Convex optimization algorithms (mirror descent type). See Table \ref{table:gd-convex-opt-algs} for conventions. \NA{JHH: should add ISTA and FISTA} }
 \end{center}
 \label{table:md-convex-opt-algs}
 \end{table}

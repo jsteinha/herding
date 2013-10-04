@@ -1,0 +1,42 @@
+\documentclass[reqno,oneside,a4paper]{amsart}
+%\usepackage{jhh-misc}
+\usepackage{hyperref}
+\usepackage{epsfig}
+\usepackage{framed}
+\usepackage{natbib}
+\usepackage{subfig}
+\usepackage{xspace}
+\usepackage[normalem]{ulem}
+
+\input{latex-defs.tex}
+
+\begin{document}
+
+\title{Supplementary Material} 
+\author{}
+\date{}
+
+\maketitle
+
+\appendix
+
+\section{CGD, MD, and Boosted MD}
+
+The \bmd algorithms are very closely related to \cgd and \md. \dual and \cgd are related as follows. \dual minimizes $g + R^{*}$ while \cgd minimizes $h^{*} + f^{*}$. Make the identifications $h^{*} = R^{*}$ and $f^{*} = g$. Note that $R^{*}$ is $\beta$-smooth $\iff R$ is $(1/\beta)$-strongly convex $\iff h$ is $(1/\beta)$-strongly convex, so the conditions on the functions being optimized are equivalent. Then with $\rho_{t} = \alpha_{t+1}/A_{t+1}$, we can rewrite the \cgd updates  s 
+\[
+x_{t} &= \partial R^{*}(-\bar y_{t})  \\
+y_{t} &= \partial g^{*}(x_{t}) \\
+\bar y_{t+1} &= A_{t+1}^{-1}\sum_{s \le t+1} \alpha_{t} y_{t},
+\]
+which is identical to the \dual if we make the substitutions $x_{t} \to -\theta_{t}$ and $y_{t} \to -u_{t}$. 
+
+We similarly relate \primal and \md. \primal minimizes $g + R^{*}$ while \md minimizes $h + f$. Make the identifications $h = g$ and $f = R^{*}$ and note the conditions of $h$ and $g$ are the same. Letting $\rho_{t+1} = \alpha_{t}/A_{t}$, we can rewrite the \md updates as 
+\[
+y_{t} &= \partial R^{*}(x_{t}) \\
+x_{t+1} &= \partial g^{*}((1 - \rho_{t+1})\partial g(x_{t}) - \rho_{t+1}y_{t}) \\
+&= \partial g^{*}(-\bar y_{t}), 
+\]
+where $\bar y_{t}$ is the same as above. Making the substitutions $y_{t} \to \theta_{t}$ and $x_{t} \to u_{t}$ completes the identification of the two methods. 
+
+\end{document}
+
