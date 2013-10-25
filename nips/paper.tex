@@ -1,0 +1,181 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{import, subfiles}
+\usepackage{tabularx}
+\usepackage{nips13submit_e,times}
+\input{latex-defs.tex}
+
+\title{A Greedy Framework for First-Order Optimization}
+\author{
+Jacob Steinhardt\thanks{Both authors contributed equally to this work.} \\
+Department of Computer Science\\
+Stanford University\\
+Stanford, CA 94305 \\
+\texttt{jsteinhardt@cs.stanford.edu} \\
+\And
+Jonathan Huggins\footnote[1]{}\\
+Department of EECS \\
+Massachusetts Institute of Technology \\
+Cambridge, MA 02139 \\
+\texttt{jhuggins@mit.edu}
+}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\nipsfinalcopy
+
+\begin{document}
+\maketitle
+
+Recent work has shown many connections between conditional gradient 
+and other first-order optimization methods, such as herding \cite{Bach:2012a} 
+and subgradient descent \cite{Bach:2012b}. By considering a type of 
+\emph{proximal conditional method}, which we call boosted mirror 
+descent (\bmd), we are able to unify all of these algorithms into 
+a single framework, which can be interpreted as taking successive 
+arg-mins of a sequence of surrogate functions. Using a standard 
+online learning analysis based on Bregman divergences, we are 
+able to demonstrate an $O(1/T)$ convergence rate for all algorithms 
+in this class. 
+
+More concretely, suppose that we are given a function 
+$L : U \times \Theta \to \bR$ defined by
+\[ L(u, \theta) = h(u) + \ip{u}{\theta} - R(\theta) \]
+and wish to find the \emph{saddle point} 
+\[ L_* \eqdef \min_{u} \max_{\theta} L(u, \theta). \]
+We should think of $u$ as the primal variables and $\theta$ 
+as the dual variables; we will assume throughout that 
+$h$ and $R$ are both convex. We will also abuse notation 
+and define $L(u) \eqdef \max_{\theta} L(u, \theta)$; we 
+can equivalently write $L(u)$ as 
+\[ L(u) = h(u) + R^*(u), \]
+where $R^*$ is the Fenchel conjugate of $R$. Note that 
+$L(u)$ is a convex function. Moreover, since 
+$R \leftrightarrow R^*$ is a one-to-one mapping, for 
+\emph{any} convex function $L$ and \emph{any} decomposition 
+of $L$ into convex functions $h$ and $R^*$, we get a 
+corresponding two-argument function $L(u, \theta)$. 
+
+Given the function $L(u, \theta)$, we define the following 
+optimization procedure, which will generate a sequence of 
+points $(u_1,\theta_1), (u_2, \theta_2), \ldots$ converging 
+to a saddle point of $L$. First, take a sequence of weights
+$\alpha_1, \alpha_2, \ldots$, and for notational convenience 
+define
+\(
+\hat{u}_t = \frac{\sum_{s=1}^t \alpha_su_s}{\sum_{s=1}^t \alpha_s} 
+\quad \text{and} \quad 
+\hat{\theta}_t = \frac{\sum_{s=1}^t \alpha_s\theta_s}{\sum_{s=1}^t \alpha_s}.
+\)
+Then 
+the {\em primal boosted mirror descent} (\primal) algorithm is:
+\begin{enumerate}
+\item $u_1 \in \arg\min_u h(u)$
+\item $\theta_{t} \in \arg\max_{\theta \in \Theta} \langle \theta, u_t \rangle - R(\theta) = \partial R^{*}(u_{t})$
+\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \hat{\theta}_t, u \rangle = \partial h^{*}(-\hat\theta_{t})$
+\end{enumerate}
+As long as $h$ is strongly convex, for the proper choice of $\alpha_{t}$ we 
+obtain the bound (see Corollary~\ref{cor:method-1}):
+\begin{equation}
+\sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq L_{*} + O(1/T).
+\end{equation}
+
+As an example, suppose that we are given a $\gamma$-strongly convex function 
+$f$: that is, $f(x) = \frac{\gamma}{2}\|x\|_2^2 + f_0(x)$, where $f_0$ is convex. 
+Then we let $h(x) = \frac{\gamma}{2}\|x\|_2^2$, $R^*(x) = f_0(x)$, and obtain 
+the updates:
+\begin{enumerate}
+\item $u_1 = 0$
+\item $\theta_t = \partial f_0(u_t)$
+\item $u_{t+1} = -\frac{1}{\gamma}\hat{\theta}_t = -\frac{\sum_{s=1}^t \alpha_s\partial f_0(u_s)}{\gamma \sum_{s=1}^t \alpha_s}$
+\end{enumerate}
+We therefore obtain a variant on subgradient descent where $u_{t+1}$ 
+is a weighted average of the first $t$ subgradients (times a step size 
+$1/\gamma$). Note that these are the subgradients of $f_0$, which are related 
+to the subgradients of $f$ by $\partial f_0(x) = \partial f(x) - \gamma x$.
+
+We can also concern the dual form of our mirror descent algorithm 
+({\em dual boosted mirror descent}, or \dual):
+\begin{enumerate}
+\item $\theta_1 \in \arg\min_{\theta} R(\theta)$
+\item $u_t \in \arg\min_{u} h(u) + \langle \theta_t, u \rangle = \partial h^{*}(-\theta_{t})$
+\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \hat{u}_t \rangle - R(\theta) = \partial R^{*}(\hat u_{t})$
+\end{enumerate}
+Convergence now hinges upon strong convexity of $R$ rather than 
+$h$, and we obtain the same $1/T$ convergence 
+rate (see Corollary~\ref{cor:method-2}):
+\[ \sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq L_{*} + O(1/T). \]
+An important special case is $h(u) = \left\{ \begin{array}{ccl} 0 & : & u \in K \\ \infty & : & u \not\in K \end{array} \right.$, where $K$ is some 
+compact set. Also let $R^* = f$, where $f$ is an arbitrary strongly convex 
+function. Then we are minimizing $f$ over the compact set $K$, and we obtain 
+the updates from conditional gradient:
+\begin{enumerate}
+\item $\theta_1 = \partial f(0)$
+\item $u_t \in \arg\min_{u \in K} \langle \theta_t, u \rangle$
+\item $\theta_{t+1} = \partial f(\hat{u}_t)$
+\end{enumerate}
+Our notation is slightly different from previous presentations in 
+that we use linear weights ($\alpha_t$) instead of geometric weights 
+(often denoted $\rho_t$, as in \cite{Bach:2012b}). However, under the 
+mapping $\alpha_t = \rho_t/\prod_{s=1}^t (1-\rho_s)$, we obtain an 
+algorithm equivalent to the usual formulation.
+
+Our framework is intriguing in that it involves a purely greedy minimization 
+of surrogate loss functions (alternating between the primal and dual), and yet 
+is powerful enough to capture both subgradient descent and conditional gradient 
+descent, as well as a host of other first-order methods, including the low-rank 
+SDP solver introduced by Arora, Hazan, and Kale \cite{aroraSDP}. Briefly, the 
+AHK algorithm seeks to maximize 
+$\sum_{j=1}^m \frac{1}{2}(\Tr(A_j^TX)-b_j)^2$ subject to the 
+constraints $X \succeq 0$ and $\Tr(X) \leq \rho$.\footnote{This is actually a 
+variant of their algorithm, which we present for ease of exposition.} We 
+can then define 
+\[ h(X) = \left\{ \begin{array}{ccl} 0 & : & X \succeq 0\mathrm{ \ and \ }\Tr(X) \leq \rho \\ \infty & : & \mathrm{else} \end{array} \right.\]
+and
+\[ R^*(X) = \sum_{j=1}^m \frac{1}{2}(\Tr(A_j^TX)-b_j)^2. \]
+Note that this decomposition is actually a special case of the conditional 
+gradient decomposition above, and so we obtain the updates 
+\[ X_{t+1} \in \operatorname{argmin}_{X \succeq 0, Tr(X) \leq \rho} \sum_{j=1}^m \left[\Tr(A_j^T\hat{X}_t)-b_j\right]\Tr(A_j^TX), \]
+whose solution turns out to be $\rho vv^T$, where $v$ is the top singular 
+vector of the matrix
+$-\sum_{j=1}^m \left[\Tr(A_j^T\hat{X}_t)-b_j\right]A_j$. This example serves both 
+to illustrate the flexibility of our framework and to highlight the interesting 
+fact that the Arora-Hazan-Kale SDP algorithm is a special case of conditional 
+gradient (to get the original formulation in \cite{aroraSDP}, we need to replace 
+the function $\frac{1}{2}x^2$ with $x_{+}\log x_{+}$, where $x_{+} = \max(x,0)$).
+
+We end by stating our formal convergence results. For the primal algorithm 
+(\primal) we have:
+\begin{theorem}
+\label{thm:method-1}
+Suppose that $h$ is strongly convex with respect to a norm $\|\cdot\|$ 
+and let $r = \sup_{\theta} \|\theta\|_{*}$. Then 
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}. \]
+\end{theorem}
+\begin{corollary} 
+\label{cor:method-1}
+Under the hypotheses of Theorem \ref{thm:method-1}, for $\alpha_{t} = 1$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2 (\log (T) + 1)}{T}. \]
+and for $\alpha_t = t$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T}. \]
+\end{corollary}
+Similarly, for the dual algorithm (\dual) we have:
+\begin{theorem}
+\label{thm:method-2}
+Suppose that $R$ is strongly convex with respect to a norm $\|\cdot\|$ 
+and let $r = \sup_{u} \|u\|_{*}$. Then 
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}. \]
+\end{theorem}
+\begin{corollary}
+\label{cor:method-2}
+Under the hypotheses of Theorem \ref{thm:method-2}, for $\alpha_t = 1$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2(\log(T) + 1)}{T} \]
+and for $\alpha_t = t$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T} \]
+\end{corollary}
+Thus, a step size of $\alpha_t = t$ yields the claimed $O(1/T)$ convergence rate.
+
+\bibliography{herding}
+\bibliographystyle{plain}
+
+\end{document}

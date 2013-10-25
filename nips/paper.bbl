@@ -1,0 +1,21 @@
+\begin{thebibliography}{1}
+
+\bibitem{aroraSDP}
+Sanjeev Arora, Elad Hazan, and Satyen Kale.
+\newblock Fast algorithms for approximate semidefinite programming using the
+  multiplicative weights update method.
+\newblock In {\em Foundations of Computer Science, 2005. FOCS 2005. 46th Annual
+  IEEE Symposium on}, pages 339--348. IEEE, 2005.
+
+\bibitem{Bach:2012b}
+F~Bach.
+\newblock {Duality between subgradient and conditional gradient methods}.
+\newblock {\em arXiv.org}, November 2012.
+
+\bibitem{Bach:2012a}
+F~Bach, Simon Lacoste-Julien, and Guillaume Obozinski.
+\newblock {On the Equivalence between Herding and Conditional Gradient
+  Algorithms}.
+\newblock In {\em ICML}. INRIA Paris - Rocquencourt, LIENS, March 2012.
+
+\end{thebibliography}
