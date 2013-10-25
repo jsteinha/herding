@@ -27,6 +27,7 @@ Cambridge, MA 02139 \\
 \begin{document}
 \maketitle
 
+\paragraph{Introduction.} 
 Recent work has shown many connections between conditional gradient 
 and other first-order optimization methods, such as herding \cite{Bach:2012a} 
 and subgradient descent \cite{Bach:2012b}. By considering a type of 
@@ -38,6 +39,7 @@ online learning analysis based on Bregman divergences, we are
 able to demonstrate an $O(1/T)$ convergence rate for all algorithms 
 in this class. 
 
+\paragraph{Setup.} 
 More concretely, suppose that we are given a function 
 $L : U \times \Theta \to \bR$ defined by
 \[ L(u, \theta) = h(u) + \ip{u}{\theta} - R(\theta) \]
@@ -56,6 +58,7 @@ $R \leftrightarrow R^*$ is a one-to-one mapping, for
 of $L$ into convex functions $h$ and $R^*$, we get a 
 corresponding two-argument function $L(u, \theta)$. 
 
+\paragraph{Primal algorithm.}
 Given the function $L(u, \theta)$, we define the following 
 optimization procedure, which will generate a sequence of 
 points $(u_1,\theta_1), (u_2, \theta_2), \ldots$ converging 
@@ -94,6 +97,7 @@ is a weighted average of the first $t$ subgradients (times a step size
 $1/\gamma$). Note that these are the subgradients of $f_0$, which are related 
 to the subgradients of $f$ by $\partial f_0(x) = \partial f(x) - \gamma x$.
 
+\paragraph{Dual algorithm.}
 We can also concern the dual form of our mirror descent algorithm 
 ({\em dual boosted mirror descent}, or \dual):
 \begin{enumerate}
@@ -120,6 +124,7 @@ that we use linear weights ($\alpha_t$) instead of geometric weights
 mapping $\alpha_t = \rho_t/\prod_{s=1}^t (1-\rho_s)$, we obtain an 
 algorithm equivalent to the usual formulation.
 
+\paragraph{Discussion.}
 Our framework is intriguing in that it involves a purely greedy minimization 
 of surrogate loss functions (alternating between the primal and dual), and yet 
 is powerful enough to capture both subgradient descent and conditional gradient 
@@ -144,6 +149,26 @@ fact that the Arora-Hazan-Kale SDP algorithm is a special case of conditional
 gradient (to get the original formulation in \cite{aroraSDP}, we need to replace 
 the function $\frac{1}{2}x^2$ with $x_{+}\log x_{+}$, where $x_{+} = \max(x,0)$).
 
+\paragraph{$q$-herding.}
+In addition to unifying several existing methods, our framework allows us to 
+extend herding to a an algorithm that we call \emph{$q$-herding}. Herding is 
+an algorithm for constructing pseudosamples that match a specified collection 
+of moments from a distribution; it was originally introduced by Welling 
+\cite{Welling:2009a} and was shown to be a special case of conditional gradient 
+by Bach et al. \cite{Bach:2012a}. It can be cast as trying to minimize 
+$\|\bE_{\mu}[\phi(x)]-\bar{\phi}\|_2^2$ for $\mu$ in the probability simplex over 
+$\sX$, for a given $\phi : \sX \to \bR^d$ and $\bar{\phi} \in \bR^d$. As shown in 
+\cite{Bach:2012a}, the herding updates are equivalent to \dual with 
+$h(\mu) \equiv 0$ and $R(\theta) = \theta^T\bar{\phi} + \frac{1}{2}\|\theta\|_2^2$.
+The implicit assumption in the herding algorithm is that $\|\phi(x)\|_2$ is 
+bounded. We are able to construct a more general algorithm that only requires 
+$\|\phi(x)\|_p$ to be bounded for some $p \geq 2$. This \emph{$q$-herding} 
+algorithm works by taking 
+$R(\theta) = \theta^T\bar{\phi} + \frac{1}{q}\|\theta\|_q^q$, where 
+$\frac{1}{p} + \frac{1}{q} = 1$. In this case our convergence results imply that 
+$\|\bE_{\mu}[\phi(x)]-\bar{\phi}\|_p^p$ decays at a rate of $O(1/T)$.
+
+\paragraph{Convergence results.}
 We end by stating our formal convergence results. For the primal algorithm 
 (\primal) we have:
 \begin{theorem}
