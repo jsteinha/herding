@@ -4,8 +4,7 @@
 Sanjeev Arora, Elad Hazan, and Satyen Kale.
 \newblock Fast algorithms for approximate semidefinite programming using the
   multiplicative weights update method.
-\newblock In {\em Foundations of Computer Science, 2005. FOCS 2005. 46th Annual
-  IEEE Symposium on}, pages 339--348. IEEE, 2005.
+\newblock In {\em FOCS}, pages 339--348, 2005.
 
 \bibitem{Bach:2012b}
 F~Bach.
@@ -18,10 +17,20 @@ F~Bach, Simon Lacoste-Julien, and Guillaume Obozinski.
   Algorithms}.
 \newblock In {\em ICML}. INRIA Paris - Rocquencourt, LIENS, March 2012.
 
+\bibitem{Jaggi:2013}
+Martin Jaggi.
+\newblock {Revisiting {Frank-Wolfe}: Projection-Free Sparse Convex
+  Optimization}.
+\newblock In {\em ICML}, pages 427--435, 2013.
+
+\bibitem{Mairal:2013}
+Julien Mairal.
+\newblock {Optimization with First-Order Surrogate Functions }.
+\newblock In {\em ICML}, 2013.
+
 \bibitem{Welling:2009a}
 Max Welling.
 \newblock {Herding dynamical weights to learn}.
-\newblock In {\em ICML '09: Proceedings of the 26th Annual International
-  Conference on Machine Learning}. ACM, June 2009.
+\newblock In {\em ICML}, 2009.
 
 \end{thebibliography}
