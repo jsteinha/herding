@@ -7,9 +7,8 @@ We now prove the convergence results cited in Section~\ref{sec:algorithm}.
 Throughout this section, assume that $\alpha_1,\ldots,\alpha_T$ is 
 a sequence of real numbers and that $A_t = \sum_{s=1}^t \alpha_s$. 
 We further require that $A_t > 0$ for all $t$.
-
 Also recall that the Bregman divergence is defined by 
-$D_f(x_2 \| x_1) \eqdef f(x_2) - \langle \nabla f(x_1), x_2-x_1 \rangle - f(x_1)$.
+$D_f(x_2 \| x_1) \eqdef f(x_2) - \langle \partial f(x_1), x_2-x_1 \rangle - f(x_1)$.
 
 Our proofs hinge on the following key lemma:
 %, whose proof is given in the Supplementary Material:
@@ -30,7 +29,7 @@ Then for any $x^*$ we have
 %%% START PROOF %%%
 \begin{proof}
 First note that, if $x_0 = \arg\min f(x) + \langle z, x \rangle$, 
-then $\nabla f(x_0) = -z$.
+then $\partial f(x_0) = -z$.
 
 %\NA{JNS: In the following proof, (2) is by the update formula for $x_{t+1}$ together with the preceding observation.  (3) is applying (2). (4) and (5) are re-arranging the sum. (6) is definition of Bregman divergence. (7) is the observation again. (8) is the definition of $x_{T+1}$.}
 
@@ -38,20 +37,20 @@ Now note that
 \begin{align}
 \alpha_{t}z_{t} 
 &= A_{t}\hat z_{t} - A_{t-1}\hat z_{t-1} \\
-&= - A_{t}\nabla f(x_{t+1}) + A_{t-1} \nabla f(x_{t}),
+&= - A_{t}\partial f(x_{t+1}) + A_{t-1} \partial f(x_{t}),
 \end{align}
 so we have
 \begin{align}
 \lefteqn{\sum_{t=1}^T \{\alpha_t(f(x_t) + \langle z_t, x_t \rangle)\}} \\
- &= \sum_{t=1}^T \{\alpha_t f(x_t) + \langle A_{t-1} \nabla f(x_t) - A_t \nabla f(x_{t+1}), x_t \rangle\} \\
- &= \sum_{t=1}^T \{\alpha_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle\} \\
- & \quad - A_{T}\langle \nabla f(x_{T+1}), x_{T+1} \rangle
+ &= \sum_{t=1}^T \{\alpha_t f(x_t) + \langle A_{t-1} \partial f(x_t) - A_t \partial f(x_{t+1}), x_t \rangle\} \\
+ &= \sum_{t=1}^T \{\alpha_t f(x_t) - \langle A_{t} \partial f(x_{t+1}), x_t-x_{t+1} \rangle\} \\
+ & \quad - A_{T}\langle \partial f(x_{T+1}), x_{T+1} \rangle
 \end{align}
 \begin{align}
- &= \sum_{t=1}^T \{A_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle - A_t f(x_{t+1})\}  \\
- &\quad+ A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
+ &= \sum_{t=1}^T \{A_t f(x_t) - \langle A_{t} \partial f(x_{t+1}), x_t-x_{t+1} \rangle - A_t f(x_{t+1})\}  \\
+ &\quad+ A_T(f(x_{T+1}) - \langle \partial f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
  &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\}  \\
- &\quad+ A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
+ &\quad+ A_T(f(x_{T+1}) - \langle \partial f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
  &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x_{T+1}) + \langle \hat{z}_T, x_{T+1} \rangle) \\
  &\leq \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x^*) + \langle \hat{z}_T, x^* \rangle). 
 \end{align}
@@ -72,7 +71,7 @@ Then $D_{f^*}(x' \| x) \leq \frac{1}{2}\|x-x'\|_{*}^2$.
 
 %%% ALGORITHM 1 ANALYSIS %%%
 % Convergence proposition
-\begin{proposition}[Convergence of Algorithm 1]
+\begin{proposition}[Convergence of \primal]
 \label{prop:method-1}
 Consider the updates $\theta_t \in \arg\max_{\theta} \langle \theta, u_t \rangle - R(\theta)$ 
 and $u_{t+1} \in \arg\min_u h(u) + \langle \hat{\theta}_s, u \rangle$. 
@@ -149,7 +148,7 @@ which completes the proof.
 
 %%% ALGORITHM 2 ANALYSIS %%%
 % Convergence proposition
-\begin{proposition}[Convergence of Algorithm 2]
+\begin{proposition}[Convergence of \dual]
 \label{prop:method-2}
 Consider the updates $u_t \in \arg\min_{u} h(u) + \langle \theta_t, u \rangle$ 
 and $\theta_{t+1} \in \arg\max_{\theta} \langle \theta, \hat{u}_t \rangle - R(\theta)$. 
@@ -200,7 +199,7 @@ and for $\alpha_t = t$ we have
 \[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T} \]
 \end{corollary}
 \begin{proof}[Proofs]
-The proofs are identical to those for Algorithm 1.
+The proofs are identical to those for \primal.
 \end{proof}
 
 \end{document}
