@@ -144,7 +144,7 @@ algorithm is a ``dual'' algorithm is that it hinges on strong convexity of
 the dual, as opposed to strong convexity of the primal. If we care about dual 
 convergence instead of primal convergence, the only change we need to make 
 is to take $\hat{\theta}_T$ at the end of the algorithm instead of $\hat{u}_T$. 
-(This can be seeing by defining the loss function $L_2(\theta, u) \eqdef -L(u, \theta)$, 
+(This can be seeing by defining the loss function $L'(\theta, u) \eqdef -L(u, \theta)$, 
 which inverts the role of $u$ and $\theta$ but yields the same updates as above.)
 
 \paragraph{Discussion.}
@@ -251,9 +251,9 @@ and for $\alpha_t = t$ we have
 Thus, a step size of $\alpha_t = t$ yields the claimed $O(1/T)$ convergence rate.
 
 \paragraph{Acknowledgements.}
-Thanks to Simon Lacoste-Julien, Martin Jaggi, Percy Liang, Arun Chaganty, and Sida Wang 
+Thanks to Cameron Freer, Simon Lacoste-Julien, Martin Jaggi, Percy Liang, Arun Chaganty, and Sida Wang 
 for helpful discussions. Thanks also to the anonymous reviewer for suggesting improvements 
-to the paper. This work was supported by the Hertz Foundation and by the NDSEG graduate 
+to the paper. JR was supported by the Hertz Foundation. JHH was supported by the U.S. Government under FA9550-11-C-0028 and awarded by the Department of Defense, Air Force Office of Scientific Research, National Defense Science and Engineering Graduate (NDSEG) Fellowship, 32 CFR 168a.
 fellowship.
 
 \bibliography{herding}

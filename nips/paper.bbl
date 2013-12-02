@@ -7,12 +7,12 @@ Sanjeev Arora, Elad Hazan, and Satyen Kale.
 \newblock In {\em FOCS}, pages 339--348, 2005.
 
 \bibitem{Bach:2012b}
-F~Bach.
+Francis Bach.
 \newblock {Duality between subgradient and conditional gradient methods}.
 \newblock {\em arXiv.org}, November 2012.
 
 \bibitem{Bach:2012a}
-F~Bach, Simon Lacoste-Julien, and Guillaume Obozinski.
+Francis Bach, Simon Lacoste-Julien, and Guillaume Obozinski.
 \newblock {On the Equivalence between Herding and Conditional Gradient
   Algorithms}.
 \newblock In {\em ICML}. INRIA Paris - Rocquencourt, LIENS, March 2012.
