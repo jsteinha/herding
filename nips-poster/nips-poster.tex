@@ -1,0 +1,286 @@
+\documentclass[final]{beamer}
+\mode<presentation>
+{
+ %\usetheme{Berlin}
+ % \usetheme{Aachen}
+%  \usetheme{Oldi6}
+%  \usetheme{I6td}
+ \usetheme{I6dv}
+%  \usetheme{I6pd}
+%  \usetheme{I6pd2}
+}
+
+\usepackage{bm}
+
+\usepackage{times}
+\usepackage{amsmath,amssymb,amsthm}
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{natbib}
+
+
+\input{latex-defs.tex}
+
+\usepackage[orientation=landscape,size=custom,width=129,height=110,scale=1.4]{beamerposter}
+
+% Display a grid to help align images
+%\beamertemplategridbackground[1cm]
+
+\title%[] %(optional, use only with long paper titles)
+{A Greedy Framework for First-Order Optimization}
+
+%\subtitle {Include Only If Paper Has a Subtitle}
+
+\author%[Author, Another] % (optional, use only with lots of authors)
+{Jonathan Huggins$^{*1}$, Jacob Steinhardt$^{*2}$}
+
+\institute[] % (optional, but mostly needed)
+{$^{*}$Both authors contributed equally to this work. $^1$Massachusetts Institute of Technology. $^{2}$Stanford University.}
+
+\date{December 2013}
+
+\begin{document}
+
+\begin{frame}{} 
+  	%\titlepage  
+%\vfill
+    \begin{columns}
+\begin{column}{0.48\linewidth}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% COLUMN 1		 						%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BEGIN INTRODUCTION BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{block}{\large Introduction}
+Recent work has shown many connections between conditional gradient 
+and other first-order optimization methods, such as herding \cite{Bach:2012a} 
+and subgradient descent \cite{Bach:2012b}. By considering a type of 
+\emph{proximal conditional method}, which we call boosted mirror 
+descent (\bmd), we are able to unify all of these algorithms into 
+a single framework, which can be interpreted as taking successive 
+arg-mins of a sequence of surrogate functions. Using a standard 
+online learning analysis based on Bregman divergences, we are 
+able to demonstrate an $O(1/T)$ convergence rate for all algorithms 
+in this class. 
+\end{block}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% END INTRODUCTION BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BEGIN ALGORITHM BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{block}{\large The Boosted Mirror Descent Algorithm}
+
+More concretely, suppose that we are given a function 
+$L : U \times \Theta \to \bR$ defined by
+\[ L(u, \theta) = h(u) + \ip{u}{\theta} - R(\theta) \]
+and wish to find the \emph{saddle point} 
+\[ L_* \eqdef \min_{u} \max_{\theta} L(u, \theta). \]
+We should think of $u$ as the primal variables and $\theta$ 
+as the dual variables; we will assume throughout that 
+$h$ and $R$ are both convex. We will also abuse notation 
+and define $L(u) \eqdef \max_{\theta} L(u, \theta)$; we 
+can equivalently write $L(u)$ as 
+\[ L(u) = h(u) + R^*(u), \]
+where $R^*$ is the Fenchel conjugate of $R$. Note that 
+$L(u)$ is a convex function. Moreover, since 
+$R \leftrightarrow R^*$ is a one-to-one mapping, for 
+\emph{any} convex function $L$ and \emph{any} decomposition 
+of $L$ into convex functions $h$ and $R^*$, we get a 
+corresponding two-argument function $L(u, \theta)$. 
+
+\begin{columns}[t]
+%%% PRIMAL ALGORITHM SUB-BLOCK %%%
+\begin{column}{0.45\linewidth}
+\begin{block}{Primal Algorithm}
+Given the function $L(u, \theta)$, we define the following 
+optimization procedure, which will generate a sequence of 
+points $(u_1,\theta_1), (u_2, \theta_2), \ldots$ converging 
+to a saddle point of $L$. First, take a sequence of weights
+$\alpha_1, \alpha_2, \ldots$, and for notational convenience 
+define
+\(
+\hat{u}_t = \frac{\sum_{s=1}^t \alpha_su_s}{\sum_{s=1}^t \alpha_s} 
+\quad \text{and} \quad 
+\hat{\theta}_t = \frac{\sum_{s=1}^t \alpha_s\theta_s}{\sum_{s=1}^t \alpha_s}.
+\)
+Then 
+the {\em primal boosted mirror descent} (\primal) algorithm is:
+\begin{enumerate}
+\item $u_1 \in \arg\min_u h(u)$
+\item $\theta_{t} \in \arg\max_{\theta \in \Theta} \langle \theta, u_t \rangle - R(\theta) = \partial R^{*}(u_{t})$
+\item $u_{t+1} \in \arg\min_{u} h(u) + \langle \hat{\theta}_t, u \rangle = \partial h^{*}(-\hat\theta_{t})$
+\end{enumerate}
+As long as $h$ is strongly convex, for the proper choice of $\alpha_{t}$ we 
+obtain the bound (see Corollary~\ref{cor:method-1}):
+\begin{equation}
+\sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq L_{*} + O(1/T).
+\end{equation}
+
+As an example, suppose that we are given a $\gamma$-strongly convex function 
+$f$: that is, $f(x) = \frac{\gamma}{2}\|x\|_2^2 + f_0(x)$, where $f_0$ is convex. 
+Then we let $h(x) = \frac{\gamma}{2}\|x\|_2^2$, $R^*(x) = f_0(x)$, and obtain 
+the updates:
+\begin{enumerate}
+\item $u_1 = 0$
+\item $\theta_t = \partial f_0(u_t)$
+\item $u_{t+1} = -\frac{1}{\gamma}\hat{\theta}_t = -\frac{\sum_{s=1}^t \alpha_s\partial f_0(u_s)}{\gamma \sum_{s=1}^t \alpha_s}$
+\end{enumerate}
+We therefore obtain a variant on subgradient descent where $u_{t+1}$ 
+is a weighted average of the first $t$ subgradients (times a step size 
+$1/\gamma$). Note that these are the subgradients of $f_0$, which are related 
+to the subgradients of $f$ by $\partial f_0(x) = \partial f(x) - \gamma x$.
+\end{block}
+\end{column}
+
+%%% DUAL ALGORITHM SUB-BLOCK %%%
+\begin{column}{0.45\linewidth}
+\begin{block}{Dual Algorithm}
+We can also consider the dual form of our mirror descent algorithm 
+({\em dual boosted mirror descent}, or \dual):
+\begin{enumerate}
+\item $\theta_1 \in \arg\min_{\theta} R(\theta)$a
+\item $u_t \in \arg\min_{u} h(u) + \langle \theta_t, u \rangle = \partial h^{*}(-\theta_{t})$
+\item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \hat{u}_t \rangle - R(\theta) = \partial R^{*}(\hat u_{t})$
+\end{enumerate}
+Convergence now hinges upon strong convexity of $R$ rather than 
+$h$, and we obtain the same $1/T$ convergence 
+rate (see Corollary~\ref{cor:method-2}):
+\[ \sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq L_{*} + O(1/T). \]
+An important special case is $h(u) = \left\{ \begin{array}{ccl} 0 & : & u \in K \\ \infty & : & u \not\in K \end{array} \right.$, where $K$ is some 
+compact set. Also let $R^* = f$, where $f$ is an arbitrary strongly convex 
+function. Then we are minimizing $f$ over the compact set $K$, and we obtain 
+the updates from conditional gradient:
+\begin{enumerate}
+\item $\theta_1 = \partial f(0)$
+\item $u_t \in \arg\min_{u \in K} \langle \theta_t, u \rangle$
+\item $\theta_{t+1} = \partial f(\hat{u}_t)$
+\end{enumerate}
+Our notation is slightly different from previous presentations in 
+that we use linear weights ($\alpha_t$) instead of geometric weights 
+(often denoted $\rho_t$, as in \cite{Bach:2012b}). However, under the 
+mapping $\alpha_t = \rho_t/\prod_{s=1}^t (1-\rho_s)$, we obtain an 
+algorithm equivalent to the usual formulation.
+\end{block}
+	
+\end{column}
+\end{columns}
+\end{block}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% END ALGORITHM BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{column}		
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% COLUMN 2		 						%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{column}{0.48\linewidth}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BEGIN CONVERGENCE BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{block}{\large Convergence of Boosted Mirror Descent}
+\begin{columns}[t]
+%%% PRIMAL CONVERGENCE SUB-BLOCK %%%
+\begin{column}{0.45\linewidth}
+\begin{block}{Primal Algorithm}
+\begin{theorem}
+\label{thm:method-1}
+Suppose that $h$ is strongly convex with respect to a norm $\|\cdot\|$ 
+and let $r = \sup_{\theta} \|\theta\|_{*}$. Then 
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}. \]
+\end{theorem}
+\begin{corollary} 
+\label{cor:method-1}
+Under the hypotheses of Theorem \ref{thm:method-1}, for $\alpha_{t} = 1$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2 (\log (T) + 1)}{T}. \]
+and for $\alpha_t = t$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T}. \]
+\end{corollary}
+\end{block}
+\end{column}
+
+%%% DUAL CONVERGENCE SUB-BLOCK %%%
+\begin{column}{0.45\linewidth}
+\begin{block}{Dual Convergence}
+\begin{theorem}
+\label{thm:method-2}
+Suppose that $R$ is strongly convex with respect to a norm $\|\cdot\|$ 
+and let $r = \sup_{u} \|u\|_{*}$. Then 
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}. \]
+\end{theorem}
+\begin{corollary}
+\label{cor:method-2}
+Under the hypotheses of Theorem \ref{thm:method-2}, for $\alpha_t = 1$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2(\log(T) + 1)}{T} \]
+and for $\alpha_t = t$ we have
+\[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{8r^2}{T} \]
+\end{corollary}
+\end{block}
+\end{column}
+\end{columns}
+\end{block}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% END CONVERGENCE BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BEGIN AHK APPLICATION BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{block}{\large Application: Solving SDPs}
+
+
+\end{block}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% END AHK APPLICATION BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BEGIN Q-HERDING APPLICATION BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{block}{\large Application: $q$-herding}
+
+
+\end{block}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% END Q-HERDING APPLICATION BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BEGIN ACKNOWLEDGMENTS BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{block}{\large Acknowledgements}
+We thank Cameron Freer for helpful conversations that led to this work. JHH was supported by the U.S. Government under FA9550-11-C-0028 and awarded by the Department of Defense, Air Force Office of Scientific Research, National Defense Science and Engineering Graduate (NDSEG) Fellowship, 32 CFR 168a.
+\end{block}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% END ACKNOWLEDGMENTS BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BEGIN BIBLIOGRAPHY BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{block}{\small References}
+\begin{footnotesize}
+\bibliographystyle{plainnat}
+\bibliography{herding}
+\end{footnotesize}
+\end{block}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% END BIBLIOGRAPHY BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{column}
+
+\end{columns}
+\end{frame}
+\end{document}

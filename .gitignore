@@ -4,4 +4,8 @@
 *.out
 *.bbl
 *.blg
+*.nav
+*.snm
+*.toc
 *~
+.DS_STORE
