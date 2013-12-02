@@ -107,7 +107,7 @@ We can also consider the dual form of our mirror descent algorithm
 \item $\theta_{t+1} \in \arg\max_{\theta \in \Theta} \langle \theta, \hat{u}_t \rangle - R(\theta) = \partial R^{*}(\hat u_{t})$
 \end{enumerate}
 Convergence now hinges upon strong convexity of $R$ rather than 
-$h$, and we obtain the same $1/T$ convergence 
+$h$, and we obtain the same $O(1/T)$ convergence 
 rate (see Corollary~\ref{cor:method-2}):
 \[ \sup_{\theta \in \Theta} L(\hat{u}_T, \theta) \leq L_{*} + O(1/T). \]
 An important special case is $h(u) = \left\{ \begin{array}{ccl} 0 & : & u \in K \\ \infty & : & u \not\in K \end{array} \right.$, where $K$ is some 
@@ -132,7 +132,7 @@ an attractive sparsity property: the solution after the $t$-th iteration is
 a convex combination of $t$ extreme points of the optimized space. In 
 \cite{Jaggi:2013} it is shown that conditional gradient is asymptotically 
 optimal amongst algorithms with sparse solutions. This 
-suggests that the $1/T$ convergence rate obtained in this paper cannot be 
+suggests that the $O(1/T)$ convergence rate obtained in this paper cannot be 
 improved without further assumptions. For further discussion of the properties 
 of conditional gradient, see Jaggi~\cite{Jaggi:2013}.
 
