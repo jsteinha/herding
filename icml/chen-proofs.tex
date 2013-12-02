@@ -22,7 +22,7 @@ that $R_0$ exhibits quadratic scaling as above. Define
 Then $R(\theta_{t+1}) \leq \frac{2r_*^2+(2r_*^2/\gamma_*)^2}{t^2}$ as long 
 as $\gamma^* > 0$.
 \end{theorem}
-This corresponds to Proposition 1 of \citet{Chen:2010b} for $R(\theta) = \frac{1}{2}\|\theta\|_2^2$. Note that if there is an $\ell^2$ ball of radius $\epsilon$ 
+This corresponds to Proposition 1 of \citet{Chen:2010b} for $R_{0}(\theta) = \frac{1}{2}\|\theta\|_2^2$. Note that if there is an $\ell^2$ ball of radius $\epsilon$ 
 around $u_0$ that is contained in $u$ then $\gamma^* \geq \frac{\epsilon}{r_*}$ 
 in this case, which is how Chen's result follows from ours.
 \begin{proof}[Proof of Theorem~\ref{thm:chen}]
@@ -30,14 +30,14 @@ The key quantity we will analyze is $(t-1)^2R(\theta_t)$. Note that we have
 \begin{align*}
 \lefteqn{(t-1)^2R(\theta_t) - t^2R(\theta_{t+1})} \\
  &= (t-1)^2R^*(\hat{u}_{t-1})-t^2R^*(\hat{u}_t) \\
- &= (t-1)^2R_0^*(\hat{u}_{t-1})-t^2R_0^*(\hat{u}_t-z) \\
- &= (t-1)^2\left[R^*(\hat{u}_{t-1})-R_0^*((t/(t-1))(\hat{u}_t-z))\right] \\
- &= (t-1)^2\left[R^*(\hat{u}_{t-1})-R^*\left(\frac{t\hat{u}_t-z}{t-1}\right)\right] \\
- &= (t-1)^2\left[\ip{\frac{\partial R^*}{\partial \hat{u}_{t-1}}}{\hat{u}_{t-1}-\frac{t\hat{u}_t-z}{t-1}}-D_{R^*}\left(\frac{t\hat{u}_t-z}{t-1} \middle\| \hat{u}_{t-1}\right)\right] \\
- &\geq (t-1)^2\left[\ip{\theta_t}{-\frac{1}{t-1}(u_t-z)}-\frac{1}{2}\left\|\frac{u_t-z}{t-1}\right\|_*^2\right] \\
- &= -(t-1)\ip{\theta_t}{u_t-z}-\frac{1}{2}\|u_t-z\|_*^2 \\
- &= -(t-1)\left[\inf_{u \in U} \ip{\theta_t}{u} - \ip{\theta_t}{z}\right]-\frac{1}{2}\|u_t-z\|_*^2 \\
- &\geq (t-1)\sqrt{R(\theta_t)}\left[\inf_{\theta} \sup_{u \in U} \ip{-\theta}{u-u_0}\right]-2r_*^2 \\
+ &= (t-1)^2R^*(\hat{u}_{t-1})-t^2R_0^*(\hat{u}_t-u_{0}) \\
+ &= (t-1)^2\left[R^*(\hat{u}_{t-1})-R_0^*((t/(t-1))(\hat{u}_t-u_{0}))\right] \\
+ &= (t-1)^2\left[R^*(\hat{u}_{t-1})-R^*\left(\frac{t\hat{u}_t-u_{0}}{t-1}\right)\right] \\
+ &= (t-1)^2\left[\ip{\partial R^*(\hat{u}_{t-1})}{\hat{u}_{t-1}-\frac{t\hat{u}_t-u_{0}}{t-1}}-D_{R^*}\left(\frac{t\hat{u}_t-u_{0}}{t-1} \middle\| \hat{u}_{t-1}\right)\right] \\
+ &\geq (t-1)^2\left[\ip{\theta_t}{-\frac{1}{t-1}(u_t-u_{0})}-\frac{1}{2}\left\|\frac{u_t-u_{0}}{t-1}\right\|_*^2\right] \\
+ &= -(t-1)\ip{\theta_t}{u_t-u_{0}}-\frac{1}{2}\|u_t-u_{0}\|_*^2 \\
+ &= -(t-1)\left[\inf_{u \in U} \ip{\theta_t}{u} - \ip{\theta_t}{u_{0}}\right]-\frac{1}{2}\|u_t-u_{0}\|_*^2 \\
+ &\geq (t-1)\sqrt{R(\theta_t)}\left[\inf_{\theta} \sup_{u \in U} \frac{\ip{-\theta}{u-u_0}}{\sqrt{R(\theta_t)}}\right]-2r_*^2 \\
  &= \sqrt{(t-1)^2R(\theta_t)}\gamma^*-2r_*^2.
 \end{align*}
 There are now two possibilities for each $t$:
