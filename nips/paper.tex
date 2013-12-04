@@ -186,7 +186,7 @@ While both algorithms share the intuition of trying to construct a ``proximal Fr
 algorithm, the general framework of \cite{Mairal:2013} studies convex \emph{upper bounds}, 
 rather than the convex \emph{lower bounds} of this paper (although for the 
 ``proximal gradient surrogates'' that they suggest using, their Frank-Wolfe algorithm 
-does indeed deal with lower bounds). Another difference is that their analysis focuses 
+does implicitly use lower bounds). Another difference is that their analysis focuses 
 on the Lipschitz properties of the objective function, whereas we use the more general 
 notion of strong convexity with respect to an arbitrary norm. We believe that this 
 geometric perspective is useful for tailoring the proximal function to specific applications, 
@@ -253,8 +253,7 @@ Thus, a step size of $\alpha_t = t$ yields the claimed $O(1/T)$ convergence rate
 \paragraph{Acknowledgements.}
 Thanks to Cameron Freer, Simon Lacoste-Julien, Martin Jaggi, Percy Liang, Arun Chaganty, and Sida Wang 
 for helpful discussions. Thanks also to the anonymous reviewer for suggesting improvements 
-to the paper. JR was supported by the Hertz Foundation. JHH was supported by the U.S. Government under FA9550-11-C-0028 and awarded by the Department of Defense, Air Force Office of Scientific Research, National Defense Science and Engineering Graduate (NDSEG) Fellowship, 32 CFR 168a.
-fellowship.
+to the paper. JS was supported by the Hertz Foundation. JHH was supported by the U.S. Government under FA9550-11-C-0028 and awarded by the Department of Defense, Air Force Office of Scientific Research, National Defense Science and Engineering Graduate (NDSEG) Fellowship, 32 CFR 168a.
 
 \bibliography{herding}
 \bibliographystyle{plain}
