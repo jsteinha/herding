@@ -121,7 +121,8 @@ u_t\,\,\,\,\,\, &= \argmin_u \left[\frac{1}{2}u^2 + u\theta\right]             =
 %%% BEGIN ALGORITHM BLOCK %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{columns}[t]
-\begin{column}{.43\linewidth}
+\begin{column}{.001\linewidth}\end{column}
+\begin{column}{.4\linewidth}
 \begin{block}{\large Being (Less) Greedy: \\ Boosted Mirror Descent}
 Replace $u_t$ with a weighted average
 \begin{align*}
@@ -169,7 +170,8 @@ So $u_{t}$ is chosen such that the gradient contributed by $h$ at $u_{t}$ cancel
 %%% BEGIN APPLICATIONS BLOCK %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{block}{\large Special Cases and Applications}
-Many particular algorithms can be cast into our framework.
+Many particular algorithms can be cast into our framework.\
+\vspace{-4 mm}
 \begin{columns}[t]
 \begin{column}{0.01\linewidth}\end{column}
 \begin{column}{0.47\linewidth}
@@ -233,6 +235,7 @@ which only requires that $\|\bar{\phi}\|_p$ exists, where $\frac{1}{p} + \frac{1
 
 \end{column}
 \end{columns}
+\vspace{-3 mm}
 \end{block}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% END APPLICATIONS BLOCK %%%
