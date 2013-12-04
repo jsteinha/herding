@@ -88,14 +88,15 @@
 
   \begin{beamercolorbox}[wd=\paperwidth]{headline}
     \begin{columns}[T]
-%      \begin{column}{.01\paperwidth}
-%      \end{column}
-%      \begin{column}{.02\paperwidth}
-%        \begin{center}
-%          %\includegraphics[width=.6\linewidth]{logos/i6-hks44}
-%        \end{center}
-%        \vskip1ex
-%      \end{column}
+      \begin{column}{.01\paperwidth}
+      \end{column}
+      \begin{column}{.65\paperwidth}
+        \vskip3ex
+        \raggedleft
+        \usebeamercolor{title in headline}{\color{fg}\textbf{\LARGE{\inserttitle}}\\[1ex]}
+        \usebeamercolor{author in headline}{\color{fg}\Large{\insertauthor}\\[.5ex]}
+        \usebeamercolor{institute in headline}{\color{fg}\large{\insertinstitute}\\[.5ex]}     
+      \end{column}
       \begin{column}{.06\paperwidth}
         \vskip2.25cm
         \begin{center}
@@ -103,20 +104,34 @@
         \end{center}
         \vskip1.25cm
       \end{column}
-      \begin{column}{.76\paperwidth}
-        \vskip3ex
-        \raggedleft
-        \usebeamercolor{title in headline}{\color{fg}\textbf{\LARGE{\inserttitle}}\\[1ex]}
-        \usebeamercolor{author in headline}{\color{fg}\Large{\insertauthor}\\[.5ex]}
-        \usebeamercolor{institute in headline}{\color{fg}\large{\insertinstitute}\\[.5ex]}     
-      \end{column}
-      \begin{column}{.16\paperwidth}
-        \vskip2.25cm
+       \begin{column}{.12\paperwidth}
+       \vskip1cm
         \begin{center}
-		% possibly include logo here
+          \includegraphics[width=6in]{figures/mit-logo.pdf}
         \end{center}
-        \vskip1.25cm
+        %\vskip1ex
       \end{column}
+      \begin{column}{.07\paperwidth}
+	    \vskip1cm
+        \begin{center}
+          \includegraphics[width=3in]{figures/csail-logo.jpg}
+        \end{center}
+        %\vskip1ex
+      \end{column}
+      \begin{column}{.07\paperwidth}
+      	\vskip1cm
+        \begin{center}
+          \includegraphics[width=2in]{figures/stanford-seal.png}
+        \end{center}
+        %\vskip1ex
+      \end{column}
+%      \begin{column}{.12\paperwidth}
+%        \vskip2.25cm
+%        \begin{center}
+%		% possibly include logo here
+%        \end{center}
+%        \vskip1.25cm
+%      \end{column}
 %      \begin{column}{.01\paperwidth}
 %      \end{column}
     \end{columns}
