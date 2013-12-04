@@ -114,8 +114,11 @@ u_t\,\,\,\,\,\, &= \partial h^*(-\theta_t) \\
 \begin{tabular}{|c|c|}
 \hline
 $L(u,\theta)$ & Algorithm \\ \hline
-$\|u\|_1 + (Au-y)^T\theta - \frac{1}{2}\|\theta\|_2^2$ & thresholded gradient \\ \hline
+$h(u) + u^T\theta - f^*(\theta)$ & mirror descent \\ \hline
+$\|u\|_1 + (Au-y)^T\theta - \frac{1}{2}\|\theta\|_2^2$ & thresholded Frank-Wolfe \\ \hline
 $\Tr(A^TX) + \sum_{i=1}^n y_i(X_{ii} -1 -\eta \log y_i)$ & AHK low-rank SDP \\ \hline
+$\bE_{x \sim \mu}[\theta^T(\phi(x)-\bar{\phi})] - \frac{1}{q}\|\theta\|_q^q$ & $q$-herding \\ \hline
 \end{tabular}
+(Note: some of the entries above use a dual version of the algorithm.)
 \end{frame}
 \end{document} 

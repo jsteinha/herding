@@ -60,7 +60,29 @@
 %%% BEGIN MOTIVATION BLOCK %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{block}{\large Motivation}
-JS
+Suppose we want to solve the following \emph{saddle point} problem:
+\[ \min_u \max_{\theta} L(u, \theta), \]
+where $L(u,\theta) = h(u) + \langle u, \theta \rangle - R(\theta)$. 
+We assume that $h$ and $R$ are both convex and that $\langle \cdot, \cdot \rangle$ 
+is an arbitrary bilinear map.
+
+\textbf{Intuition:} $u$ is the ``primal'', $\theta$ is the ``dual''.
+
+Tie-in with optimization: can recast as minimizing
+\[ L(u) \eqdef \max_{\theta} L(u, \theta) = h(u) + R^*(u). \]
+
+Here $R^*(u) \eqdef \max_{\theta} u^T\theta - R(\theta)$ is the 
+\emph{Fenchel conjugate} of $\theta$.
+\end{block}
+
+\begin{block}{\large Fenchel conjugate properties}
+Fenchel conjugates are a key component of \emph{Legendre-Fenchel duality} 
+and also show up in mirror descent. It turns out that they will also be 
+important for generalizing the Frank-Wolfe algorithm.
+
+\textbf{Property 1:} If $R$ is convex then $R^{**} = R$.
+
+\textbf{Property 2:} $\partial R^*(u) = \argmin_{\theta} u^T\theta - R(\theta)$.
 \end{block}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% END MOTIVATION BLOCK %%%
@@ -101,26 +123,65 @@ This block would contain the statement of the algorithms and the geometric intui
 %%% BEGIN APPLICATIONS BLOCK %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{block}{\large Special Cases and Applications}
-JS?
+Many particular algorithms can be cast into our framework.
 \begin{columns}[t]
 \begin{column}{0.45\linewidth}
 
-\begin{block}{Subgradient descent}
-
+\begin{block}{Conditional gradient (Frank-Wolfe)}
+Let $h \equiv 0$. Then we have the updates
+\begin{align*}
+u_t &= \argmin_u u^T\theta_t \\
+ &= \argmin_u u^T\partial R^*(\hat{u}_{t-1}),
+\end{align*}
+which is the Frank-Wolfe update for $R^*$.
 \end{block}
 
-\begin{block}{Conditional gradient descent}
+\begin{block}{Thresholded Frank-Wolfe}
+Suppose we want to minimize $\|u\|_1 + R^*(u)$. Then 
+we can consider the following 
+\emph{thresholded Frank-Wolfe algorithm}:
+\begin{align*}
+u_t &= \argmin_u \|u\|_1 + u^T\partial R^*(\hat{u}_{t-1}),
+\end{align*}
+which converges at the same rate as conditional gradient 
+but also imposes sparsity.
 \end{block}
 
-\begin{block}{Thresholded gradient}
+\begin{block}{(Modified) subgradient}
+Let $h(u) = \frac{\gamma}{2} \|u\|_2^2$. Then the primal version of the 
+algorithm gives the updates:
+\begin{align*}
+u_{t+1} &= \argmin_{\theta} \frac{\gamma}{2}\|u\|_2^2 + u^T\hat{\theta}_t \\
+ &= -\frac{1}{\gamma}\hat{\theta}_t \\
+ &= -\frac{1}{\gamma} \frac{\sum_{s=1}^t \alpha_s \partial R^*(u_s)}{\sum_{s=1}^t \alpha_s}.
+\end{align*}
 \end{block}
 
 \end{column}
 \begin{column}{0.45\linewidth}
 \begin{block}{AHK low-rank SDP solver}
+Suppose we want to solve the SDP
+\begin{align*}
+\text{maximize }   & \Tr(A^TX) \\
+\text{subject to } & X \succeq 0 \\
+                  & X_{ii} \leq 1 \, \forall i
+\end{align*}
+Set \small{$L(X,y) = \Tr(A^TX) + \sum_{i=1}^n \left[y_i(X_{ii}-1) - \eta y_i\log y_i\right]$}.
+Then updating $X$ is an eigenvalue problem and each update is rank $1$. This 
+yields a variant of the Arora-Hazan-Kale fast SDP solver.
 \end{block}
 
 \begin{block}{$q$-herding}
+The \emph{herding} algorithm finds a distribution $\mu$ over 
+$\sX$ such that $\bE_{x \sim \mu}[\phi(x)] \approx \bar{\phi}$ 
+for a given collection of moments $\phi$. It is equivalent to 
+the dual version of our algorithm for
+\[ L(\mu,\theta) = \bE_{x \sim \mu}\left[\theta^T[\phi(x)-\bar{\phi}]\right] - \frac{1}{2}\|\theta\|_2^2, \]
+which hinges upon $\|\bar{\phi}\|_2$ existing. In infinite 
+dimensions this may not be the case and we can instead use the 
+\emph{$q$-herding} algorithm based on the updates
+\[ L(\mu,\theta) = \bE_{x \sim \mu}\left[\theta^T[\phi(x)-\bar{\phi}]\right] - \frac{1}{q}\|\theta\|_q^q, \]
+which only requires that $\|\bar{\phi}\|_p$ exists, where $\frac{1}{p} + \frac{1}{q} = 1$.
 \end{block}
 
 \end{column}
