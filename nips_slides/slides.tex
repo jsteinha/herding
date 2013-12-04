@@ -1,0 +1,121 @@
+\documentclass{beamer}
+\usetheme{Madrid} % My favorite!
+%\usetheme{Boadilla} % Pretty neat, soft color.
+%\usetheme{default}
+%\usetheme{Warsaw}
+%\usetheme{Bergen} % This template has nagivation on the left
+%\usetheme{Frankfurt} % Similar to the default 
+%with an extra region at the top.
+%\usecolortheme{seahorse} % Simple and clean template
+%\usetheme{Darmstadt} % not so good
+% Uncomment the following line if you want %
+% page numbers and using Warsaw theme%
+% \setbeamertemplate{footline}[page number]
+%\setbeamercovered{transparent}
+\setbeamercovered{invisible}
+% To remove the navigation symbols from 
+% the bottom of slides%
+\setbeamertemplate{navigation symbols}{} 
+%
+\usepackage{graphicx}
+%\usepackage{bm}         % For typesetting bold math (not \mathbold)
+%\logo{\includegraphics[height=0.6cm]{yourlogo.eps}}
+%
+\usepackage{import, subfiles}
+\usepackage[absolute,overlay]{textpos}
+\usepackage{mathtools}
+\input{defs-beamer.tex}
+
+
+\title[Greedy First-Order Optimization]{A Greedy Framework for First-Order Optimization}
+\author[JHH and JS]{Jonathan Huggins \inst{1} \and Jacob Steinhardt \inst{2}}
+\institute[MIT, Stanford]{\inst{1} Massachusetts Institute of Technology \and \inst{2} Stanford University}
+\date{Dec 10, 2013}
+% \today will show current date. 
+% Alternatively, you can specify a date.
+%
+\begin{document}
+%
+\begin{frame}
+\titlepage
+\end{frame}
+%
+\newcommand{\reminder}{
+\begin{textblock}{14}(9.5,1.9)
+\fbox{$L(u,\theta) \eqdef h(u) + u^T\theta - R(\theta)$}
+\end{textblock}}
+\begin{frame}
+\frametitle{Motivation}
+We want to solve the following \emph{saddle point} problem:
+\[ \min_{u} \max_{\theta} L(u,\theta), \]
+where $L(u,\theta) = h(u) + u^T\theta - R(\theta)$. (Assume $h, R$ convex.)
+\pause
+\vskip 0.2in
+Tie-in with optimization: can think of as minimizing
+\[ L(u) \eqdef \max_{\theta} L(u,\theta) = h(u) + R^*(u). \]
+%Think of as two-player game between $u$ and $\theta$ with payoff 
+%$L(u,\theta) \eqdef h(u) + u^T\theta - R(\theta)$.
+\only<3>{\reminder}
+\end{frame}
+%
+\begin{frame}
+\frametitle{Being (Too) Greedy}
+\reminder
+Let's try the following updates:
+\begin{align*}
+u_t\,\,\,\,\,\, &= \argmin_{u} L(u,\theta_t) \\
+\theta_{t+1}   &= \argmax_{\theta} L(u_t, \theta)
+\end{align*}
+``iterative best response''
+\vskip 0.2in
+\pause
+Issue: let $u,\theta \in \bR$, $h(u) = \frac{1}{2}u^2$, $R(\theta) = \frac{1}{2}\theta^2$. 
+Then:
+\begin{align*}
+u_t\,\,\,\,\,\, &= \argmin_u \left[\frac{1}{2}u^2 + u\theta\right]             = -\theta_t \\
+\theta_{t+1}    &= \argmax_{\theta} \left[u\theta - \frac{1}{2}\theta^2\right] = u_t
+\end{align*}
+\textcolor{red}{OSCILLATION}
+\end{frame}
+
+\begin{frame}
+\frametitle{Being Just Greedy Enough}
+\reminder
+Can get what we want if we replace $u_t$ with $\hat{u}_t \eqdef \frac{1}{t} \sum_{s=1}^t u_s$:
+\begin{align*}
+u_t\,\,\,\,\,\, &= \argmin_{u} L(u,\theta_t) \\
+\theta_{t+1}    &= \argmax_{\theta} L(\hat{u}_t, \theta)
+\end{align*}
+\pause
+\begin{theorem}
+If $R$ is strongly convex then $|L(u_t,\theta_t)-L(u^*,\theta^*)| \leq O\left(\frac{\log(T)}{T}\right)$.
+\end{theorem}
+Note: can get $O(1/T)$ convergence if we use a weighted average for $\hat{u}_t$.
+\end{frame}
+
+\begin{frame}
+\frametitle{Frank-Wolfe}
+\reminder
+We get Frank-Wolfe for $h \equiv 0$:
+\begin{align*}
+u_t\,\,\,\,\,\, &= \argmin_u L(u, \theta_t) = \Aboxed{\argmin_u u^T\theta_t} \\
+\theta_{t+1}    &= \argmax_{\theta} L(\hat{u}_t, \theta) = \argmax_{\theta} \hat{u}_t^T\theta - R(\theta) = \Aboxed{\partial R^*(\hat{u}_t)}
+\end{align*}
+\pause
+General updates:
+\begin{align*}
+u_t\,\,\,\,\,\, &= \partial h^*(-\theta_t) \\
+\theta_{t+1} &= \partial R^*(\hat{u}_t).
+\end{align*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Applications}
+\begin{tabular}{|c|c|}
+\hline
+$L(u,\theta)$ & Algorithm \\ \hline
+$\|u\|_1 + (Au-y)^T\theta - \frac{1}{2}\|\theta\|_2^2$ & thresholded gradient \\ \hline
+$\Tr(A^TX) + \sum_{i=1}^n y_i(X_{ii} -1 -\eta \log y_i)$ & AHK low-rank SDP \\ \hline
+\end{tabular}
+\end{frame}
+\end{document} 
