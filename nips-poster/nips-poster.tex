@@ -50,11 +50,11 @@
 %\titlepage  
 %\vfill
 \begin{columns}
-\begin{column}{0.48\linewidth}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% COLUMN 1		 						%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{column}{0.46\linewidth}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% BEGIN MOTIVATION BLOCK %%%
@@ -65,10 +65,10 @@ Suppose we want to solve the following \emph{saddle point} problem:
 where $L(u,\theta) = h(u) + \langle u, \theta \rangle - R(\theta)$. 
 We assume that $h$ and $R$ are both convex and that $\langle \cdot, \cdot \rangle$ 
 is an arbitrary bilinear map.
-
+\newline\newline
 \textbf{Intuition:} $u$ is the ``primal'', $\theta$ is the ``dual''.
-
-Tie-in with optimization: can recast as minimizing
+\newline\newline
+\textbf{Tie-in with optimization:} can recast as minimizing
 \[ L(u) \eqdef \max_{\theta} L(u, \theta) = h(u) + R^*(u). \]
 
 Here $R^*(u) \eqdef \max_{\theta} u^T\theta - R(\theta)$ is the 
@@ -79,9 +79,9 @@ Here $R^*(u) \eqdef \max_{\theta} u^T\theta - R(\theta)$ is the
 Fenchel conjugates are a key component of \emph{Legendre-Fenchel duality} 
 and also show up in mirror descent. It turns out that they will also be 
 important for generalizing the Frank-Wolfe algorithm.
-
+\newline\newline
 \textbf{Property 1:} If $R$ is convex then $R^{**} = R$.
-
+\qquad\qquad
 \textbf{Property 2:} $\partial R^*(u) = \argmin_{\theta} u^T\theta - R(\theta)$.
 \end{block}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -92,7 +92,26 @@ important for generalizing the Frank-Wolfe algorithm.
 %%% BEGIN TOO GREEDY BLOCK %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{block}{\large Being (Too) Greedy}
-JHH
+\begin{columns}[t]
+\begin{column}{.48\linewidth}
+We might try the following ``iterative best response'' updates:
+\begin{align*}
+u_t\,\,\,\,\,\, &= \argmin_{u} L(u,\theta_t) \\
+\theta_{t+1}   &= \argmax_{\theta} L(u_t, \theta)
+\end{align*}
+\end{column}
+\begin{column}{.48\linewidth}
+{\bf Problem:} let $u,\theta \in \bR$, $h(u) = \frac{1}{2}u^2$, $R(\theta) = \frac{1}{2}\theta^2$. 
+Then:
+\begin{align*}
+u_t\,\,\,\,\,\, &= \argmin_u \left[\frac{1}{2}u^2 + u\theta\right]             = -\theta_t \\
+\theta_{t+1}    &= \argmax_{\theta} \left[u\theta - \frac{1}{2}\theta^2\right] = u_t
+\end{align*}
+\begin{center}
+\textcolor{red}{OSCILLATION}
+\end{center}
+\end{column}
+\end{columns}
 \end{block}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% END TOO GREEDY BLOCK %%%
@@ -101,11 +120,39 @@ JHH
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% BEGIN ALGORITHM BLOCK %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{block}{\large Being Greedy Enough: Boosted Mirror Descent}
-JHH
-
-This block would contain the statement of the algorithms and the geometric intuition 
+\begin{columns}[t]
+\begin{column}{.43\linewidth}
+\begin{block}{\large Being (Less) Greedy: \\ Boosted Mirror Descent}
+Replace $u_t$ with a weighted average
+\begin{align*}
+\hat{u}_t &\eqdef \frac{1}{A_{t}} \sum_{s=1}^t \alpha_{s} u_s & A_{t} = \sum_{s=1}^{t} \alpha_{s}
+\end{align*}
+New updates (``dual'' algorithm):
+\begin{align*}
+u_t\,\,\,\,\,\, &= \argmin_{u} L(u,\theta_t)  = && \partial h^{*}(-\theta_{t}) \\
+\theta_{t+1}    &= \argmax_{\theta} L(\hat{u}_t, \theta)  = &&\partial R^{*}(\hat u_{t})
+\end{align*}
+Alternatively, replace $\theta_{t}$ with a weighted average (``primal'' algorithm):
+\begin{align*}
+u_t\,\,\,\,\,\, &= \argmin_{u} L(u,\hat\theta_t) = && \partial h^{*}(-\hat\theta_{t}) \\
+\theta_{t+1}    &= \argmax_{\theta} L(u_t, \theta) = &&\partial R^{*}(u_{t})
+\end{align*}
 \end{block}
+\end{column}
+\begin{column}{.53\linewidth}
+\begin{block}{\large A Geometric Picture (Primal)}
+\begin{center}
+\includegraphics[width=10in]{figures/primal-demo.pdf}
+\end{center}
+For the primal algorithm,
+\begin{align*}
+u_t\,\,\,\,\,\, &= \partial h^{*}(-\hat\theta_{t}) \text{ is a point where $-\hat\theta_{t} \in \partial h$} \\ 
+\theta_{t+1}    &= \partial R^{*}(u_{t}) \text{ is the gradient of $R^{*}$ at $u_{t}$}
+\end{align*}
+So $u_{t}$ is chosen such that the gradient contributed by $h$ at $u_{t}$ cancels out the gradient contributed by $R^{*}$. 
+\end{block}
+\end{column}
+\end{columns}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% END ALGORITHM BLOCK %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,8 +163,7 @@ This block would contain the statement of the algorithms and the geometric intui
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% COLUMN 2		 						%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{column}{0.48\linewidth}
+\begin{column}{0.50\linewidth}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% BEGIN APPLICATIONS BLOCK %%%
@@ -125,7 +171,8 @@ This block would contain the statement of the algorithms and the geometric intui
 \begin{block}{\large Special Cases and Applications}
 Many particular algorithms can be cast into our framework.
 \begin{columns}[t]
-\begin{column}{0.45\linewidth}
+\begin{column}{0.01\linewidth}\end{column}
+\begin{column}{0.47\linewidth}
 
 \begin{block}{Conditional gradient (Frank-Wolfe)}
 Let $h \equiv 0$. Then we have the updates
@@ -158,7 +205,7 @@ u_{t+1} &= \argmin_{\theta} \frac{\gamma}{2}\|u\|_2^2 + u^T\hat{\theta}_t \\
 \end{block}
 
 \end{column}
-\begin{column}{0.45\linewidth}
+\begin{column}{0.47\linewidth}
 \begin{block}{AHK low-rank SDP solver}
 Suppose we want to solve the SDP
 \begin{align*}
@@ -196,14 +243,15 @@ which only requires that $\|\bar{\phi}\|_p$ exists, where $\frac{1}{p} + \frac{1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{block}{\large Convergence of Boosted Mirror Descent}
 \begin{columns}[t]
-\begin{column}{0.45\linewidth}
+\begin{column}{0.01\linewidth}\end{column}
+\begin{column}{0.47\linewidth}
 \begin{theorem}
 Consider the primal (respectively the dual) algorithm. Suppose that $h$ ($R$) is strongly convex with respect to a norm $\|\cdot\|$ 
 and let $r = \sup_{\theta} \|\theta\|_{*}$ ($r = \sup_{u} \|u\|_{*}$). Then
 \[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}. \]
 \end{theorem}
 \end{column}
-\begin{column}{0.45\linewidth}
+\begin{column}{0.47\linewidth}
 \begin{corollary} 
 Under the hypotheses of the Theorem, for $\alpha_{t} = 1$ we have
 \[ \sup_{\theta} L(\hat{u}, \theta) \leq \sup_{\theta} L(u^*, \theta) + \frac{2r^2 (\log (T) + 1)}{T}. \]
@@ -243,26 +291,25 @@ and for $\alpha_t = t$ we have
 %%% BEGIN ACKNOWLEDGMENTS BLOCK %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{block}{\small Acknowledgements}
-{\footnotesize Thanks to Cameron Freer, Simon Lacoste-Julien, Martin Jaggi, Percy Liang, Arun Chaganty, and Sida Wang 
-for helpful discussions. Thanks also to the anonymous reviewer for suggesting improvements 
-to the paper. JS was supported by the Hertz Foundation. JHH was supported by the U.S. Government under FA9550-11-C-0028 and awarded by the Department of Defense, Air Force Office of Scientific Research, National Defense Science and Engineering Graduate (NDSEG) Fellowship, 32 CFR 168a.}
+{\tiny Thanks to Cameron Freer, Simon Lacoste-Julien, Martin Jaggi, Percy Liang, Arun Chaganty, and Sida Wang 
+for helpful discussions. JS was supported by the Hertz Foundation. JHH was supported by the U.S. Government under FA9550-11-C-0028 and awarded by the Department of Defense, Air Force Office of Scientific Research, National Defense Science and Engineering Graduate (NDSEG) Fellowship, 32 CFR 168a.}
 \end{block}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% END ACKNOWLEDGMENTS BLOCK %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% BEGIN BIBLIOGRAPHY BLOCK %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{block}{\small References}
-\begin{footnotesize}
-\bibliographystyle{plainnat}
-\bibliography{herding}
-\end{footnotesize}
-\end{block}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% END BIBLIOGRAPHY BLOCK %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% BEGIN BIBLIOGRAPHY BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{block}{\small References}
+%\begin{footnotesize}
+%\bibliographystyle{plainnat}
+%\bibliography{herding}
+%\end{footnotesize}
+%\end{block}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% END BIBLIOGRAPHY BLOCK %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \end{column}
