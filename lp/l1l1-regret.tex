@@ -1,0 +1,49 @@
+\documentclass[11pt]{article}
+\usepackage{import}
+\input{../../latex-utils/defs.tex}
+\usepackage{fullpage}
+
+\title{$l^1$-$l^1$ regret bound}
+\begin{document}
+\maketitle
+
+Suppose that we want to minimize the regret 
+\[ \sum_{t=1}^T x_t^Tz_t - \inf_{x \in \sC} \sum_{t=1}^T x^Tz_t. \]
+\begin{proposition}
+If $\|x\|_1 \leq 1$ for all $x \in \sC$ and 
+$\|z_t\|_1 \leq 1$ for all $t$, then there is 
+an algorithm whose regret 
+after $T$ rounds is $\sqrt{\frac{2T}{n}}$.
+\end{proposition}
+\begin{proof}
+Consider a matrix $Q$ such that $|Q_{ij}| \leq 1/\sqrt{n}$ 
+for all $i,j$, and such that $Q^TQ = I$; one such matrix would 
+be any Hadamard matrix, which exists whenever $n$ is a power of 
+$2$. Then take the regularizer $h(x) = \frac{\eta}{2}x^TQx$, 
+and apply the mirror descent algorithm. Note that 
+$|x^TQX| \leq 1/\sqrt{n}$ whenever $\|x\|_1 \leq 1$, by H\"{o}lder's 
+inequality. Then the OMD regret is:
+\begin{align*}
+\sup_{x \in \sC} \frac{\eta}{2}x^TQx - \inf_{x \in \sC} \frac{\eta}{2}x^TQx + \sum_{t=1}^T \frac{1}{2\eta} z_t^TQ^Tz_t &\leq \frac{\eta}{2\sqrt{n}} + \frac{\eta}{2\sqrt{n}} + \frac{T}{2\eta \sqrt{n}}.
+\end{align*}
+If we set $\eta$ to $\sqrt{T/2}$, then the above quantity is equal to 
+$\sqrt{\frac{2T}{n}}$, which proves the result.
+\end{proof}
+
+\section{Extension}
+Suppose there was a matrix $A$ such that:
+\begin{align*}
+\left|\frac{1}{2}x^TAx\right| &\leq n^{\frac{1}{2}-\frac{1}{p}} \|x\|_p^2. \\
+\left|\frac{1}{2}y^TA^{-1}y\right| &\leq n^{\frac{1}{2}-\frac{1}{q}} \|x\|_q^2.
+\end{align*}
+(we conjecture that such a matrix exists for $p, q \leq 2$). Then we could 
+obtain the following interesting extension of the above:
+\begin{proposition}[Conjecture]
+Suppose that $p, q \leq 2$. If $\|x\|_p \leq 1$ for all $x \in \sC$ 
+and $\|z_t\|_q \leq 1$ for all $t$, then we can obtain regret 
+$\sqrt{Tn^{1-1/p-1/q}}$.
+\end{proposition}
+\begin{proof}
+Use the $A$ matrix that is conjectured to exist, and apply the same argument as above.
+\end{proof}
+\end{document}

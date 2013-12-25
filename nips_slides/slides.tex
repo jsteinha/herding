@@ -51,13 +51,29 @@ We want to solve the following \emph{saddle point} problem:
 where $L(u,\theta) = h(u) + u^T\theta - R(\theta)$. (Assume $h, R$ convex.)
 \pause
 \vskip 0.2in
-Tie-in with optimization: can think of as minimizing
-\[ L(u) \eqdef \max_{\theta} L(u,\theta) = h(u) + R^*(u). \]
+Tie-in with optimization: can think of this as minimizing
+\[ L(u) \eqdef \max_{\theta} L(u,\theta) = h(u) + \underbrace{R^*(u)}_{\phantom{x} \hskip -1in \text{Fenchel conjugate}\hskip -1in \phantom{x}}. \]
 %Think of as two-player game between $u$ and $\theta$ with payoff 
 %$L(u,\theta) \eqdef h(u) + u^T\theta - R(\theta)$.
 \only<3>{\reminder}
 \end{frame}
 %
+\begin{frame}
+\frametitle{Examples}
+\reminder
+\begin{center}
+\setlength{\tabcolsep}{1.3em}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{ccc}
+Task & $L(u,\theta)$ & $R^*(u)$ \pause \\
+LP & $c^Tu + u^TA\theta - b^T\theta$ & $\bI[Au \leq b]$ \pause  \\
+QP & $\frac{1}{2}u^TQu + c^Tu + u^TA\theta - b^T\theta$ & $\bI[Au \leq b]$ \pause \\
+SVM & $\frac{1}{2}\|u\|_2^2 - \sum_{i=1}^n \theta_i [y_i u^T x_i - 1]$ & $\max(0, y_i u^T x_i - 1)$ \pause \\
+Lasso & $\|u\|_1 + (Au-b)^T\theta - \frac{1}{2}\|\theta\|_2^2$ & $\frac{1}{2}\|Au-b\|_2^2$ 
+\end{tabular}
+\end{center}
+\end{frame}
+
 \begin{frame}
 \frametitle{Being (Too) Greedy}
 \reminder
@@ -88,9 +104,24 @@ u_t\,\,\,\,\,\, &= \argmin_{u} L(u,\theta_t) \\
 \end{align*}
 \pause
 \begin{theorem}
-If $R$ is strongly convex then $|L(u_t,\theta_t)-L(u^*,\theta^*)| \leq O\left(\frac{\log(T)}{T}\right)$.
+If $R$ is strongly convex then $|L(\hat{u}_t,\theta_t)-L(u^*,\theta^*)| \leq O\left(\frac{\log(T)}{T}\right)$.
 \end{theorem}
 Note: can get $O(1/T)$ convergence if we use a weighted average for $\hat{u}_t$.
+\end{frame}
+
+\begin{frame}
+\frametitle{Being Just Greedy Enough}
+\reminder
+Can get what we want if we replace $\theta_t$ with $\hat{\theta}_t \eqdef \frac{1}{t} \sum_{s=1}^t \theta_s$:
+\begin{align*}
+u_t\,\,\,\,\,\, &= \argmin_{u} L(u,\hat{\theta_t}) \\
+\theta_{t+1}    &= \argmax_{\theta} L(u_t, \theta)
+\end{align*}
+
+\begin{theorem}
+If $h$ is strongly convex then $|L(u_t,\hat{\theta}_t)-L(u^*,\theta^*)| \leq O\left(\frac{\log(T)}{T}\right)$.
+\end{theorem}
+Note: can get $O(1/T)$ convergence if we use a weighted average for $\hat{\theta}_t$.
 \end{frame}
 
 \begin{frame}
@@ -109,6 +140,23 @@ u_t\,\,\,\,\,\, &= \partial h^*(-\theta_t) \\
 \end{align*}
 \end{frame}
 
+%% \begin{frame}
+%% \frametitle{Teasers (come see our poster!)}
+%% Applications to:
+%% \begin{itemize}
+%% \item fast SDP solvers
+%% \item herding
+%% \item ``thresholded Frank-Wolfe'' (sparse recovery)
+%% \end{itemize}
+%% 
+%% \vskip 0.2in
+%% Formal, non-asymptotic convergence results.
+%% 
+%% \vskip 0.2in
+%% Mini-tutorial on Legendre-Fenchel duality.
+%% 
+%% \end{frame}
+
 \begin{frame}
 \frametitle{Applications}
 \begin{tabular}{|c|c|}
@@ -119,6 +167,5 @@ $\|u\|_1 + (Au-y)^T\theta - \frac{1}{2}\|\theta\|_2^2$ & thresholded Frank-Wolfe
 $\Tr(A^TX) + \sum_{i=1}^n y_i(X_{ii} -1 -\eta \log y_i)$ & AHK low-rank SDP \\ \hline
 $\bE_{x \sim \mu}[\theta^T(\phi(x)-\bar{\phi})] - \frac{1}{q}\|\theta\|_q^q$ & $q$-herding \\ \hline
 \end{tabular}
-(Note: some of the entries above use a dual version of the algorithm.)
 \end{frame}
 \end{document} 
