@@ -1,0 +1,69 @@
+\documentclass[11pt]{article}
+\usepackage{import}
+\input{../icml/latex-defs.tex}
+\usepackage{fullpage}
+
+\title{Quadratic Weights}
+\author{Jacob Steinhardt}
+\begin{document}
+\maketitle
+We are interested in the following learning problem: our experts 
+consist of all vectors $w \geq 0$, $\|w\|_2 = 1$; our adversary 
+can play any move $z_t$ with $z_t \leq 0$, $\|z_t\|_2 \leq \rho$. 
+All vectors lie in $\bR^n$.
+Our end goal is to obtain a regret bound that does not grow with $T$:
+namely
+\[ \sum_{t=1}^T w_t^Tx_t \leq \frac{2\rho \sqrt{n}}{\epsilon} + (1-\epsilon)\sum_{t=1}^T w^Tx_t, \]
+for all experts $w$.
+
+We will do this using the following updates:
+\begin{align*}
+        x_{1, i} &= 1,\ \forall i \\
+        x_{t+1, i} &= \sqrt{x_{t,i}^2 - \eta x_{t,i}z_{t,i}} \\
+        \Phi^{(t+1)} &= \sqrt{\sum_{i=1}^n x_{t+1,i}^2} \\
+        w_{t+1,i} &= \frac{1}{\Phi^{(t+1)}}x_{t+1,i}
+\end{align*}
+The quantity $\Phi^{(t+1)}$ is a normalization constant used to 
+ensure that $\|w_t\|_2 = 1$. We will use $(\Phi^{(t+1)})^2$ as a 
+potential function to bound the regret:
+\begin{align*}
+        (\Phi^{(t+1)})^2 &= \sum_{i=1}^n x_{t+1,i}^2 \\
+                         &= \sum_{i=1}^n x_{t,i}^2 - \eta x_{t,i}z_{t,i} \\
+                         &= (\Phi^{(t)})^2 - \eta \Phi^{(t)}w_t^Tz_t \\
+                         &\leq (\Phi^{(t)}-\frac{\eta}{2}w_t^Tz_t)^2.
+\end{align*}
+By induction we then obtain:
+\begin{align}
+        (\Phi^{(T+1)})^2 &\leq (\Phi^{(1)}-\frac{\eta}{2}\sum_{t=1}^Tw_t^Tz_t)^2 \\
+                         &= (\sqrt{n}-\frac{\eta}{2}\sum_{t=1}^Tw_t^Tz_t)^2.
+\end{align}
+
+We next obtain a bound in the other direction; for this, we will need the 
+inequality $\sqrt{1-x} \geq 1-\frac{x}{2}-\frac{x^2}{2}$ for $x \leq 1$.
+
+We have:
+\begin{align*}
+        x_{t+1,i} &= \sqrt{x_{t,i}^2 - \eta x_{t,i}z_{t,i}} \\
+                  &= x_{t,i}\sqrt{1-\eta\frac{z_{t,i}}{x_{t,i}}} \\
+                  &\geq x_{t,i}(1-\frac{\eta}{2}\frac{z_{t,i}}{x_{t,i}} - \frac{\eta^2}{2}\frac{z_{t,i}^2}{x_{t,i}} \\
+                  &\geq x_{t,i} - \frac{\eta}{2}z_{t,i} + \frac{\eta^2\rho}{2}z_{t,i},
+\end{align*}
+where in the last step we used the fact 
+that $0 \geq z_{t,i} \geq -\rho$ and $x_{t,i} \geq 1$.
+
+Again by induction, we have
+\[ x_{T+1,i} \geq 1-\frac{\eta-\eta^2\rho}{2}\sum_{t=1}^T z_{t,i}. \]
+Since $(\Phi^{(T+1)})^2 = \sum_{i=1}^n x_{T+1,i}^2$, we have, by combining 
+the above inequality with our earlier upper bound:
+\begin{align}
+        (\sqrt{n}-\frac{\eta}{2}\sum_{t=1}^T w_t^Tz_t)^2 &\geq (\Phi^{(t+1)})^2 \\
+                                                         &\geq \sum_{i=1}^n (1-\frac{\eta-\eta^2\rho}{2}\sum_{t=1}^T z_{t,i})^2 \\
+                                                         &\geq (w^T1 - \sum_{t=1}^T w^Tz_t)^2.
+\end{align}
+We thus have:
+\[ \frac{\eta}{2}\sum_{t=1}^T w_t^Tz_t \leq \sqrt{n} + \frac{\eta-\eta^2\rho}{2}\sum_{t=1}^T w^Tz_t. \]
+Setting $\eta$ to $\frac{\epsilon}{\rho}$, we obtain
+\[ \sum_{t=1}^T w_t^Tz_t \leq \frac{2\rho\sqrt{n}}{\epsilon} + (1-\epsilon)\sum_{t=1}^T w_t^Tz_t, \]
+as was to be shown.
+
+\end{document}
