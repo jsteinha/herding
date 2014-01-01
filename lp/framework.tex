@@ -1,0 +1,116 @@
+\documentclass[11pt]{article}
+\usepackage{import}
+\input{../icml/latex-defs.tex}
+\usepackage{fullpage}
+
+\title{Online Learning Framework}
+\author{Jacob Steinhardt}
+\begin{document}
+\maketitle
+We are interested in the following learning problem: our experts 
+consist of vectors $w \in \sC_P$, where $\sC_P$ is some convex 
+set; similarly, our adversary can play any move $z_t$ with 
+$z_t \in \sC_D$. A typical example is $\sC_P$ is the $n$-dimensional 
+simplex and $\sC_D$ is the unit $l^{\infty}$ ball. Our end goal is 
+to obtain a regret bound of the following type:
+\[ \sum_{t=1}^T w_t^Tz_t \leq \frac{\rho}{\epsilon} + \epsilon \sum_{t=1}^T |w|^T|z_t| + \sum_{t=1}^T w^Tz_t. \]
+If we let $\sigma = \sup_{w \in \sC_P, z \in \sC_D} |w|^T|z|$, then the regret is bounded by
+$\frac{\rho}{\epsilon} + \epsilon \sigma T$, which is equal to $2\sqrt{\rho \sigma T}$ for 
+$\epsilon = \sqrt{\frac{\rho}{\sigma T}}$. This is the type of regret bound that is typical 
+in most online learning settings. However, our bound can lead to stronger results in some 
+situations.
+
+We propose the following general style of algorithm for obtaining such 
+bounds. The key innovation is an auxiliary variable $x_t$ that lets us 
+relate $w_t^Tz_t$ and $w^Tz_t$. The updates are as follows:
+\begin{align*}
+x_{t+1} &= f(x_t, \eta z_t) \\
+w_{t+1} &= \argmax_{w \in \sC_P} w^Tx_{t+1} - \psi(w) \\
+\Phi_{t+1} &= w_{t+1}^Tx_{t+1} - \psi(w_{t+1})  \\ &= \psi^*(x_{t+1}).
+\end{align*}
+
+To see why these updates are a good idea, we will make a ``physicist's approximation'' 
+and suppose that $f(x_t, \eta z_t) \approx x_t - \eta z_t$. Then we would have
+\[ x_{T+1} \approx x_1 - \eta \sum_{t=1}^T z_t \] and thus, by definition, 
+\[ \Phi_{T+1} \gtrsim w^Tx_1 - \psi(w) - \eta \sum_{t=1}^T w^Tz_t. \]
+On the other hand, 
+\begin{align*}
+\Phi_{t+1} &\approx \Phi_t + w_t^T(x_{t+1} - x_t) \\
+           &= \Phi_t - \eta w_t^T z_t,
+\end{align*}
+so we have 
+\[ \Phi_{T+1} \approx \Phi_1 - \eta \sum_{t=1}^T w_t^Tz_t. \]
+Combining this with the preceding bound on $\Phi_{T+1}$ yields
+$\Phi_1 - \eta \sum_{t=1}^T w_t^Tz_t \gtrsim w^Tx_1 - \psi(w) - \eta \sum_{t=1}^T w^Tz_t$, 
+or
+\[ \sum_{t=1}^T w_t^Tz_t \lesssim \frac{\Phi_1 + \psi(w) - w^Tx_1}{\eta} + \sum_{t=1}^T w^Tz_t, \]
+which gives us an even better regret bound than we had sought (the $\sum_{t=1}^T |w|^T|z_t|$ term 
+will show up when we track the errors made in each of the approximations).
+
+\paragraph{Formal statement.} To turn these approximations into a rigorous bound, we will 
+need $f$ and $\psi$ to satisfy the following properties:
+\begin{itemize}
+\item Convexity of $\psi^* \circ f$: $\psi^*(f(x,\eta z)) \leq \psi^*(x) - \eta w_x^Tz$, where $w_x = \partial \psi^*(x)$.
+\item Smoothness of $f$: $w^T(x-\eta z - f(x,\eta z)) \leq \eta^2 \alpha |w|^T|z|$ for all $w$.
+\end{itemize}
+(For some intuition, any $f$ satisfying the two properties above 
+must satisfy $f(x,0) = x$ and $f(x,\eta z) = x-\eta z + O(\eta^2)$.)
+\begin{theorem}
+\label{thm:main}
+Suppose that $\psi^*$ and $f$ satisfy the two properties above. Then, 
+for $\eta = \frac{\epsilon}{\alpha}$, we have the bound
+\[ \sum_{t=1}^T w_t^Tz_t \leq \alpha \frac{\Phi_1 + \psi(w) - w^Tx_1}{\epsilon} + \epsilon \sum_{t=1}^T |w|^T|z_t| + \sum_{t=1}^T w^Tz_t. \]
+\end{theorem}
+\begin{proof}
+By the first condition, we have
+\begin{align*}
+\Phi^{t+1} &= \psi^*(x_{t+1}) \\
+ &= \psi^*(f(x_t, \eta z_t)) \\
+ &\leq \psi^*(x_t) - \eta \left(\frac{\partial \psi^*}{\partial x_t}\right)^T z_t \\
+ &= \Phi_t - \eta w_t^T z_t,
+\end{align*}
+which by induction implies that
+\[ \Phi_{T+1} \leq \Phi_1 - \eta \sum_{t=1}^T w_t^Tz_t. \]
+By the second condition, we have
+\begin{align*}
+w^Tx_{t+1} &= w^Tf(x, \eta z) \\
+ &\geq w^Tx_t - \eta w^Tz_t - \eta^2 \alpha |w|^T|z_t|,
+\end{align*}
+which by induction implies that
+\[ w^Tx_{T+1} \geq w^Tx_1 - \eta^2\alpha \sum_{t=1}^T |w|^T|z_t| - \eta \sum_{t=1}^T w^Tz_t. \]
+Combining this with the first inequality yields
+\begin{align*}
+\Phi_1 - \eta \sum_{t=1}^T w_t^Tz_t &\geq \Phi_{T+1} \\
+ &\geq w^Tx_{T+1} - \psi(w) \\
+ &\geq w^Tx_1 - \psi(w) - \eta^2\alpha \sum_{t=1}^T |w|^T|z_t| - \eta \sum_{t=1}^T w^Tz_t.
+\end{align*}
+Re-arranging yields
+\[ \sum_{t=1}^T w_t^Tz_t \leq \frac{\Phi_1 + \psi(w) - w^Tx_1}{\eta} + \eta\alpha \sum_{t=1}^T |w|^T|z_t| + \sum_{t=1}^T w^Tz_t, \]
+which gives the desired result.
+\end{proof}
+\section{Examples}
+\paragraph{Multiplicative updates.} If we let $\sC_P$ be the simplex and $\sC_D$ be the 
+$l^{\infty}$ ball of radius $r$, then a standard algorithm for minimizing regret is the 
+\emph{multiplicative weights update method}. We recover this by letting $f(x,z) = x + \log(1-z)$ 
+and $\psi(w) = \sum_{i=1}^n w_i\log w_i$. Then $\psi^*(x) = \log\left(\sum_{i=1}^n \exp(x_i)\right)$, 
+and $w_{t+1,i} = \exp(x_{t+1,i})/\sum_{j=1}^n \exp(x_{t+1,j})$.
+\begin{align*}
+\psi^*(f(x,\eta z)) &= \log\left(\sum_{i=1}^n \exp(x_i + \log(1-\eta z_i))\right) \\
+ &= \log\left(\sum_{i=1}^n \exp(x_i)(1-\eta z_i)\right) \\
+ &= \log\left(\sum_{i=1}^n \exp(x_i) - \eta \sum_{i=1}^n \exp(x_i) z_i\right) \\
+ &\leq \log\left(\sum_{i=1}^n \exp(x_i)\right) - \eta \frac{\sum_{i=1}^n \exp(x_i) z_i}{\sum_{i=1}^n \exp(x_i)} \\
+ &= \psi^*(x) - \eta w^Tz,
+\end{align*}
+so condition 1 is satisfied.
+
+Also, using the fact that $\log(1-\eta z_i) \geq -\eta z_i - \eta^2 z_i^2$, we have
+\begin{align*}
+w^T(x-\eta z - f(x, \eta z)) &= w^T(x-\eta z - (x + \log(1-\eta z))) \\
+ &\leq \eta^2 \sum_{i=1}^n w_iz_i^2 \\
+ &\leq \eta^2 r \sum_{i=1}^n |w_i||z_i|,
+\end{align*}
+where in the last step we used the fact that $|z_i| \leq r$. These updates 
+thus fulfill the conditions of Theorem~\ref{thm:main} for $\alpha$ equal to 
+$r$.
+
+\end{document}
