@@ -104,8 +104,8 @@ Each algorithm can be interpreted as (adaptive) mirror descent with an appropria
 regularizer. The regularizers are as follows:
 \begin{enumerate}
         \item \textbf{Exponentiated gradient:} $\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]$.
-        \item \textbf{Multiplicative updates:} $\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1-\sum_{t=1}^T (\eta z_{t,i} + \log(1-\eta z_{t,i}))]$.
-        \item \textbf{Adaptive exponentiated gradient:} $\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1+\sum_{t=1}^T \eta^2 z_{t,i}^2 w_i]$.
+        \item \textbf{Multiplicative updates:} $\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1-\sum_{s=1}^t (\eta z_{s,i} + \log(1-\eta z_{s,i}))]$.
+        \item \textbf{Adaptive exponentiated gradient:} $\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1+\sum_{s=1}^t \eta^2 z_{s,i}^2 w_i]$.
 \end{enumerate}
 The parameter $\lambda$ is a hyperparameter controlling the size of $w$. Typically it should be on the order of $\frac{1}{n}$ 
 (as we will see more explicitly when we prove a formal regret bound). Note that in the limit of small $\eta$, 
@@ -117,17 +117,77 @@ to each of the above regularizers are:
         \item \textbf{Multiplicative updates:} $w_{t,i} = \lambda \cdot \prod_{t=1}^T (1- \eta z_{t,i})$
         \item \textbf{Adaptive exponentiated gradient:} $w_{t,i} = \lambda \cdot \exp\left(- \sum_{t=1}^T \eta z_{t,i} + \eta^2 z_{t,i}^2\right)$
 \end{enumerate}
-Finally, we base our regret bounds on the following standard bound on the regret of mirror descent:
+Finally, we base our regret bounds on an adaptation of the mirror descent analysis. In the analysis of 
+mirror descent based on Fenchel conjugacy, we have the following inequality for any regularizer $\psi$; 
+letting $\theta_t \eqdef -\sum_{s=1}^T z_s$ and $\psi_t$ denote the regularizer at time $t$:
 \begin{equation}
-        \label{eqn:bound}
-        \Regret(w) \leq \psi_T(w) + \sum_{t=1}^T D_{\psi_t^*}(\theta_{t+1} \| \theta_t).
+        \label{eqn:bound1}
+        -\psi_T(w) - \eta \sum_{t=1}^T w^T z_t \leq \psi_0^*(0) + \sum_{t=1}^T \psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}).
 \end{equation}
-Our idea is to pick $\psi_{t+1}-\psi_t$ to cancel out the Bregman divergence term. The intuition is 
-that we are absorbing all of our loss into the regularizer, therefore giving us a bound that depends 
-on $w$ rather than $w_t$. This strategy is non-standard, although has been used before, for instance in 
-various papers by Francesco Orabona. Note that in all three cases, $\psi_t(w)$ differs from $\psi_0(w)$ 
-only in a linear term, and hence $D_{\psi_t^*} \equiv D_{\psi_0^*}$, and in particular 
-$D_{\psi_t^*}(\theta_{t+1} \| \theta_t) \leq \sum_{i=1}^n w_{t,i}z_{t,i}^2$ by analysis via a local norm.
+Usually the regularizer is fixed, in which case $\psi^*(\theta_t) - \psi^*(\theta_{t-1}) = -\eta w_t^Tz_t + D_{\psi^*}(\theta_{t+1} \| \theta_t)$. 
+Note that $w_t^Tz_t$ is the loss suffered in round $t$; the Bregman divergence term $D_{\psi^*}$ measures the increase in regret for that round. 
+In particular, re-arranging gives
+\begin{equation}
+        \label{eqn:bound2}
+        \Regret(w) = \sum_{t=1}^T w_t^Tz_t - \sum_{t=1}^T w^Tz_t \leq \frac{1}{\eta}\left[ \psi^*(0) + \psi(w) + \sum_{t=1}^T D_{\psi^*}(\theta_{t+1} \| \theta_t)\right].
+\end{equation}
+One can then use an analysis based on strong convexity of $\psi$ to bound $\psi^*$; for instance, in the case of exponentiated gradient, 
+we have the bound $D_{\psi^*}(\theta_{t+1} \| \theta_t) \leq \eta^2 \sum_{i=1}^n w_{t,i}z_{t,i}^2$, which leads to our claimed regret bound 
+for exponentiated gradient.
+
+In contrast, our analysis based on adaptive regularizers will choose $\psi_t^*$ such that $\psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}) \leq -\eta w_t^Tz_t$. 
+Assuming we succeed in picking such a $\psi_t^*$, the $\sum_{t=1}^T \psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1})$ term can be replaced with 
+$-\eta \sum_{t=1}^T w_t^Tz_t$. We can then re-arrange to obtain the regret bound
+\begin{equation}
+        \label{eqn:bound3}
+        \Regret(w) = \sum_{t=1}^T w_t^Tz_t - \sum_{t=1}^T w^Tz_t \leq \frac{\psi_0^*(0) + \psi_T(w)}{\eta}.
+\end{equation}
+This is quite interesting as we have pushed the entire regret bound into an increase in the size 
+of the regularizer.
+
+We will now verify the property $\psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}) \leq -\eta w_t^Tz_t$ 
+for both multiplicative updates and adaptive EG. It will be useful to know the following fact about 
+$\psi_t^*$:
+\begin{lemma}
+        \label{lem:fenchel}
+        If $\psi(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1+s_i]$, 
+        then $\psi^*(\theta) = \lambda \sum_{i=1}^n \exp(\theta_i - s_i)$.
+\end{lemma}
+Now, we can easily verify the property for multiplicative updates:
+\begin{align}
+        \psi_t^*(\theta_t) &= \psi_t^*(\theta_{t-1}- \eta z_t) \\
+                           &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} - \eta z_{t,i} + \sum_{s=1}^t \eta z_{s,i} + \log(1 - \eta z_{s,i})\right) \\
+                           &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} + \log(1- \eta z_{t,i}) + \sum_{s=1}^{t-1} \eta z_{s,i} + \log(1 - \eta z_{s,i})\right) \\
+                           &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} + \sum_{s=1}^{t-1} \eta z_{s,i} + \log(1 - \eta z_{s,i})\right)(1 - \eta z_{t,i}) \\
+                           &= \psi_{t-1}^*(\theta_{t-1}) - \eta \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} + \sum_{s=1}^{t-1} \eta z_{s,i} + \log(1- \eta z_{s,i})\right) z_{t,i} \\
+                           &= \psi_{t-1}^*(\theta_{t-1}) - \eta w_t^Tz_t,
+\end{align}
+hence $\psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}) = -\eta w_t^Tz_t$, i.e. the property holds with equality. We \
+thus have the regret bound
+\begin{align}
+        \Regret(w) &\leq \frac{\psi_0*(0) + \psi_T(w)}{\eta} \\
+                   &= \frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1-\sum_{t=1}^T \eta z_{s,i} + \log(1 - \eta z_{t,i})]}{\eta} \\
+                   &\leq \frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1] + \eta^2 \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2}{\eta} \\
+                   &= \frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]}{\eta} + \eta \sum_{t=1}^T \sum_{i=1}^n w_i z_{t,i}^2.
+\end{align}
+Setting $\lambda$ to $1/n$ yields a bound of
+\[ \Regret(w) \leq \frac{1+(\log(n)-1)\|w\|_1 + \sum_{i=1}^n w_i\log(w_i)}{\eta} + \eta \sum_{t=1}^T \sum_{i=1}^n w_i z_{t,i}^2. \]
+The proof for adaptive exponentiated gradient is similar.
+\section{Experiments}
+TODO.
+
+
+% the following standard bound on the regret of mirror descent:
+% \begin{equation}
+%         \label{eqn:bound}
+%         \Regret(w) \leq \psi_T(w) + \sum_{t=1}^T D_{\psi_t^*}(\theta_{t+1} \| \theta_t).
+% \end{equation}
+% Our idea is to pick $\psi_{t+1}-\psi_t$ to cancel out the Bregman divergence term. The intuition is 
+% that we are absorbing all of our loss into the regularizer, therefore giving us a bound that depends 
+% on $w$ rather than $w_t$. This strategy is non-standard, although has been used before, for instance in 
+% various papers by Francesco Orabona. Note that in all three cases, $\psi_t(w)$ differs from $\psi_0(w)$ 
+% only in a linear term, and hence $D_{\psi_t^*} \equiv D_{\psi_0^*}$, and in particular 
+% $D_{\psi_t^*}(\theta_{t+1} \| \theta_t) \leq \sum_{i=1}^n w_{t,i}z_{t,i}^2$ by analysis via a local norm.
 
 %%% We are interested in the following learning problem: our experts 
 %%% consist of vectors $w \in \sH$, where $\sH$ is some convex 
