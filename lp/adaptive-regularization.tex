@@ -90,8 +90,21 @@ in the regret bounds given in Table~\ref{fig:alg1}.
 \end{figure}
 
 \section{General Algorithms and Theoretical Analysis}
+
+\begin{table}
+\begin{tabular}{|c|c|c|} \hline
+        Algorithm & Regret \\ \hline
+        Exponentiated gradient & $\frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]}{\eta} + \eta \sum_{t=1}^T \sum_{i=1}^n w_{t,i}z_{t,i}^2$ \\ \hline
+        Multiplicative updates & $\frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]}{\eta} + \eta \sum_{t=1}^T \sum_{i=1}^n w_{i}z_{t,i}^2$ \\ \hline
+        Adaptive exponentiated gradient & $\frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]}{\eta} + \eta \sum_{t=1}^T \sum_{i=1}^n w_iz_{t,i}^2$ \\ \hline
+\end{tabular}
+\caption{Comparison of exponentiated gradient, multiplicative updates, and adaptive exponentiated gradient algorithms in the unconstrained case.}
+\label{fig:unconstrained}
+\end{table}
+
 We now present the unconstrained versions of our three algorithms, together 
-with an analysis based on adaptive regularizers. In each case, the weight 
+with an analysis based on adaptive regularizers (the bounds can be found summarized 
+in Table~\ref{fig:unconstrained}). In each case, the weight 
 vector $w$ is necessarily non-negative. We can deal with this constraint by 
 maintaining two weight vectors $w_+$ and $w_-$ and predicting with $w_+-w_-$ 
 (this is a standard idea, going back at least to the original exponentiated 
@@ -101,14 +114,29 @@ For simplicity of exposition, we will simply assume that $w$ is constrained
 to be non-negative in our algorithms and analysis.
 
 Each algorithm can be interpreted as (adaptive) mirror descent with an appropriate 
-regularizer. The regularizers are as follows:
-\begin{enumerate}
-        \item \textbf{Exponentiated gradient:} $\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]$.
-        \item \textbf{Multiplicative updates:} $\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1-\sum_{s=1}^t (\eta z_{s,i} + \log(1-\eta z_{s,i}))]$.
-        \item \textbf{Adaptive exponentiated gradient:} $\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1+\sum_{s=1}^t \eta^2 z_{s,i}^2 w_i]$.
-\end{enumerate}
+regularizer. Each regularizer will (potentially) vary with the round $t$, and will be a 
+member of the family $\psi_u(w)$, which for $u \in \bR^n$ is defined as
+\[ \psi_u(w) \eqdef \sum_{i=1}^n w_i[\log(w_i/\lambda)-1] + u^{\top}w. \]
 The parameter $\lambda$ is a hyperparameter controlling the size of $w$. Typically it should be on the order of $\frac{1}{n}$ 
-(as we will see more explicitly when we prove a formal regret bound). Note that in the limit of small $\eta$, 
+(as we will see more explicitly when we prove a formal regret bound). 
+Before continuing, it will be useful to point out a few properties of $\psi_u$, which we 
+state in Lemma~\ref{lem:properties} and prove in the Appendix.
+\begin{lemma}
+\label{lem:properties}
+For $\psi_u(w) \eqdef \sum_{i=1}^n w_i[\log(w_i/\lambda)-1] + u^{\top}w$, we have:
+\begin{align}
+\psi_u^*(\theta) &= \lambda \sum_{i=1}^n \exp(\theta_i - u_i). \\
+\frac{\partial \psi_i^*}{\partial \theta_i} &= \lambda \exp(\theta_i - u_i). 
+\end{align}
+\end{lemma}
+Now, as noted above, each of the three algorithms can be expressed in terms of a 
+time-varying regularizer $\psi_t(w) \equiv \psi_{u_t}(w)$. The particular choices of $u_t$ are:
+\begin{enumerate}
+        \item \textbf{Exponentiated gradient:} $u_{t,i} = 0$ (non-varying regularizer) %$\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]$.
+        \item \textbf{Multiplicative updates:} $u_{t,i} = -\sum_{s=1}^t \eta z_{s,i} + \log(1-\eta z_{s,i})$ %$\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1-\sum_{s=1}^t (\eta z_{s,i} + \log(1-\eta z_{s,i}))]$.
+        \item \textbf{Adaptive exponentiated gradient:} $u_{t,i} = \eta \sum_{s=1}^t z_{s,i}^2$ %$\psi_t(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1+\sum_{s=1}^t \eta^2 z_{s,i}^2 w_i]$.
+\end{enumerate}
+Note that in the limit of small $\eta$, 
 $-\eta z_{t,i} - \log(1-\eta z_{t,i}) \approx \frac{1}{2}\eta z_{t,i}^2$, so that 
 the latter two regularizers are in fact very similar. The mirror descent updates corresponding 
 to each of the above regularizers are:
@@ -122,263 +150,68 @@ mirror descent based on Fenchel conjugacy, we have the following inequality for 
 letting $\theta_t \eqdef -\sum_{s=1}^T z_s$ and $\psi_t$ denote the regularizer at time $t$:
 \begin{equation}
         \label{eqn:bound1}
-        -\psi_T(w) - \eta \sum_{t=1}^T w^T z_t \leq \psi_0^*(0) + \sum_{t=1}^T \psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}).
+        -\psi_T(w) - \eta \sum_{t=1}^T w^{\top} z_t \leq \psi_0^*(0) + \sum_{t=1}^T \psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}).
 \end{equation}
-Usually the regularizer is fixed, in which case $\psi^*(\theta_t) - \psi^*(\theta_{t-1}) = -\eta w_t^Tz_t + D_{\psi^*}(\theta_{t+1} \| \theta_t)$. 
-Note that $w_t^Tz_t$ is the loss suffered in round $t$; the Bregman divergence term $D_{\psi^*}$ measures the increase in regret for that round. 
+Usually the regularizer is fixed, in which case $\psi^*(\theta_t) - \psi^*(\theta_{t-1}) = -\eta w_t^{\top}z_t + D_{\psi^*}(\theta_{t+1} \| \theta_t)$. 
+Note that $w_t^{\top}z_t$ is the loss suffered in round $t$; the Bregman divergence term $D_{\psi^*}$ measures the increase in regret for that round. 
 In particular, re-arranging gives
 \begin{equation}
         \label{eqn:bound2}
-        \Regret(w) = \sum_{t=1}^T w_t^Tz_t - \sum_{t=1}^T w^Tz_t \leq \frac{1}{\eta}\left[ \psi^*(0) + \psi(w) + \sum_{t=1}^T D_{\psi^*}(\theta_{t+1} \| \theta_t)\right].
+        \Regret(w) = \sum_{t=1}^T w_t^{\top}z_t - \sum_{t=1}^T w^{\top}z_t \leq \frac{1}{\eta}\left[ \psi^*(0) + \psi(w) + \sum_{t=1}^T D_{\psi^*}(\theta_{t+1} \| \theta_t)\right].
 \end{equation}
 One can then use an analysis based on strong convexity of $\psi$ to bound $\psi^*$; for instance, in the case of exponentiated gradient, 
 we have the bound $D_{\psi^*}(\theta_{t+1} \| \theta_t) \leq \eta^2 \sum_{i=1}^n w_{t,i}z_{t,i}^2$, which leads to our claimed regret bound 
 for exponentiated gradient.
 
-In contrast, our analysis based on adaptive regularizers will choose $\psi_t^*$ such that $\psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}) \leq -\eta w_t^Tz_t$. 
+In contrast, our analysis based on adaptive regularizers will choose $\psi_t^*$ such that $\psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}) \leq -\eta w_t^{\top}z_t$. 
 Assuming we succeed in picking such a $\psi_t^*$, the $\sum_{t=1}^T \psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1})$ term can be replaced with 
-$-\eta \sum_{t=1}^T w_t^Tz_t$. We can then re-arrange to obtain the regret bound
+$-\eta \sum_{t=1}^T w_t^{\top}z_t$. We can then re-arrange to obtain the regret bound
 \begin{equation}
         \label{eqn:bound3}
-        \Regret(w) = \sum_{t=1}^T w_t^Tz_t - \sum_{t=1}^T w^Tz_t \leq \frac{\psi_0^*(0) + \psi_T(w)}{\eta}.
+        \Regret(w) = \sum_{t=1}^T w_t^{\top}z_t - \sum_{t=1}^T w^{\top}z_t \leq \frac{\psi_0^*(0) + \psi_T(w)}{\eta}.
 \end{equation}
 This is quite interesting as we have pushed the entire regret bound into an increase in the size 
 of the regularizer.
 
-We will now verify the property $\psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}) \leq -\eta w_t^Tz_t$ 
-for both multiplicative updates and adaptive EG. It will be useful to know the following fact about 
-$\psi_t^*$:
-\begin{lemma}
-        \label{lem:fenchel}
-        If $\psi(w) = \sum_{i=1}^n w_i[\log(w_i/\lambda)-1+s_i]$, 
-        then $\psi^*(\theta) = \lambda \sum_{i=1}^n \exp(\theta_i - s_i)$.
-\end{lemma}
-Now, we can easily verify the property for multiplicative updates:
+We will now verify the property $\psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}) \leq -\eta w_t^{\top}z_t$ 
+for both multiplicative updates and adaptive EG. Our analysis relies on Lemma~\ref{lem:properties}.
+For multiplicative updates:
 \begin{align}
         \psi_t^*(\theta_t) &= \psi_t^*(\theta_{t-1}- \eta z_t) \\
-                           &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} - \eta z_{t,i} + \sum_{s=1}^t \eta z_{s,i} + \log(1 - \eta z_{s,i})\right) \\
-                           &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} + \log(1- \eta z_{t,i}) + \sum_{s=1}^{t-1} \eta z_{s,i} + \log(1 - \eta z_{s,i})\right) \\
-                           &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} + \sum_{s=1}^{t-1} \eta z_{s,i} + \log(1 - \eta z_{s,i})\right)(1 - \eta z_{t,i}) \\
-                           &= \psi_{t-1}^*(\theta_{t-1}) - \eta \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} + \sum_{s=1}^{t-1} \eta z_{s,i} + \log(1- \eta z_{s,i})\right) z_{t,i} \\
-                           &= \psi_{t-1}^*(\theta_{t-1}) - \eta w_t^Tz_t,
+                           &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} - \eta z_{t,i} - u_{t,i}\right) \\
+                           &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} + \log(1- \eta z_{t,i}) - u_{t-1,i}\right) \\
+                           &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} - u_{t-1,i}\right)(1 - \eta z_{t,i}) \\
+                           &= \psi_{t-1}^*(\theta_{t-1}) - \eta \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} - u_{t-1,i}\right) z_{t,i} \\
+                           &= \psi_{t-1}^*(\theta_{t-1}) - \eta w_t^{\top}z_t,
 \end{align}
-hence $\psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}) = -\eta w_t^Tz_t$, i.e. the property holds with equality. We \
-thus have the regret bound
+hence $\psi_t^*(\theta_t) - \psi_{t-1}^*(\theta_{t-1}) = -\eta w_t^{\top}z_t$, i.e. the property holds with equality. Using the 
+fact that $\eta z + \log(1-\eta z) \leq \eta^2 z^2$ for $\eta \leq \frac{1}{2z}$, we have the regret bound
 \begin{align}
         \Regret(w) &\leq \frac{\psi_0*(0) + \psi_T(w)}{\eta} \\
-                   &= \frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1-\sum_{t=1}^T \eta z_{s,i} + \log(1 - \eta z_{t,i})]}{\eta} \\
+                   &= \frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1] + u_T^{\top}w}{\eta} \\
                    &\leq \frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1] + \eta^2 \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2}{\eta} \\
-                   &= \frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]}{\eta} + \eta \sum_{t=1}^T \sum_{i=1}^n w_i z_{t,i}^2.
+                   &= \frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]}{\eta} + \eta \sum_{t=1}^T \sum_{i=1}^n w_i z_{t,i}^2,
 \end{align}
+which holds whenever $\eta \leq \frac{1}{2 \max_{t=1}^T \|z_t\|_{\infty}}$. 
+
 Setting $\lambda$ to $1/n$ yields a bound of
 \[ \Regret(w) \leq \frac{1+(\log(n)-1)\|w\|_1 + \sum_{i=1}^n w_i\log(w_i)}{\eta} + \eta \sum_{t=1}^T \sum_{i=1}^n w_i z_{t,i}^2. \]
-The proof for adaptive exponentiated gradient is similar.
+The proof for adaptive exponentiated gradient is similar; we have:
+\begin{align}
+\psi_t^*(\theta_t) &= \psi_t^*(\theta_{t-1} - \eta z_t) \\
+ &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} - \eta z_{t,i} - u_{t,i}\right) \\
+ &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} - \eta z_{t,i} - \eta^2 z_{t,i}^2 - u_{t-1,i}\right) \\
+ &= \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} - u_{t-1,i}\right)\exp(-\eta z_{t,i} - \eta^2 z_{t,i}^2) \\
+ &\leq \lambda \sum_{i=1}^n \exp\left(\theta_{t-1,i} - u_{t-1,i}\right)(1-\eta z_{t,i}) \\
+ &= \psi_{t-1}^*(\theta_{t-1}) - \eta w_t^{\top}z_t,
+\end{align}
+where the last step re-uses the analysis for multiplicative updates. We thus have
+\begin{align}
+\Regret(w) &\leq \frac{\psi_0^*(0) + \psi_T(w)}{\eta} \\
+ &= \frac{\lambda n + \sum_{i=1}^n w_i[\log(w_i/\lambda)-1]}{\eta} + \eta \sum_{t=1}^T \sum_{i=1}^n w_i z_{t,i}^2,
+\end{align}
+which is the same regret bound as before.
 \section{Experiments}
 TODO.
 
-
-% the following standard bound on the regret of mirror descent:
-% \begin{equation}
-%         \label{eqn:bound}
-%         \Regret(w) \leq \psi_T(w) + \sum_{t=1}^T D_{\psi_t^*}(\theta_{t+1} \| \theta_t).
-% \end{equation}
-% Our idea is to pick $\psi_{t+1}-\psi_t$ to cancel out the Bregman divergence term. The intuition is 
-% that we are absorbing all of our loss into the regularizer, therefore giving us a bound that depends 
-% on $w$ rather than $w_t$. This strategy is non-standard, although has been used before, for instance in 
-% various papers by Francesco Orabona. Note that in all three cases, $\psi_t(w)$ differs from $\psi_0(w)$ 
-% only in a linear term, and hence $D_{\psi_t^*} \equiv D_{\psi_0^*}$, and in particular 
-% $D_{\psi_t^*}(\theta_{t+1} \| \theta_t) \leq \sum_{i=1}^n w_{t,i}z_{t,i}^2$ by analysis via a local norm.
-
-%%% We are interested in the following learning problem: our experts 
-%%% consist of vectors $w \in \sH$, where $\sH$ is some convex 
-%%% set; similarly, our adversary can play any move $z_t$ with 
-%%% $z_t \in \sA$. A typical example is $\sH$ is the $n$-dimensional 
-%%% simplex and $\sA$ is the unit $l^{\infty}$ ball. Our end goal is 
-%%% to obtain a regret bound of the following type:
-%%% \[ \sum_{t=1}^T w_t^Tz_t \leq \frac{\lambda}{\epsilon} + \epsilon \sum_{t=1}^T |w|^T|z_t| + \sum_{t=1}^T w^Tz_t. \]
-%%% If we let $\sigma = \sup_{w \in \sH, z \in \sA} |w|^T|z|$, then the regret is bounded by
-%%% $\frac{\lambda}{\epsilon} + \epsilon \sigma T$, which is equal to $2\sqrt{\lambda \sigma T}$ for 
-%%% $\epsilon = \sqrt{\frac{\lambda}{\sigma T}}$. This is the type of regret bound that is typical 
-%%% in most online learning settings. However, our bound can lead to stronger results in some 
-%%% situations, for instance if $\sA$ is very asymmetrical about the origin, in which case 
-%%% $|w|^T|z_t|$ will tend to be close to $w^Tz_t$ and we get bound
-%%% \[ \sum_{t=1}^T w_t^Tz_t \leq \frac{\lambda}{\epsilon} + (1+\epsilon)\sum_{t=1}^T w^Tz_t, \]
-%%% which is potentially much better, for instance if there is an expert that achieves 
-%%% very small loss.
-%%% 
-%%% We propose the following general style of algorithm for obtaining such 
-%%% bounds. The key innovation is an auxiliary variable $x_t$ that lets us 
-%%% relate $w_t^Tz_t$ and $w^Tz_t$. The updates are as follows:
-%%% \begin{align*}
-%%% x_{t+1} &= f(x_t, \eta z_t) \\
-%%% w_{t+1} &= \argmax_{w \in \sH} w^Tx_{t+1} - \psi(w) \\
-%%% \Phi_{t+1} &= w_{t+1}^Tx_{t+1} - \psi(w_{t+1})  \\ &= \psi^*(x_{t+1}).
-%%% \end{align*}
-%%% 
-%%% To see why these updates are a good idea, we will make a ``physicist's approximation'' 
-%%% and suppose that $f(x_t, \eta z_t) \approx x_t - \eta z_t$. Then we would have
-%%% \[ x_{T+1} \approx x_1 - \eta \sum_{t=1}^T z_t \] and thus, by definition, 
-%%% \[ \Phi_{T+1} \gtrsim w^Tx_1 - \psi(w) - \eta \sum_{t=1}^T w^Tz_t. \]
-%%% On the other hand, 
-%%% \begin{align*}
-%%% \Phi_{t+1} &\approx \Phi_t + w_t^T(x_{t+1} - x_t) \\
-%%%            &= \Phi_t - \eta w_t^T z_t,
-%%% \end{align*}
-%%% so we have 
-%%% \[ \Phi_{T+1} \approx \Phi_1 - \eta \sum_{t=1}^T w_t^Tz_t. \]
-%%% Combining this with the preceding bound on $\Phi_{T+1}$ yields
-%%% $\Phi_1 - \eta \sum_{t=1}^T w_t^Tz_t \gtrsim w^Tx_1 - \psi(w) - \eta \sum_{t=1}^T w^Tz_t$, 
-%%% or
-%%% \[ \sum_{t=1}^T w_t^Tz_t \lesssim \frac{\Phi_1 + \psi(w) - w^Tx_1}{\eta} + \sum_{t=1}^T w^Tz_t, \]
-%%% which gives us an even better regret bound than we had sought (the $\sum_{t=1}^T |w|^T|z_t|$ term 
-%%% will show up when we track the errors made in each of the approximations).
-%%% 
-%%% \paragraph{Formal statement.} To turn these approximations into a rigorous bound, we will 
-%%% need $f$ and $\psi$ to satisfy the following properties:
-%%% \begin{itemize}
-%%% \item Concavity of $\psi^* \circ f$: $\psi^*(f(x,\eta z)) \leq \psi^*(x) - \eta w_x^Tz$, where $w_x = \partial \psi^*(x)$.
-%%% \item Smoothness of $f$: $w^T(x-\eta z - f(x,\eta z)) \leq \eta^2 \alpha |w|^T|z|$ for all $w$.
-%%% \end{itemize}
-%%% (For some intuition, any $f$ satisfying the two properties above 
-%%% must satisfy $f(x,0) = x$ and $f(x,\eta z) = x-\eta z + O(\eta^2)$.)
-%%% \begin{theorem}
-%%% \label{thm:main}
-%%% Suppose that $\psi^*$ and $f$ satisfy the two properties above. Then, 
-%%% for $\eta = \frac{\epsilon}{\alpha}$, we have the bound
-%%% \[ \sum_{t=1}^T w_t^Tz_t \leq \alpha \frac{\Phi_1 + \psi(w) - w^Tx_1}{\epsilon} + \epsilon \sum_{t=1}^T |w|^T|z_t| + \sum_{t=1}^T w^Tz_t. \]
-%%% \end{theorem}
-%%% \begin{proof}
-%%% By the first condition, we have
-%%% \begin{align*}
-%%% \Phi^{t+1} &= \psi^*(x_{t+1}) \\
-%%%  &= \psi^*(f(x_t, \eta z_t)) \\
-%%%  &\leq \psi^*(x_t) - \eta \left(\frac{\partial \psi^*}{\partial x_t}\right)^T z_t \\
-%%%  &= \Phi_t - \eta w_t^T z_t,
-%%% \end{align*}
-%%% which by induction implies that
-%%% \[ \Phi_{T+1} \leq \Phi_1 - \eta \sum_{t=1}^T w_t^Tz_t. \]
-%%% By the second condition, we have
-%%% \begin{align*}
-%%% w^Tx_{t+1} &= w^Tf(x, \eta z) \\
-%%%  &\geq w^Tx_t - \eta w^Tz_t - \eta^2 \alpha |w|^T|z_t|,
-%%% \end{align*}
-%%% which by induction implies that
-%%% \[ w^Tx_{T+1} \geq w^Tx_1 - \eta^2\alpha \sum_{t=1}^T |w|^T|z_t| - \eta \sum_{t=1}^T w^Tz_t. \]
-%%% Combining this with the first inequality yields
-%%% \begin{align*}
-%%% \Phi_1 - \eta \sum_{t=1}^T w_t^Tz_t &\geq \Phi_{T+1} \\
-%%%  &\geq w^Tx_{T+1} - \psi(w) \\
-%%%  &\geq w^Tx_1 - \psi(w) - \eta^2\alpha \sum_{t=1}^T |w|^T|z_t| - \eta \sum_{t=1}^T w^Tz_t.
-%%% \end{align*}
-%%% Re-arranging yields
-%%% \[ \sum_{t=1}^T w_t^Tz_t \leq \frac{\Phi_1 + \psi(w) - w^Tx_1}{\eta} + \eta\alpha \sum_{t=1}^T |w|^T|z_t| + \sum_{t=1}^T w^Tz_t, \]
-%%% which gives the desired result.
-%%% \end{proof}
-%%% 
-%%% \paragraph{Relationship to mirror descent.} Mirror descent can be cast in the same framework as above, 
-%%% and corresponds to the exact additive update $x_{t+1} = x_t - \eta z_t$. Thus while our algorithm 
-%%% makes sure that $\psi^*$ decreases at a rate of $w_t^Tz_t$ and then bounds the error between 
-%%% $x_{t+1}$ and $x_t - \eta z_t$, in contrast mirror descent sets the error between $x_{t+1}$ and 
-%%% $x_t - \eta z_t$ to zero, and then relies on the smoothness of $\psi^*$ to bound the error between 
-%%% $\psi^*(x-\eta z)$ and $\psi^*(x) - \eta w_x^Tz$.
-%%% \section{Examples}
-%%% \paragraph{Multiplicative updates.} If we let $\sH$ be the simplex and $\sA$ be the 
-%%% $l^{\infty}$ ball of radius $r$, then a standard algorithm for minimizing regret is the 
-%%% \emph{multiplicative weights update method}. We recover this by letting $f(x,z) = x + \log(1-z)$ 
-%%% and $\psi(w) = \sum_{i=1}^n w_i\log w_i$. Then $\psi^*(x) = \log\left(\sum_{i=1}^n \exp(x_i)\right)$, 
-%%% and $w_{t+1,i} = \exp(x_{t+1,i})/\sum_{j=1}^n \exp(x_{t+1,j})$.
-%%% \begin{align*}
-%%% \psi^*(f(x,\eta z)) &= \log\left(\sum_{i=1}^n \exp(x_i + \log(1-\eta z_i))\right) \\
-%%%  &= \log\left(\sum_{i=1}^n \exp(x_i)(1-\eta z_i)\right) \\
-%%%  &= \log\left(\sum_{i=1}^n \exp(x_i) - \eta \sum_{i=1}^n \exp(x_i) z_i\right) \\
-%%%  &\leq \log\left(\sum_{i=1}^n \exp(x_i)\right) - \eta \frac{\sum_{i=1}^n \exp(x_i) z_i}{\sum_{i=1}^n \exp(x_i)} \\
-%%%  &= \psi^*(x) - \eta w^Tz,
-%%% \end{align*}
-%%% so condition 1 is satisfied.
-%%% 
-%%% Also, using the fact that $\log(1-\eta z_i) \geq -\eta z_i - \eta^2 z_i^2$, we have
-%%% \begin{align*}
-%%% w^T(x-\eta z - f(x, \eta z)) &= w^T(x-\eta z - (x + \log(1-\eta z))) \\
-%%%  &\leq \eta^2 \sum_{i=1}^n w_iz_i^2 \\
-%%%  &\leq \eta^2 r \sum_{i=1}^n |w_i||z_i|,
-%%% \end{align*}
-%%% where in the last step we used the fact that $|z_i| \leq r$. These updates 
-%%% thus fulfill the conditions of Theorem~\ref{thm:main} for $\alpha$ equal to 
-%%% $r$.
-%%% 
-%%% \paragraph{Sum of pointed convex sets.} Suppose that our hypothesis class 
-%%% $\sH \subseteq \bR^n$ can be decomposed as $\sH = \sH_+ + \sH_-$, where $\sH_+$ consists 
-%%% only of non-negative vectors and $\sH_-$ consists only of non-positive vectors. 
-%%% We can translate this into a problem n $\bR^{2n}$, by letting $\sH' \eqdef \sH_+ \times (-\sH_-)$ 
-%%% and $\sA' \eqdef \{(z, -z) \mid z \in \sA\}$. Then $(w')^T(z') = w^Tz$. Now 
-%%% let $(w_+, w_-)$ be the decomposition of $w'$ into its two components. We will 
-%%% define
-%%% \[ \psi(w') = \left\{ \begin{array}{ccl} \sum_{i=1}^n \log((w_+)_i + (w_-)_i) & : & w' \in \sH \\ \infty & : & \mathrm{else}. \end{array} \right. \]
-%%% Now let 
-%%% \[ R \eqdef \sup\limits_{w_+ \in \sH_+, w_- \in \sH_-, z \in \sA}  |w_+^Tz| + |w_-^Tz|, \]
-%%% and consider the update $x_{t+1} = x_t - \eta z'_t - 2\eta^2 R |z'_t|$. Then we have
-%%% \begin{align*}
-%%% \psi^*(x_{t+1}) &= \psi^*(x_t) - \eta (w'_t)^T(z'_t) - 2\eta^2R (w'_t)^T|z'_t| + D_{\psi^*}(x_{t+1} \| x_t) \\
-%%%  &= \psi^*(x_t) - \eta (w'_t)^Tz_t - 2\eta^2R (w'_t)^T|z'_t| + \frac{1}{2}((w'_t)^T|x_{t+1}-x_t|)^2 \\
-%%%  &= \psi^*(x_t) - \eta (w'_t)^Tz_t - 2\eta^2R (w'_t)^T|z'_t| + \frac{1}{2}(\eta (w'_t)^T|z'_t| + 2\eta^2R (w'_t)^T|z'_t|)^2 \\
-%%%  &= \psi^*(x_t) - \eta (w'_t)^Tz_t
-%%% \end{align*}
-%%% as long as $2\eta R \leq 1$, or $\eta \leq \frac{1}{2R}$. Thus the first condition is 
-%%% satisfied. Also, by construction we have 
-%%% \[ w^T(x_t - \eta z_t - x_{t+1}) = 2\eta^2 R w^T|z'_t|, \]
-%%% so that the second condition is satisfied for $\alpha = 2R$. Combining these, and 
-%%% setting $x_1 = 0$, we obtain the bound
-%%% \[ \sum_{t=1}^T w_t^Tz_t \leq \frac{2R[\psi(w) - \inf_{\tilde{w}} \psi(\tilde{w})]}{\epsilon} + \epsilon \sum_{t=1}^T (w_+ + w_-)^T|z_t| + \sum_{t=1}^T w^Tz_t. \]
-%%% This is a quite general result, but suffers from the fact that $\psi(w)$ can grow very large. 
-%%% Finding ways to deal with this would thus be very interesting.
-%%% 
-%%% \paragraph{Inflated $l^p$ norm.} By abuse of notation, let $\alpha$ denote the vector 
-%%% whose coordinates are all equal to $\alpha$. Let $\sH = B_{\alpha}^p(\lambda)$, where 
-%%% \[ B_{\alpha}^p(\lambda) \eqdef \{w \mid w \geq \alpha, \|w-\alpha\|_p \leq \lambda \}. \]
-%%% Note that this is the positive $l^p$ ball of radius $\lambda$, translated by $\alpha$. 
-%%% (We will show below that we can embed the unconstrained $l^p$ ball into $B_{\alpha}^p(\lambda)$ 
-%%% at the cost of increasing the dimension by a factor of 2, implying that 
-%%% $B_{\alpha}^p(\lambda)$ is a rich hypothesis class.) 
-%%% 
-%%% We will let $\psi(w) = \left\{ \begin{array}{ccl} \frac{1}{2(p-1)}\|w-\alpha\|_p^2 & : & w \geq \alpha \\ \infty & : & w \not\geq \alpha. \end{array} \right.$. 
-%%% Then 
-%%% \[ \psi^*(x) = \alpha \sum_{i=1}^n x_i + \frac{1}{2(q-1)}\|x_+\|_q^2, \]
-%%% where $x_+$ is the positive part of $x$ and $\frac{1}{p} + \frac{1}{q} = 1$.
-%%% 
-%%% Now suppose we use the update $x_{t+1,i} = x_{t,i} - \eta z_{t,i} - 2\eta^2 \frac{\|z\|_q^2}{\|z\|_1} |z_{t,i}| / \alpha$. 
-%%% Note that the Bregman divergence $D_{\psi^*}(x_{t+1} \| x_t)$ is bounded above by the Bregman divergence 
-%%% of $\frac{1}{2(q-1)}\|x\|_q^2$ (since it can be obtained from $\psi^*$ by adding a convex function), 
-%%% which is in turn bounded above by $\frac{1}{2}\|x_{t+1}-x_t\|_q^2$. Using these facts, together with the fact that 
-%%% $w \geq \alpha$, we have
-%%% \begin{align*}
-%%% \psi^*(x_{t+1}) &\leq \psi^*(x_t) - \eta w_t^Tz_t - \frac{2\eta^2\|z\|_q^2}{\alpha \|z\|_1} w_t^T|z_t| + D_{\psi^*}(x_{t+1} \| x_t) \\
-%%%  &\leq \psi^*(x_t) - \eta w_t^Tz_t - \frac{2\eta^2\|z\|_q^2}{\alpha \|z\|_1} w_t^T|z_t| + \frac{1}{2}\left\|\eta z_t + \frac{2\eta^2\|z\|_q^2}{\alpha \|z\|_1} |z_t|\right\|_q^2 \\
-%%%  &\leq \psi^*(x_t) - \eta w_t^Tz_t - 2\eta^2 \|z\|_q^2 + \frac{1}{2} \left(\eta \|z_t\|_q + \frac{2\eta^2\|z_t\|_q^3}{\alpha \|z_t\|_1}\right)^2 \\
-%%%  &\leq \psi^*(x_t) - \eta w_t^Tz_t - 2\eta^2 \|z\|_q^2 + \frac{1}{2} \left(\eta \|z_t\|_q + 2\eta^2 \|z_t\|_{q}^2 / \alpha\right)^2 \\
-%%%  &\leq \psi^*(x_t) - \eta w_t^Tz_t
-%%% \end{align*}
-%%% as long as $2\eta \|z_t\|_q/\alpha \leq 1$, which holds as long as $\eta \leq \frac{\alpha}{2r_q}$. In addition, we have that
-%%% \begin{align*}
-%%% w^T(x_{t} - \eta z_t - x_{t+1}) &= -\frac{2\eta^2\|z_t\|_q^2}{\alpha\|z_t\|_1}w^T|z_t| \\
-%%%  &\leq \eta^2 \frac{2\|z_t\|_q}{\alpha} |w|^T|z_t| \\
-%%%  &\leq \eta^2 \frac{2r_q}{\alpha} |w|^T|z_t|.
-%%% \end{align*}
-%%% So, both conditions of Theorem~\ref{thm:main} are satisfied. 
-%%% If we set $x_1 = 0$, then $\psi^*(x_1) = 0$ as well.
-%%% Therefore, for $\eta = \frac{\epsilon \alpha}{2r_q}$, we obtain a regret bound of 
-%%% \[ \frac{2r_q\psi(w)}{\epsilon \alpha} + \epsilon \sum_{t=1}^T |w|^T|z_t|. \]
-%%% Note that the regret gets smaller as $\alpha$ grows larger. This might seem too good 
-%%% to be true, until we notice the following: if $\alpha$ is very large, then all 
-%%% vectors with a small value of $\|w-\alpha\|_p$ will point in approximately the same 
-%%% direction, and thus get similar (multiplicative) values for the regret.
-%%% \paragraph{Embedding the $l^p$ ball into $B_{\alpha}^p$.} We now show how to turn problems 
-%%% involving the $l^p$ ball into problems involving $B_{\alpha}^p$. Given a vector 
-%%% $w \in \bR^n$, we can create a vector $w' \in \bR^{2n}$ via the embedding 
-%%% $w \mapsto \left[ \begin{array}{c} \alpha + \max(w, 0) \\ \alpha - \min(w,0) \end{array} \right]$. 
-%%% This embedding satisfies the property that $\|w\|_p = \|w'-\alpha\|_p$. Also, $w^Tz = w'^T\left[ \begin{array}{c} z \\ -z \end{array} \right]$. 
-%%% If we plug into the regret bound above, the only difference is that the value of $|w|^T|z_t|$ increases, yielding 
-%%% a regret of
-%%% \[ \frac{r_q \|w\|_p^2}{\epsilon \alpha (p-1)} + \epsilon \sum_{t=1}^T \left(|w|^T|z_t| + 2\alpha \|z_t\|_1\right). \]
-%%% Unfortunately, this final bound is quite bad, because the $\|z_t\|_1$ term grows with $T$ and depends on the 
-%%% $l^1$ norm, which is the biggest of all the $l^p$ norms.
 \end{document}
