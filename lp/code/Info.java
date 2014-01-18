@@ -1,10 +1,11 @@
 import java.io.*;
+import java.util.*;
 public class Info {
   Map<String, String> map;
-  public Info(String filename){
+  public Info(String filename) throws Exception {
     map = new HashMap<String, String>();
     Scanner scanner = new Scanner(new File(filename));
-    while(scanner.hasNextLine(){
+    while(scanner.hasNextLine()){
       String[] line = scanner.nextLine().split("\\s");
       map.put(line[0], line[1]);
     }

@@ -1,3 +1,4 @@
+import java.util.*;
 public class Example {
   int label, mult;
   Map<Integer, Double> features;

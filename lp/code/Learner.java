@@ -1,5 +1,5 @@
 public abstract class Learner {
-  double[] theta;
+  double[][] theta;
   double lambda, eta;
   public Learner(Info info){
     if(info.numLabels() != 2){
@@ -20,7 +20,7 @@ public abstract class Learner {
 
   // hinge loss
   double loss(double y){
-    return Math.min(1+y, 0);
+    return Math.max(1+y, 0);
   }
 
   abstract void updateTheta(Example example);
@@ -28,12 +28,17 @@ public abstract class Learner {
   public double predict(Example example){
     double y = 0.0;
     for(Integer index : example.features.keySet()){
-      double value = example.get(index);
+      double value = example.features.get(index);
       y += weights(index) * value;
     }
     double ret = loss(y);
     if(y > -1){
       updateTheta(example);
+    }
+    if(Main.zeroOne){
+      return ret > .999 ? 1 : 0;
+    } else {
+      return ret;
     }
   }
 

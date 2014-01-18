@@ -5,7 +5,7 @@ public class EGLearner extends Learner {
 
   public void updateTheta(Example example){
     for(Integer index : example.features.keySet()){
-      double value = example.get(index);
+      double value = example.features.get(index);
       theta[index][0] -= eta * value;
       theta[index][1] += eta * value;
     }

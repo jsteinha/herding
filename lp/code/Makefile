@@ -13,9 +13,9 @@ include=jars/guava-14.0.1.jar:jars/fig.jar
 	mkdir -p $(prefix)/$(NAME)
 
 run:
-	java -Xmx10g -cp .:$(include):classes/$(NAME) Main -execPoolDir $(prefix)/$(NAME) -Main.dataset $(DATASET)
+	java -Xmx10g -cp .:$(include):classes/$(NAME) Main -execPoolDir $(prefix)/$(NAME) -Main.dataset $(DATASET) -Main.learnerType $(TYPE) -Main.zeroOne $(Z1)
 
 run_silent:
-	java -Xmx10g -cp .:$(include):classes/$(NAME) Main -execPoolDir $(prefix)/$(NAME) -log.stdout false -Main.dataset $(DATASET)
+	java -Xmx10g -cp .:$(include):classes/$(NAME) Main -execPoolDir $(prefix)/$(NAME) -log.stdout false -Main.dataset $(DATASET) -Main.learnerType $(TYPE) -Main.zeroOne $(Z1)
 
 
