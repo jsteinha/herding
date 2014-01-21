@@ -5,8 +5,9 @@ public abstract class Learner {
     if(info.numLabels() != 2){
       throw new RuntimeException("expected binary classification problem");
     } else {
-      lambda = 1.0/info.numFeatures();
-      eta = Math.sqrt(-Math.log(lambda)/info.numExamples());
+      lambda = 20.0 /info.numFeatures();
+      int n = info.numFeatures(), T = info.numExamples();
+      eta = (lambda*n)*Math.sqrt(Math.log(n)/T);
       theta = new double[info.numFeatures()][2]; // two sets of weights (positive and negative)
       for(int i = 0; i < info.numFeatures(); i++){
         theta[i][0] = theta[i][1] = Math.log(lambda);

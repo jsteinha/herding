@@ -1,0 +1,125 @@
+CITE "Online Learning and Online Convex Optimization". Shai Shalev-Shwartz.
+http://www.cs.huji.ac.il/~shais/papers/OLsurvey.pdf
+-general survey (good to follow references)
+
+Fenchel: [40, 39, 24]
+EG: [26, 6, 28]
+Local norms: [2, 34]
+Hinge loss <-> Perceptron: [37, 3, 33, 18]
+Winnow algorithm: max(0, 1-y(2<w,x>-1))  *** this is most closely related to our setings ***: [29, 5]
+
+Distributional assumptions:
+"Learning from Noisy Data under Distributional Assumptions", 2010
+-probably not relevant, looks at perturbing (xt, yt) by some noise to make the problem harder
+
+Exponentiated gradient:
+CITE Learning Sparse Low-Threshold Linear Classifiers, 2012
+-more delicate analysis of unnormalized-EG for hinge loss to get O(k*theta) instead of O(k^2)
+CITE J. Kivinen and M. Warmuth, “Exponentiated gradient versus gradient descent
+for linear predictors,” 1997
+-original EG algorithm
+J. Kivinen and M. K. Warmuth, “Additive versus exponentiated gradient
+updates for linear prediction,” STOC 1995;
+-conference version of the above
+MAYBE K. Azoury and M. Warmuth, “Relative loss bounds for on-line density estima-
+tion with the exponential family of distributions,” 1999(?)
+-something like EG, with log loss
+J. Kivinen and M. Warmuth, “Relative loss bounds for multidimensional regres-
+sion problems,” 2001
+-seems like an early version of mirror descent, not that relevant
+
+
+  Winnow:
+  READ P. Auer and M. Warmuth, “Tracking the best disjunction”
+  -tracks a time-varying disjunction, basically time-varying winnow, could be good to try to adapt our analysis to this case
+  CITE N. Littlestone, “Learning quickly when irrelevant attributes abound: A new
+    linear-threshold algorithm,” 1988
+  -paper originally introducing the Winndow algorithm
+  N. Littlestone, “Mistake bounds and logarithmic linear-threshold learning algo-
+    rithms,” Ph.D. Thesis, University of California at Santa Cruz, 1990.
+
+
+
+Perceptron:
+F. Rosenblatt, “The perceptron: A probabilistic model for information storage
+and organization in the brain,” 1958
+Y. Freund and R. E. Schapire, “Large margin classification using the perceptron
+algorithm,” 1999
+
+
+Fenchel:
+S. Shalev-Shwartz, “Online learning: Theory, algorithms, and applications,”
+Ph.D. Thesis, The Hebrew University, 2007.
+S. Shalev-Shwartz and Y. Singer, “A primal-dual perspective of online learning
+algorithms,” Machine Learning Journal, vol. 69, no. 2, pp. 115–142, 2007.
+
+
+Misc. recent:
+"Learning Optimally Sparse Support Vector Machines", 2013
+"Vanishing Component Analysis", 2013
+"Learning the Experts for Online Sequence Prediction", 2012
+"Regularization Techniques for Learning with Matrices" Sham Kakade, Shai Shalev-Shwartz, Ambuj Tewari. 2012. 
+"Online Learning of Noisy Data" Nicolo Cesa-Bianchi, Shai Shalev-Shwartz and Ohad Shamir, 2011
+"Learning Kernel Based Halfspaces with the 0-1 Loss" Shai Shalev-Shwartz, Karthik Sridharan and Ohad Shamir, 2011
+Stochastic Methods for l1-regularized Loss Minimization", 2011
+"Pegasos: Primal Estimated sub-GrAdient SOlver for SVM", 2011
+"Trading Accuracy for Sparsity in Optimization Problems with Sparsity Constraints", 2010
+A. Rakhlin, Lecture Notes on Online Learning. draft, 2009.
+A. Rakhlin, K. Sridharan, and A. Tewari, “Online learning: Random averages,
+combinatorial parameters, and learnability,” 2010.
+S. Kakade, S. Shalev-Shwartz, and A. Tewari, “Regularization techniques for
+learning with matrices,” 2012
+"Online Learning of Noisy Data with Kernels", 2010
+"Composite Objective Mirror Descent", 2010
+E. Hazan, The Convex Optimization Approach to Regret Minimization. 2009.
+S. Ben-David, D. Pal, and S. Shalev-Shwartz, “Agnostic online learning,” 2009
+"Agnostic Online Learning" Shai Ben-David, David Pal and Shai Shalev-Shwartz COLT, 2009.
+"Stochastic Convex Optimization", Shai Shalev-Shwartz, Ohad Shamir, Karthik Sridharan and Nati Srebro COLT, 2009.
+"Mind the duality gap: Logarithmic regret algorithms for online optimization", 2008
+"Fast Rates for Regularized Objectives", 2008
+J. Abernethy, P. L. Bartlett, A. Rakhlin, and A. Tewari, “Optimal strategies
+and minimax lower bounds for online convex games,” 2008
+J. Abernethy, E. Hazan, and A. Rakhlin, “Competing in the dark: An effi-
+cient algorithm for bandit linear optimization,” 2008
+"Online Learning of Complex Prediction Problems Using Simultaneous Projections", 2008
+
+COLT 2013:
+"Online Learning for Time Series Prediction", Oren Anava, Elad Hazan, Shie Mannor and Ohad Shamir.
+"A Tale of Two Metrics: Simultaneous Bounds on Competitiveness and Regret"
+"Competing With Strategies", Wei Han, Alexander Rakhlin and Karthik Sridharan.
+"Online Learning with Predictable Sequences", Alexander Rakhlin and Karthik Sridharan.
+"Approachability, fast and slow". Shie Mannor and Vianney Perchet.
+"Horizon-Independent Optimal Prediction with Log-Loss in Exponential Families"
+"Opportunistic Strategies for Generalized No-Regret Problems", Andrey Bernstein, Shie Mannor and Nahum Shimkin.
+"Prediction by random-walk perturbation"
+"Regret Minimization for Branching Experts"
+"Online Similarity Prediction of Networked Data from Known and Unknown Graphs"
+
+COLT 2012:
+"Unified Algorithms for Online Learning and Competitive Analysis"
+"Online Optimization with Gradual Variations"
+"The Optimality of Jeffreys Prior for Online Density Estimation and the Asymptotic Normality of Maximum Likelihood Estimators"
+"The best of both worlds: stochastic and adversarial bandits"
+
+COLT 2011:
+"Sparsity regret bounds for individual sequences in online linear regression"
+"Online Learning: Beyond Regret"
+
+COLT 2010:
+"Adaptive Bound Optimization for Online Convex Optimization"
+"Adaptive Subgradient Methods for Online Learning and Stochastic Optimization"
+
+COLT 2008:
+"Minimizing Wide Range Regret with Time Selection Functions"
+"Regret Bounds for Sleeping Experts and Bandits"
+"Optimal Strategies for Random Walks"
+
+
+
+Interesting but unrelated:
+"Efficient Learning with Partially Observed Attributes. Nicolo Cesa-Bianchi, Shai Shalev-Shwartz and Ohad Shamir, 2011
+"Pegasos: Primal Estimated sub-GrAdient SOlver for SVM" , 2011
+--> Shai seems to work in general on "budgeted optimization"
+"ShareBoost: Efficient multiclass learning with feature sharing", 2012
+"Some Impossibility Results for Budgeted Learning", 2010
+"Announcement: The Generalization Ability of Online Algorithms for Dependent Data", COLT 2012
