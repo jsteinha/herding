@@ -9,8 +9,9 @@ Hinge loss <-> Perceptron: [37, 3, 33, 18]
 Winnow algorithm: max(0, 1-y(2<w,x>-1))  *** this is most closely related to our setings ***: [29, 5]
 
 Distributional assumptions:
+"Online Learning of Noisy Data" Nicolo Cesa-Bianchi, Shai Shalev-Shwartz and Ohad Shamir, 2011
 "Learning from Noisy Data under Distributional Assumptions", 2010
--probably not relevant, looks at perturbing (xt, yt) by some noise to make the problem harder
+  -these are probably not relevant, they look at perturbing (xt, yt) by some noise to make the problem harder
 
 Exponentiated gradient:
 CITE Learning Sparse Low-Threshold Linear Classifiers, 2012
@@ -37,34 +38,71 @@ sion problems,” 2001
   -paper originally introducing the Winndow algorithm
   N. Littlestone, “Mistake bounds and logarithmic linear-threshold learning algo-
     rithms,” Ph.D. Thesis, University of California at Santa Cruz, 1990.
+  -couldn't get a copy easily
 
 
 
 Perceptron:
-F. Rosenblatt, “The perceptron: A probabilistic model for information storage
+MAYBE F. Rosenblatt, “The perceptron: A probabilistic model for information storage
 and organization in the brain,” 1958
+-original perceptron paper
 Y. Freund and R. E. Schapire, “Large margin classification using the perceptron
 algorithm,” 1999
+-not clear
 
 
 Fenchel:
-S. Shalev-Shwartz, “Online learning: Theory, algorithms, and applications,”
-Ph.D. Thesis, The Hebrew University, 2007.
+CITE S. Shalev-Shwartz, “Online learning: Theory, algorithms, and applications,”
+ Ph.D. Thesis, The Hebrew University, 2007.
+-casts boosting as a game between a weak learner and booster
+-REALLY pretty use of duality in Chapter 3
+-claims to get efficient algorithms for structured prediction (see Eqn. 5.24)
+  -see also "Online passive aggressive algorithms", Crammer et al.
+
+
 S. Shalev-Shwartz and Y. Singer, “A primal-dual perspective of online learning
 algorithms,” Machine Learning Journal, vol. 69, no. 2, pp. 115–142, 2007.
+-looks like it's subsumed by the Thesis
+
+Adaptive:
+READ, CITE "Adaptive bound optimization for online convex optimization"
+CITE Dimension-free exponentiated gradient
+
+
+Boosting (LATER):
+“Online learning: Theory, algorithms, and applications”
+Logistic regression, AdaBoost and Bregman distances
+Additive logistic regression: a statistical view of boosting.
+Functional gradient techniques for combining hypotheses
+Totally corrective boosting algorithms that maximize the margin
+A decision-theoretic generalization of on-line learning and an application to boosting
+
 
 
 Misc. recent:
-"Learning Optimally Sparse Support Vector Machines", 2013
+Improved boosting algorithms using confidence-rated predictions, 1999
+  -allows hypotheses to assign confidences to their predictions
+"Smoothness, low-noise and fast rates", 2010
+  -focuses on ERM
+"On the universality of online mirror descent", 2011
+  -matching upper and lower bounds up to O(log^2(n)) factor
+READ "Learning Optimally Sparse Support Vector Machines", 2013
 "Vanishing Component Analysis", 2013
+  -some algebraic geometry stuff
 "Learning the Experts for Online Sequence Prediction", 2012
-"Regularization Techniques for Learning with Matrices" Sham Kakade, Shai Shalev-Shwartz, Ambuj Tewari. 2012. 
-"Online Learning of Noisy Data" Nicolo Cesa-Bianchi, Shai Shalev-Shwartz and Ohad Shamir, 2011
+  -first learns the experts given side info, then does MWU
+READ "Regularization Techniques for Learning with Matrices" Sham Kakade, Shai Shalev-Shwartz, Ambuj Tewari. 2012. 
 "Learning Kernel Based Halfspaces with the 0-1 Loss" Shai Shalev-Shwartz, Karthik Sridharan and Ohad Shamir, 2011
-Stochastic Methods for l1-regularized Loss Minimization", 2011
-"Pegasos: Primal Estimated sub-GrAdient SOlver for SVM", 2011
-"Trading Accuracy for Sparsity in Optimization Problems with Sparsity Constraints", 2010
+  -not relevant
+READ Stochastic Methods for l1-regularized Loss Minimization", 2011
+  -VERY relevant to Frank-Wolfe
+  -may also have good experiments / references
+READ "Pegasos: Primal Estimated sub-GrAdient SOlver for SVM", 2011
+MAYBE READ "Trading Accuracy for Sparsity in Optimization Problems with Sparsity Constraints", 2010
 A. Rakhlin, Lecture Notes on Online Learning. draft, 2009.
+  -possibly should look at online shortest path problem?
+
+---
 A. Rakhlin, K. Sridharan, and A. Tewari, “Online learning: Random averages,
 combinatorial parameters, and learnability,” 2010.
 S. Kakade, S. Shalev-Shwartz, and A. Tewari, “Regularization techniques for
@@ -117,6 +155,9 @@ COLT 2008:
 
 
 Interesting but unrelated:
+Prequential probability: principles and properties, 1997
+Ultraconservative online algorithms for multiclass problems, 2003
+-introduces MIRA
 "Efficient Learning with Partially Observed Attributes. Nicolo Cesa-Bianchi, Shai Shalev-Shwartz and Ohad Shamir, 2011
 "Pegasos: Primal Estimated sub-GrAdient SOlver for SVM" , 2011
 --> Shai seems to work in general on "budgeted optimization"
