@@ -14,6 +14,9 @@ Distributional assumptions:
   -these are probably not relevant, they look at perturbing (xt, yt) by some noise to make the problem harder
 
 Exponentiated gradient:
+DATA/CITE Stochastic Methods for l1-regularized Loss Minimization", 2011
+  -look at their experimental setup, has good datasets
+  -they also cite Langford 2009 which presumably also has good datasets
 CITE Learning Sparse Low-Threshold Linear Classifiers, 2012
 -more delicate analysis of unnormalized-EG for hinge loss to get O(k*theta) instead of O(k^2)
 CITE J. Kivinen and M. Warmuth, “Exponentiated gradient versus gradient descent
@@ -69,7 +72,14 @@ READ, CITE "Adaptive bound optimization for online convex optimization"
 CITE Dimension-free exponentiated gradient
 
 
-Boosting (LATER):
+Boosting / Frank-Wolfe (LATER):
+CITE "Pegasos: Primal Estimated sub-GrAdient SOlver for SVM", 2011
+-super-relevant from the perspective of the Frank-Wolfe stuff, they basically use the 
+  fixed-step-size version to solve an SVM
+READ Stochastic Methods for l1-regularized Loss Minimization", 2011
+  -VERY relevant to Frank-Wolfe
+  -may also have good experiments / references
+  -look at the references listed in the intro for other good related work
 “Online learning: Theory, algorithms, and applications”
 Logistic regression, AdaBoost and Bregman distances
 Additive logistic regression: a statistical view of boosting.
@@ -86,23 +96,23 @@ Improved boosting algorithms using confidence-rated predictions, 1999
   -focuses on ERM
 "On the universality of online mirror descent", 2011
   -matching upper and lower bounds up to O(log^2(n)) factor
-READ "Learning Optimally Sparse Support Vector Machines", 2013
+"Learning Optimally Sparse Support Vector Machines", 2013
+  -performs a post-processing step on SVMS to get out a sparse solution
 "Vanishing Component Analysis", 2013
   -some algebraic geometry stuff
 "Learning the Experts for Online Sequence Prediction", 2012
   -first learns the experts given side info, then does MWU
-READ "Regularization Techniques for Learning with Matrices" Sham Kakade, Shai Shalev-Shwartz, Ambuj Tewari. 2012. 
+CITE "Regularization Techniques for Learning with Matrices" Sham Kakade, Shai Shalev-Shwartz, Ambuj Tewari. 2012. 
+  -good suggestions for matrix regularizers, should consider whether our method generalizes to Lp norm for small p
 "Learning Kernel Based Halfspaces with the 0-1 Loss" Shai Shalev-Shwartz, Karthik Sridharan and Ohad Shamir, 2011
   -not relevant
-READ Stochastic Methods for l1-regularized Loss Minimization", 2011
-  -VERY relevant to Frank-Wolfe
-  -may also have good experiments / references
-READ "Pegasos: Primal Estimated sub-GrAdient SOlver for SVM", 2011
 MAYBE READ "Trading Accuracy for Sparsity in Optimization Problems with Sparsity Constraints", 2010
 A. Rakhlin, Lecture Notes on Online Learning. draft, 2009.
   -possibly should look at online shortest path problem?
 
 ---
+Mirror descent and nonlinear projected subgradient methods for convex optimization, 2003
+Sparse online learning via truncated gradient, 2009
 A. Rakhlin, K. Sridharan, and A. Tewari, “Online learning: Random averages,
 combinatorial parameters, and learnability,” 2010.
 S. Kakade, S. Shalev-Shwartz, and A. Tewari, “Regularization techniques for
