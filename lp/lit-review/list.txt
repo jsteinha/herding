@@ -8,8 +8,9 @@ Local norms: [2, 34]
 Hinge loss <-> Perceptron: [37, 3, 33, 18]
 Winnow algorithm: max(0, 1-y(2<w,x>-1))  *** this is most closely related to our setings ***: [29, 5]
 
-Distributional assumptions:
+LOOK AT LATER Distributional assumptions:
 "Online Learning of Noisy Data" Nicolo Cesa-Bianchi, Shai Shalev-Shwartz and Ohad Shamir, 2011
+"Online Learning of Noisy Data with Kernels", 2010
 "Learning from Noisy Data under Distributional Assumptions", 2010
   -these are probably not relevant, they look at perturbing (xt, yt) by some noise to make the problem harder
 
@@ -73,20 +74,22 @@ READ, CITE "Adaptive bound optimization for online convex optimization"
 CITE Dimension-free exponentiated gradient
 MAYBE CITE Second-Order Non-Stationary Online Learning for Regression
 -Table 1 could provide useful inspiration
-AROW
+CITE Less Regret via Online Conditioning
+  -adaptive step size for additive updates (or potentially decomposable updates more generally)
 CITE A Generalized Online Mirror Descent with Applications to Classification and Regression
--Lemma 1 in their paper is the main proof technique we use
+  -Lemma 1 in their paper is the main proof technique we use
+CITE Adaptive regularization of weight vectors
+  -AROW paper
 
-Competitive on-line statistics
-Relative loss bounds for on-line density estimation with the exponential family of distributions
 A second-order Perceptron algorithm
-Online confidence-weighted learning
-Adaptive regularization of weight vectors
-Logarithmic regret algorithms for online convex optimization
 Efficient online and batch learning using forward backward splitting
 Composite objective mirror descent
 Dual averaging methods for regularized stochastic learning and online optimization
+
 Convex games in banach spaces
+
+"Adaptive Bound Optimization for Online Convex Optimization"
+"Adaptive Subgradient Methods for Online Learning and Stochastic Optimization"
 
 
 
@@ -106,6 +109,7 @@ Additive logistic regression: a statistical view of boosting.
 Functional gradient techniques for combining hypotheses
 Totally corrective boosting algorithms that maximize the margin
 A decision-theoretic generalization of on-line learning and an application to boosting
+"Mind the duality gap: Logarithmic regret algorithms for online optimization", 2008
 
 
 
@@ -134,56 +138,32 @@ Mirror descent and nonlinear projected subgradient methods for convex optimizati
   -NOTE: first paper seems to be by Nemirovski and Yudin
 A. Rakhlin, K. Sridharan, and A. Tewari, “Online learning: Random averages, combinatorial parameters, and learnability,” 2010.
   -not too relevant here, might be relevant to Paul
+J. Abernethy, E. Hazan, and A. Rakhlin, “Competing in the dark: An efficient algorithm for bandit linear optimization,” 2008
+  -self-concordance
+  -could be useful in the conclusion
+CITE Online Learning: Stochastic, Constrained, and Smoothed Adversaries
+CITE "Online Learning with Predictable Sequences", Alexander Rakhlin and Karthik Sridharan.
+  -shows how to achieve better bounds if we know roughly the behavior of the sequence
+CITE Extracting Certainty from Uncertainty: Regret Bounded by Variation in Costs
+  -SUPER important; they have an update that is *very* similar to ours
+  -also get nicer bounds, e.g. in terms of variance rather than L2 norm
+CITE Better Algorithms for Benign Bandits
+  -bandit setting of preceding paper
+Online Optimization with Gradual Variations
+  -path length bounds
+CITE Improved second-order bounds for prediction with expert advice
+  -SUPER important; they explicitly compare MWU to MD (aka Weighted Majority) and point out the relationship between the bounds
+CITE Adaptive Online Gradient Descent
+  -adaptive in face of unknown degree of convexity
 
----
-"Online Learning of Noisy Data with Kernels", 2010
-E. Hazan, The Convex Optimization Approach to Regret Minimization. 2009.
-S. Ben-David, D. Pal, and S. Shalev-Shwartz, “Agnostic online learning,” 2009
-"Agnostic Online Learning" Shai Ben-David, David Pal and Shai Shalev-Shwartz COLT, 2009.
-"Stochastic Convex Optimization", Shai Shalev-Shwartz, Ohad Shamir, Karthik Sridharan and Nati Srebro COLT, 2009.
-"Mind the duality gap: Logarithmic regret algorithms for online optimization", 2008
-"Fast Rates for Regularized Objectives", 2008
-J. Abernethy, P. L. Bartlett, A. Rakhlin, and A. Tewari, “Optimal strategies
-and minimax lower bounds for online convex games,” 2008
-J. Abernethy, E. Hazan, and A. Rakhlin, “Competing in the dark: An effi-
-cient algorithm for bandit linear optimization,” 2008
-"Online Learning of Complex Prediction Problems Using Simultaneous Projections", 2008
 
-COLT 2013:
-"Online Learning for Time Series Prediction", Oren Anava, Elad Hazan, Shie Mannor and Ohad Shamir.
-"A Tale of Two Metrics: Simultaneous Bounds on Competitiveness and Regret"
-"Competing With Strategies", Wei Han, Alexander Rakhlin and Karthik Sridharan.
-"Online Learning with Predictable Sequences", Alexander Rakhlin and Karthik Sridharan.
-"Approachability, fast and slow". Shie Mannor and Vianney Perchet.
-"Horizon-Independent Optimal Prediction with Log-Loss in Exponential Families"
-"Opportunistic Strategies for Generalized No-Regret Problems", Andrey Bernstein, Shie Mannor and Nahum Shimkin.
-"Prediction by random-walk perturbation"
-"Regret Minimization for Branching Experts"
-"Online Similarity Prediction of Networked Data from Known and Unknown Graphs"
 
-COLT 2012:
-"Unified Algorithms for Online Learning and Competitive Analysis"
-"Online Optimization with Gradual Variations"
-"The Optimality of Jeffreys Prior for Online Density Estimation and the Asymptotic Normality of Maximum Likelihood Estimators"
-"The best of both worlds: stochastic and adversarial bandits"
-
-COLT 2011:
-"Sparsity regret bounds for individual sequences in online linear regression"
-"Online Learning: Beyond Regret"
-
-COLT 2010:
-"Adaptive Bound Optimization for Online Convex Optimization"
-"Adaptive Subgradient Methods for Online Learning and Stochastic Optimization"
-
-COLT 2008:
-"Minimizing Wide Range Regret with Time Selection Functions"
-"Regret Bounds for Sleeping Experts and Bandits"
-"Optimal Strategies for Random Walks"
 
 
 
 Interesting but unrelated:
-Prequential probability: principles and properties, 1997
+Competitive on-line statistics
+  also: Prequential probability: principles and properties, 1997
 Ultraconservative online algorithms for multiclass problems, 2003
 -introduces MIRA
 "Efficient Learning with Partially Observed Attributes. Nicolo Cesa-Bianchi, Shai Shalev-Shwartz and Ohad Shamir, 2011
@@ -192,3 +172,20 @@ Ultraconservative online algorithms for multiclass problems, 2003
 "ShareBoost: Efficient multiclass learning with feature sharing", 2012
 "Some Impossibility Results for Budgeted Learning", 2010
 "Announcement: The Generalization Ability of Online Algorithms for Dependent Data", COLT 2012
+"Online Learning of Complex Prediction Problems Using Simultaneous Projections", 2008
+"Online Learning: Beyond Regret"
+  also: "Unified Algorithms for Online Learning and Competitive Analysis"
+  also maybe: "A Tale of Two Metrics: Simultaneous Bounds on Competitiveness and Regret"
+Look up: Martingale empirical process theory
+"Opportunistic Strategies for Generalized No-Regret Problems", Andrey Bernstein, Shie Mannor and Nahum Shimkin.
+  -and notion of "approachability" more generally
+"Regret Minimization for Branching Experts"
+"Regret Bounds for Sleeping Experts and Bandits"
+Adaptivity of averaged stochastic gradient descent to local strong convexity for logistic regression
+
+
+Clarifying results:
+S. Ben-David, D. Pal, and S. Shalev-Shwartz, “Agnostic online learning,” 2009
+"Stochastic Convex Optimization", Shai Shalev-Shwartz, Ohad Shamir, Karthik Sridharan and Nati Srebro COLT, 2009.
+Convex games in banach spaces
+
