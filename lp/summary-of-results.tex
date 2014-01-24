@@ -1,0 +1,77 @@
+\documentclass[11pt]{article}
+\usepackage{import}
+\input{../icml/latex-defs.tex}
+\DeclareMathOperator{\Regret}{Regret}
+\usepackage{fullpage}
+
+\begin{document}
+\section{Summary of Results}
+This is a summary of the main results for the upcoming ICML paper. I'm writing them here because it 
+will hopefully help us organize the paper and we can also brainstorm the best way to present the results.
+
+The first result is the adaptive mirror descent result from before, with the ability to add in 
+``hints'' $s_t$ that guess what the next value of $z_t$ will be (and decrease the loss if the guess is 
+accurate). This is important because it will later let us achieve bounds based on the variance of the $z_t$ 
+rather than the second moment.
+\begin{theorem}
+For any sequence $s_1, s_2, \ldots, s_T$, consider the following prediction algorithm (we assume 
+that $\|z_t\|_{\infty} \leq 1$ and $\eta \leq \frac{1}{2}$):
+\begin{enumerate}
+\item Predict with $w_{t,i} \propto \exp(x_{t,i} - \eta s_{t,i})$.
+\item Receive loss $w_t^{\top}z_t$.
+\item Update $x_{t+1,i} = x_{t,i} - \eta z_{t,i} - \eta^2 (z_{t,i} - s_{t,i})^2$.
+\end{enumerate}
+Then the regret relative to a fixed weight vector $w$ is bounded by
+\[ \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i}-s_{t,i})^2. \]
+\end{theorem}
+
+Our major corollary uses a particular choice of $s_t$ to get bounds in terms of the variance. Interestingly, 
+the proof technique involves analyzing the $s_t$ as the moves played by a FTRL-style algorithm, so we can 
+view this algorithm as ``doubly-adaptive''.
+
+Let $\Var_i \eqdef \sum_{t=1}^T (z_{t,i}-\mu_i)^2$, with $\mu \eqdef \frac{1}{T} \sum_{t=1}^T z_t$.
+\begin{corollary}
+In the above setting, for the choice $s_t = \frac{1}{t} \sum_{s=1}^{t-1} z_s$, the 
+regret relative to $w$ is bounded by
+\[ \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i\Var_i + O(\log(T)). \]
+\end{corollary}
+
+These same results hold in the matrix case. Now we assume that $-I \preceq Z_t \preceq I$ 
+and continue to assume that $\eta \leq \frac{1}{2}$:
+\begin{theorem}
+For a sequence $S_1, \ldots, S_T$ of symmetric matrices, consider the following 
+prediction algorithm:
+\begin{enumerate}
+\item Predict $W_t \propto \exp(X_t - \eta S_t)$.
+\item Receive loss $\Tr(W_t^{\top}Z_t)$.
+\item Update $X_{t+1} = X_t - \eta Z_t - \eta^2 (Z_t-S_t)^2$.
+\end{enumerate}
+Then the regret relative to a fixed matrix $W$ is bounded by
+\[ \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \Tr((Z_t-S_t)^{\top}W(Z_t-S_t)). \]
+\end{theorem}
+We now define $\Var$ to be the matrix $\sum_{t=1}^T (Z_t-M)^2$, with $M \eqdef \frac{1}{T} \sum_{t=1}^T Z_t$.
+\begin{corollary}
+In the matrix setting, for the cohice $S_t = \frac{1}{t} \sum_{s=1}^{t-1} Z_s$, the 
+regret relative to $w$ is bounded by
+\[ \frac{\log(n)}{\eta} + \eta \Tr(W^{\top}\Var) + O(\log(T)). \]
+\end{corollary}
+It is important to note that in all of these bounds, the $O(\log(T))$ term does not 
+contain any hidden factors of $n$ or $\eta$. In fact we could take $O(\log(T)) = 8\log(T) + 2$.
+
+Finally, we show an interesting separation between our adaptive algorithm and vanilla mirror 
+descent even in the case where $s_t = 0$ for all $t$. For simplicity, we restrict our attention to the vector 
+setting (the result extends trivially to the matrix setting). We consider the ``quasi-realizable'' setting, 
+where one of the experts has identically zero loss (i.e. $z_{t,i} = 0$ for all $t$ for some $i$), and all 
+other experts have non-negative cumulative loss. This is different from the realizable setting because 
+losses can be both positive and negative.
+
+\begin{proposition}
+In the quasi-realizable setting, for any fixed step size $\eta$ there 
+exists a sequence of losses such that mirror descent suffers regret $\Omega(\sqrt{T})$. 
+In contrast, for any quasi-realizable sequence of losses and step size of $\eta = \frac{1}{2}$, 
+adaptive mirror descent has regret $O(1)$ (where the $O(1)$ suppresses a $\log(n)$ dependence 
+on dimension). These same results also hold in the matrix setting.
+\end{proposition}
+
+
+\end{document}

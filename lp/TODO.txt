@@ -1,0 +1,15 @@
+DONE 0. Derive an explicit case where MWU does much better than MD
+DONE-ish 1. Look at AdaGrad algorithm and try to understand it in the Orabona framework
+DONE-ish 2. Look at our updates and try to understand in Shai's framework
+SKIP 2b. Adaptive step size --> just go with "eta-halving trick"
+DONE 3. Generalize our updates to work with Von Neumann entropy
+DONE 3b. Better separation result in matrix case
+  Nope, can only get the same separation result as before
+SKIP 4. Generalize our updates to work with small l^p norms
+DONE 5. Explicitly compare to AdaGrad
+6. Find datasets / Run experiments
+7. Write related work section
+8. Write exposition to clarify the Orabona framework
+DONE 9. Variance extension
+  "Hint" idea appears in "Online Learning with Predictable Sequences"
+  
