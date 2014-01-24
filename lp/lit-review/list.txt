@@ -90,6 +90,9 @@ Convex games in banach spaces
 
 "Adaptive Bound Optimization for Online Convex Optimization"
 "Adaptive Subgradient Methods for Online Learning and Stochastic Optimization"
+  -for them eta = O(1), for us it is O(1/sqrt(T))
+  -their updated regularizer is doing most of the work to achieve convergence
+  -for us it's a correction term to get better bounds (e.g. in terms of best expert)
 
 
 
