@@ -74,12 +74,14 @@ define $\theta_t \eqdef -\eta \sum_{s=1}^{t-1} \theta_s$. The important
 observation in our context is that, by definition of $\psi_{T+1}^*$, 
 \begin{align}
 - \eta w^{\top} \sum_{t=1}^T z_t &\leq \psi_{T+1}(w) + \psi_{T+1}^*(\theta_{T+1}) \\
+\label{eqn:telescope}
  &= \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^T \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t).
 \end{align}
 Motivated by this, we note that if we could choose $\psi_{t+1}$ so that 
 $\psi_{t+1}^*(\theta_{t+1}) \leq \psi_{t}^*(\theta_t) - \eta w_t^{\top}z_t$, 
 then re-arranging would yield a regret bound of $\frac{\psi_1^*(\theta_1) + \psi_{T+1}(w)}{\eta}$.
 \begin{proposition}
+\label{prop:correspondence}
 Define $\lambda_{t,i} \eqdef \sum_{s=1}^{t-1} \log(1-\eta z_{s,i})$ and let
 \[ \psi_t(w) \eqdef \sum_{i=1}^n w_i\log(w_i) + (\theta_t - \lambda_t)^{\top}w. \]
 Then adaptive mirror descent with regularizer $\psi_t$ corresponds exactly to 
@@ -92,6 +94,8 @@ The corresponding regret bound is
  &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2.
 \end{align}
 \end{proposition}
+We will be able to prove this more easily with the machinery developed in 
+Section~\ref{sec:machinery}, but we also prove it here directly.
 \begin{proof}
 By standard properties of Fenchel conjugates, we have
 \begin{align}
@@ -101,5 +105,31 @@ By standard properties of Fenchel conjugates, we have
 From here we see that 
 $w_{t,i} \propto \exp(\lambda_{t,i}) = \prod_{s=1}^{t-1} (1-\eta z_{s,i})$, 
 so that $w_{t,i}$ does indeed correspond to the update in (\ref{eqn:mw2}). 
+
+Next, we exploit the property that the Fenchel conjugate of $\psi(w) + c^{\top}w$ 
+is $\psi^*(\theta - c)$, together with the fact that the Fenchel conjugate of 
+negentropy is logsumexp, to obtain
+\begin{align}
+\psi_{t+1}^*(\theta_{t+1}) &= \log\left(\sum_{i=1}^n \exp(\theta_{t+1,i} - (\theta_{t+1,i}-\lambda_{t+1,i}))\right) \\
+ &= \log\left(\sum_{i=1}^n \exp(\lambda_{t+1,i})\right) \\
+ &= \log\left(\sum_{i=1}^n \exp(\lambda_{t,i} + \log(1 - \eta z_{t,i}))\right) \\
+ &= \log\left(\sum_{i=1}^n \exp(\lambda_{t,i})(1 - \eta z_{t,i})\right) \\
+ &= \log\left(\sum_{i=1}^n \exp(\lambda_{t,i}) - \eta \sum_{i=1}^n \exp(\lambda_{t,i})z_{t,i}\right) \\
+ &\leq \log\left(\sum_{i=1}^n \exp(\lambda_{t,i})\right) - \eta \frac{\sum_{i=1}^n \exp(\lambda_{t,i})z_{t,i}}{\sum_{i=1}^n \exp(\lambda_{t,i})} \\
+ &= \psi_t^*(\theta_t) - \eta w_t^{\top}z_t.
+\end{align}
+Thus by the observations following (\ref{eqn:telescope}), $\Regret(w)$ is bounded by 
+$\frac{\psi_1^*(\theta_1) + \psi_{T+1}(w)}{\eta}$. Now using the fact that 
+$-\eta z - \log(1-\eta z) \leq \eta^2 z^2$ when $|\eta z| \leq \frac{1}{2}$, and also the 
+fact that $\sum_i w_i\log(w_i) \leq 0$, we have
+\begin{align}
+\Regret(w) &\leq \frac{\psi_1^*(\theta_1) + \psi_{T+1}(w)}{\eta} \\
+ &= \frac{\log(n) + \sum_{i=1}^n w_i\log(w_i) + (\theta_{T+1}-\lambda_{T+1})^{\top}w}{\eta} \\
+ &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2,
+\end{align}
+which completes the proposition.
 \end{proof}
+In the next section, we will present a more general framework for \emph{adaptive updates}, 
+also incorporating \emph{optimistic prediction} \cite{rakhlin2012}, which will both simplify 
+subsequent proofs and also allow us to obtain better bounds.
 \end{document}
