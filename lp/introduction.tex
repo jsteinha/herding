@@ -1,0 +1,137 @@
+\documentclass[paper_icml.tex]{subfiles}
+\begin{document}
+
+\section{Introduction} 
+\label{sec:intro}
+The exponentiated gradient algorithm is a powerful tool for performing online 
+learning in the presence of many irrelevant features 
+\cite{kivinen1997, littlestone1988}. One common application of exponentiated 
+gradient is to the learning from experts setting, in which it is also known 
+as the weighted majority algorithm \cite{wm} and entertains regret bounds of the 
+form 
+\[ \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \sum_{t=1}^T w_{t,i}z_{t,i}^2, \]
+where $w_t$ is the weight vector of the learner at time $t$ and $z_t$ is the 
+vector of losses. Such bounds can be obtained under the mirror descent 
+framework using a local norms analysis \cite{shalev2011}. 
+
+In contrast, \cite{cesa2007} present a variant 
+of this algorithm based on a multiplicative update of $(1 - \eta z_{t,i})$ rather 
+than the usual update of $\exp(-\eta z_{t,i})$. This algorithm cannot be 
+straightforwardly cast in the mirror descent framework, yet achieves an 
+improved  regret bound of
+\begin{equation}
+\label{eqn:mw-regret}
+\frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2.
+\end{equation}
+The difference is that the regret is in terms of the competing expert $w$ instead 
+of the learner's strategy $w_t$. This latter bound can sometimes be much 
+stronger; we show in Proposition~\ref{prop:separation} that there is a 
+$\Theta(\sqrt{T})$ separation in worst-case regret in what we refer to as the 
+``quasi-realizable'' setting. The difference between these two types of updates 
+is also discussed in \cite{mw-survey}. % TODO: should we actually cite this?
+
+The fact that an algorithm achieving a better regret bound cannot be cast in the 
+mirror descent framework is a bit unsettling. Does this mean that we should 
+abandon mirror descent as the gold standard for online learning, despite 
+theorems asserting its optimality \cite{srebro2011}? We answer this question 
+in the negative: the $1-\eta z_{t,i}$ can be understood as an \emph{adaptive 
+mirror descent algorithm}: one where the regularizer changes in each round 
+in response to previously observed vectors $z_t$. We obtain a 
+particularly natural interpretation of the updates as performing a form of 
+second-order correction on the gradient step.
+
+By exploiting this connection, we show that the perhaps more natural update 
+of $\exp(-\eta z_{t,i} - \eta^2 z_{t,i}^2)$ achieves the same regret bound 
+as in (\ref{eqn:mw-regret}), and that both updates continue to enjoy this 
+regret even when generalized from the simplex to an arbitrary convex set 
+(including all of $\bR^n$, which corresponds to unconstrained exponentiated 
+gradient). 
+
+Examining (\ref{eqn:mw-regret}) more closely, we see that we should expect 
+to perform well when the best expert $i$ has losses consistently close to zero: 
+then we set $w_j$ to $\delta_{ij}$ and the second term in (\ref{eqn:mw-regret}) 
+becomes $\sum_{t=1}^T z_{t,i}^2 \approx 0$. However, this assumption may be 
+unrealistic and a more realistic assumption is that the best expert's losses 
+have low variance: $\sum_{t=1}^T (z_{t,i} - m)^2$ is small for some $m$. More 
+generally, we would like to obtain a regret bound of the form
+\begin{equation}
+\label{eqn:variance-regret}
+\frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i}-m_i)^2
+\end{equation}
+with $m$ chosen to be the optimal value of 
+$m^* \eqdef \frac{1}{T} \sum_{t=1}^T z_t$.
+
+We achieve such a regret bound by combining two ideas: the first is 
+Rakhlin and Sridharan's framework of \emph{optimistic learning} 
+\cite{rakhlin2012}, which in our setting yields bounds of the form 
+\begin{equation}
+\label{eqn:optimistic-regret}
+\frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_{t,i})^2.
+\end{equation}
+If we could set $m_t$ to be $m^*$, then we would achieve the bound in 
+(\ref{eqn:variance-regret}). Unfortunately, $m^*$ is only known after observing 
+the full sequence of gradients. To overcome this, we learn $m^*$ itself in an 
+online fashion, choosing the $m_t$ according to a Follow the Regularized Leader 
+(FTRL) algorithm \cite{ftrl}. The regret bound thus obtained is given in 
+Theorem~\ref{thm:variance-vector}, which improves a result by 
+\cite{hazan2010variation}.
+
+Finally, we extend all these results to the matrix setting, where $W_t$ is now 
+a positive semidefinite matrix, possibly constrained to have trace $1$ 
+(in analogy with the simplex). This setting has already been extensively studied 
+\cite{lotsofpeople} and is important in obtaining online bounds for various 
+combinatorial optimization problems \cite{morepeople}. Using the machinery so 
+far developed, all of our results extend straightforwardly to the matrix setting, 
+with the exception of the auxiliary FTRL algorithm for estimating $M^*$. In this 
+case we need a new algorithm and analysis tool: a variant of FTRL for 
+\emph{vector-valued} losses ordered relative to some cone $\sK$. This generalized 
+FTRL lemma is given in Lemma~\ref{lem:ftrl-k} and may be of independent interest.
+
+For convenience, we summarize our contributions below:
+\begin{itemize}
+\item An interpretation of the multiplicative weights update as 
+      exponentiated gradient with an adaptive regularizer.
+\item An improved exponentiated gradient algorithm based on adaptive 
+      updates to an entropic regularizer.
+\item Further improvements to exponentiated gradient based on optimistic 
+      predictions and online learning of the mean gradient.
+\item An adaptive matrix exponentiated gradient, with similar improvements 
+      based on learning the mean gradient.
+\item A generalization of Follow the Regularized Leader to vector-valued 
+      loss functions.
+\end{itemize}
+
+\paragraph{Related work.} Our work contributes to an already rich literature 
+on using adaptive regularizers to obtain 
+better regret bounds for online learning algorithms. A common setting is 
+adaptive learning of a quadratic regularizer, as in the AROW 
+\cite{crammer2009arow}, AdaGrad \cite{duchi2011adagrad}, and online 
+preconditioning \cite{streeter2010} algorithms. 
+Other work includes dimension-free 
+exponentiated gradient \cite{orabona2013dimension} (which, however, 
+still performs essentially additive updates) and whitened perceptron 
+\cite{cesa2005perceptron}. The non-stationary setting has been explored 
+in \cite{vaits2013}, and \cite{mcmahan2010adaptive} obtain regret bounds 
+relative to an entire family of regularizers. More recently, many of these 
+algorithms have been unified into a single framework by \cite{orabona2013general}.
+To our knowledge, adaptively regularized exponentiated gradient has not 
+been explored, though \cite{hazan2010variation} provide an ad hoc algorithm 
+that is similar to one of ours.
+
+Other notions of ``adaptive'' weights have also been explored; though unrelated 
+to the current work, we briefly mention them for completeness. The first notion 
+notion of adaptivity pertains to time-varying experts: here the desire is to 
+obtain regret relative to the best \emph{schedule} of experts, where the number 
+of switches in the schedule is bounded. This is explored in \cite{switching}. 
+The other slightly more related notion is an adaptive step size, where the step 
+size $\eta$ changes as a function of time (often at a fixed schedule of 
+$1/\sqrt{T}$, but sometimes in a more sophisticated fashion). This idea is used 
+extensively throughout the literature but a few particularly relevant papers are 
+\cite{adaptive-step}.
+
+Finally, we note that the exponentiated gradient itself has been analyzed 
+and applied in various settings. One common setting, using a hinge-like loss, 
+is the Winnow Algorithm \cite{winnow}, which has been carefully analyzed in 
+\cite{winnow-careful}.
+
+\end{document}

@@ -1,0 +1,178 @@
+\documentclass[11pt]{article}
+\usepackage{import}
+\input{latex-defs.tex}
+\DeclareMathOperator{\Regret}{Regret}
+\usepackage{fullpage}
+
+\begin{document}
+\section{Proof for Matrix Setting}
+We assume that $-I \preceq Z_t \preceq I$  and that $\eta \leq \frac{1}{2}$. We 
+consider $W$ bounded so that $W \succeq 0$, $\Tr(W) \leq 1$. Thus when we write 
+$W \propto A$ we mean that $W = \frac{A}{\Tr{A}}$.
+\begin{theorem}
+\label{thm:matrix}
+For a sequence $S_1, \ldots, S_T$ of symmetric matrices, consider the following 
+prediction algorithm:
+\begin{enumerate}
+\item Predict $W_t \propto \exp(X_t - \eta S_t)$.
+\item Receive loss $\Tr(W_t^{\top}Z_t)$.
+\item Update $X_{t+1} = X_t - \eta Z_t - \eta^2 (Z_t-S_t)^2$.
+\end{enumerate}
+Then the regret relative to a fixed matrix $W$ is bounded by
+\[ \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \Tr((Z_t-S_t)^{\top}W(Z_t-S_t)). \]
+\end{theorem}
+% To prove the theorem, we will make use of the following lemma:
+% \begin{lemma}
+% \label{lem:main}
+% Let $\psi(W)$ be a convex function that is bounded below, and 
+% let $\psi^*(X) \eqdef \sup_{W} \Tr(W^TX) - \psi(W)$. Let $S$ be any convex set. 
+% 
+% Suppose that 
+% we generate a sequence $X_t$ via $X_0 = 0$ and 
+% $X_{t+1} = X_t - \eta Z_t - \eta^2 U_t$, which satisfies the 
+% property 
+% \[ \psi^*(X_t - \eta Z_t - \eta^2 U_t) \leq \psi^*(X_t) - \eta \partial \psi^*(X_t)^TZ_t. \]
+% Then, defining $W_t \eqdef \arg\max_{\tilde{W} \in S} \Tr(\tilde{W}^TX) - \psi(\tilde{W})$, for any $W \in S$ we have 
+% the bound
+% \[ \sum_{t=1}^T \Tr(W_t^TX_t) - \sum_{t=1}^T \Tr(W^TX_t) \leq \frac{\psi(W) + \psi^*(0)}{\eta} + \eta \sum_{t=1}^T \Tr(W^TU_t). \]
+% \end{lemma}
+
+\begin{proof}[Proof of Theorem~\ref{thm:matrix}]
+Define $\psi(W) = \Tr(W[\log(W)-I])$ and $\psi^*(X) \eqdef \sup_{W \succeq 0} \Tr(W^{\top}X) - \psi(W) = \Tr(\exp(X))$. 
+Note that $\partial \psi^*(X)^{\top}Z = \Tr(\exp(X)Z)$.
+
+We will prove a pair of bounds that will then allow us to obtain a regret bound by telescoping $\psi^*(X_t)$. 
+Our first bound is:
+\begin{equation}
+\label{eqn:bound-1}
+\Tr(\exp(X_t - \eta Z_t - \eta^2 (Z_t - S_t)^2 )) \leq \Tr(\exp(X_t - \eta S_t)) - \eta \Tr(\exp(X_t - \eta S_t)(Z_t - S_t)).
+\end{equation}
+This bound is the crux of our argument (the rest of the manipulations are standard and don't make use of 
+any specific properties of our setting other than convexity of $\psi$). We can verify the bound 
+using the Golden-Thompson inequality $\Tr(\exp(A+B)) \leq \Tr(\exp(A)\exp(B))$ together 
+with the fact that $-X-X^2 \preceq \log(I-X)$ for $-\frac{1}{2}I \preceq X \preceq \frac{1}{2}I$:
+\begin{align}
+\Tr(\exp(X_t - \eta Z_t - \eta^2 (Z_t - S_t)^2)) &= \Tr(\exp((X_t - \eta S_t) - \eta (Z_t - S_t) - \eta^2 (Z_t - S_t)^2)) \\
+ &\leq \Tr(\exp(X_t - \eta S_t)\exp(-\eta (Z_t - S_t) - \eta^2 (Z_t - S_t)^2)) \\
+ &\leq \Tr(\exp(X_t - \eta S_t)\exp(\log(I - \eta (Z_t - S_t)))) \\
+ &= \Tr(\exp(X_t - \eta S_t)(I - \eta (Z_t - S_t)) \\
+ &= \Tr(\exp(X_t - \eta S_t)) - \eta \Tr(\exp(X_t - \eta S_t)(Z_t - S_t)).
+\end{align}
+Our second bound is
+\begin{equation}
+\label{eqn:bound-2}
+\Tr(\exp(X_t - \eta S_t)) \leq \Tr(\exp(X_t)) - \eta \Tr(\exp(X_t - \eta S_t)S_t).
+\end{equation}
+This is just saying that $\psi^*(X_t - \eta S_t) \leq \psi^*(X_t) - \eta \langle \partial \psi^*(X_t - \eta S_t), S_t \rangle$, 
+which follows directly from convexity of $\psi^*$.
+
+Combining (\ref{eqn:bound-1}) and (\ref{eqn:bound-2}) and defining $\tilde{W}_t \eqdef \exp(X_t - \eta S_t)$ yields
+\begin{equation}
+\label{eqn:bound-3}
+\Tr(\exp(X_{t+1})) \leq \Tr(\exp(X_t)) - \eta \Tr(\tilde{W}_t^{\top}Z_t).
+\end{equation}
+We thus have
+\begin{align}
+\sum_{t=1}^T \Tr(\tilde{W}_t^{\top}Z_t) & \leq \frac{\psi^*(0) - \psi^*(X_{T+1})}{\eta} \\
+ &\leq \frac{\psi^*(0) + \psi(W) + \sum_{t=1}^T \Tr(W^{\top}(\eta Z_t + \eta^2 (Z_t - S_t)^2))}{\eta} \\
+ &\leq \frac{\psi^*(0) + \psi(W)}{\eta} + \sum_{t=1}^T \Tr(W^{\top}Z) + \eta \sum_{t=1}^T \Tr(W^{\top}(Z_t - S_t)^2) \\
+ &= \frac{\psi^*(0) + \psi(W)}{\eta} + \sum_{t=1}^T \Tr(W^{\top}Z) + \eta \sum_{t=1}^T \Tr((Z_t-S_t)^{\top}W(Z_t - S_t)).
+\end{align}
+We thus see that, had we predicted with $\tilde{W}_t$, we would have essentially the desired regret bound. 
+However, we instead predicted with $W_t = \frac{\tilde{W}_t}{\Tr(\tilde{W}_t)}$, and so we require one additional step.
+
+This additional step is captured in the following lemma:
+%% \begin{lemma}
+%% \label{lem:project}
+%% Define $\psi_{\sH}^*(X) \eqdef \sup_{W \in \sH} \Tr(W^{\top}X) - \psi(W)$. Then
+%% \[ \psi_{\sH}^*(X
+(TODO: add in additional step, may not be easily stated as a separate lemma unfortunately)
+\end{proof}
+
+\section{FTRL-$\sK$}
+
+In order to fully exploit Theorem~\ref{thm:matrix}, we need a 
+generalization of the Follow the Regularized Leader lemma, where 
+losses are vector-valued and are ordered by some cone, rather than 
+via the usual total ordering on $\bR$. To deal with the cone structure, 
+we define the notion of a \emph{global minimizer}:
+\begin{definition}
+Let $\sK$ be a cone in $\bR^d$ and let $f : \bR^n \to \bR^d$ be a 
+function. We call $X$ a \emph{global minimizer} of $f$ if $f(X) \leq_{\sK} f(X')$ 
+for all $X'$.
+\end{definition}
+
+We prove the following:
+\begin{lemma}
+\label{lem:ftrl-k}
+Suppose that for all $1 \leq t \leq T+1$, there 
+exists a global minimizer $M_t$ of 
+$\psi(X) + \sum_{s=1}^{t-1} f_s(X)$. Then for all $M$,
+\[ \sum_{t=1}^T f_t(M_t) \leq_{\sK} \psi(M) - \psi(M_1) + \sum_{t=1}^T f_t(M) + \sum_{t=1}^T f_t(M_{t}) - f_t(M_{t+1}). \]
+\end{lemma}
+\begin{proof}
+We will prove the lemma by induction on $T$. Note that the lemma is equivalent to showing that 
+\[ \psi(M_1) + \sum_{t=1}^T f_t(M_{t+1}) \leq_{\sK} \psi(M) + \sum_{t=1}^T f_t(M) \]
+for all $M$.
+
+In the base case $T = 0$, we have
+\[ \psi(M_1) \leq_{\sK} \psi(M), \]
+which follows from the fact that $M_1$ is a global minimizer of $\psi$ and 
+hence $\psi(M_1) \leq_{\sK} \psi(M)$ for all $M$. For the inductive step, suppose that
+\[ \sum_{t=1}^{T-1} f_t(M_{t+1}) \leq_{\sK} \psi(M) \sum_{t=1}^{T-1} f_t(M) \]
+for all $M$, and invoke this for the particular choice $M = M_{T+1}$. Then we have
+\begin{align}
+\psi(M_1) + \sum_{t=1}^T f_t(M_{t+1}) &= \psi(M_1) + \sum_{t=1}^{T-1} f_t(M_{t+1}) + f_T(M_{T+1}) \\
+ &\leq_{\sK} \psi(M_{T+1}) + \sum_{t=1}^{T-1} f_t(M_{T+1}) + f_T(M_{T+1}) \\
+ &= \psi(M_{T+1}) + \sum_{t=1}^T f_t(M_{T+1}) \\
+ &\leq_{\sK} \psi(M) + \sum_{t=1}^T f_t(M)
+\end{align}
+for all $M$, where we use the fact that $M_{T+1}$ is a global minimizer of $\psi(M) + \sum_{t=1}^T f_t(M)$ for 
+the last inequality. This completes the inductive hypothesis and hence the proof.
+\end{proof}
+
+The condition that a global minimizer always exists may seem somewhat strong, so we now invoke it for a concrete case.
+\begin{corollary}
+\label{cor:ftrl-matrix}
+Let $\sK$ be the semidefinite cone, $\psi(M) = M^{\top}M$, and $f_t(M) = (M - Z_t)^{\top}(M - Z_t)$. 
+Then the unique global minimizer of $\psi(M) + \sum_{s=1}^{t-1} f_t(M)$ is $M_t \eqdef \frac{1}{t} \sum_{s=1}^{t-1} Z_s$. 
+In particular, 
+\[ \sum_{t=1}^T (Z_t - M_t)^2 \preceq \sum_{t=1}^T (Z_t - M_{T+1})^2 + 4\log(T+1)I. \]
+\end{corollary}
+
+\begin{proof}
+To show that $M_t$ is the global minimizer, consider some other value $\tilde{M}_t = M_t + D_t$. Then we have 
+\begin{align}
+\lefteqn{\tilde{M}_t^{\top}\tilde{M}_t + \sum_{s=1}^{t-1} (Z_s - \tilde{M}_t)^{\top}(Z_s - \tilde{M}_t)} \\
+ &= (M_t + D_t)^{\top}(M_t + D_t) + \sum_{s=1}^{t-1} (Z_s - M_t - D_t)^{\top}(Z_s - M_t - D_t) \\
+ &= M_t^{\top}M_t + \sum_{s=1}^{t-1} (Z_s - M_t)^{\top}(Z_s - M_t) + tD_t^{\top}D_t + D_t^{\top}\left[ M_t + \sum_{s=1}^{t-1} (Z_s - M_t) \right] + \left[ M_t + \sum_{s=1}^{t-1} (Z_s - M_t)\right]^{\top} D_t \\
+ &= M_t^{\top}M_t + \sum_{s=1}^{t-1} (Z_s - M_t)^{\top}(Z_s - M_t) + tD_t^{\top}D_t \\
+ &\succeq M_t^{\top}M_t + \sum_{s=1}^{t-1} (Z_s - M_t)^{\top}(Z_s - M_t).
+\end{align}
+Since this holds for all $D_t$, $M_t$ is indeed a global minimizer. Thus, by Lemma~\ref{lem:ftrl-k}, we have
+\[ \sum_{t=1}^T (Z_t - M_t)^2 \preceq \sum_{t=1}^T (Z_t - M_{T+1})^2 + \sum_{t=1}^T (Z_t-M_t)^2 - (Z_t-M_{t+1})^2. \]
+To complete the corollary, we need only show that $(Z_t-M_t)^2 - (Z_t-M_{t+1})^2 \preceq \frac{4}{t+1}I + M_t^2 - M_{t+1}^2$ 
+(since the $M_t^2 - M_{t+1}^2$ terms will telescope to $M_1^2 - M_{T+1}^2 = -M_{T+1}^2 \preceq 0$).
+To show this, note that $M_{t+1} - M_t = \frac{1}{t+1}(Z_t - M_t)$ and hence
+\begin{align}
+(Z_t - M_t)^2 - (Z_t - M_{t+1})^2 &= (M_{t+1}-M_t)Z_t + Z_t(M_{t+1}-M_t) + M_t^2 - M_{t+1}^2 \\
+  &= \frac{1}{t+1}\left[(Z_t - M_t)Z_t + Z_t(Z_t-M_t)\right] + M_t^2 - M_{t+1}^2 \\
+  &\preceq \frac{4}{t+1}I + M_t^2 - M_{t+1}^2.
+\end{align}
+This completes the corollary.
+\end{proof}
+
+% \begin{corollary}
+% If we set $S_t = \frac{1}{t} \sum_{s=1}^{t-1} Z_s$ (so $S_1 = 0$, $S_2 = \frac{1}{2}Z_1$, $S_3 = \frac{1}{3}(Z_1+Z_2)$, etc.), 
+% then we obtain the bound
+% \[ \sum_{t=1}^T \Tr(W_t^TZ_t) - \sum_{t=1}^T \Tr(W^TZ_t) \leq \frac{\log(n)+\Tr(W\log(W))}{\eta} + \eta \sum_{t=1}^T \Tr((Z_t-M)^TW(Z_t-M)) + O(1), \]
+% where $M \eqdef \frac{1}{T} \sum_{t=1}^T Z_t$.
+% \end{corollary}
+% \begin{proof}
+% We will show that $\sum_{t=1}^T \Tr((Z_t-S_t)^2) \leq \sum_{t=1}^T \Tr((Z_t-M)^2) + O(1)$. (This follows from the fact that 
+% $S_{t} = \argmin_S \Tr(S^2) + \sum_{s=1}^{t-1} \Tr((Z_s-S)^2)$, and hence can be interpreted as Follow the Regularized Leader.)
+% 
+% Next, we use the fact that, 
+% \end{proof}
+
+\end{document}
