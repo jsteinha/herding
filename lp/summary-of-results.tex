@@ -35,6 +35,11 @@ In the above setting, for the choice $s_t = \frac{1}{t} \sum_{s=1}^{t-1} z_s$, t
 regret relative to $w$ is bounded by
 \[ \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i\Var_i + O(\log(T)). \]
 \end{corollary}
+This result is a slight strengthening of one of the main results in the Hazan-Kale paper I showed you today. 
+The places where it is stronger are that the constant is much better (additive $\log(T)$ rather than 
+multiplicative factor of $16$) and also the regret is just in terms of the variance of the best expert, 
+whereas before it was a more complicated metric in terms of largest cumulative variance of best expert 
+at any point in time.
 
 These same results hold in the matrix case. Now we assume that $-I \preceq Z_t \preceq I$ 
 and continue to assume that $\eta \leq \frac{1}{2}$:
@@ -57,6 +62,9 @@ regret relative to $w$ is bounded by
 \end{corollary}
 It is important to note that in all of these bounds, the $O(\log(T))$ term does not 
 contain any hidden factors of $n$ or $\eta$. In fact we could take $O(\log(T)) = 8\log(T) + 2$.
+As far as I'm aware, both the theorem and the corollary in the matrix case are new. But 
+a lot of the work done on this is in the theory community and I haven't reviewed 
+references on matrix multiplicative weights nearly as thoroughly as for online learning.
 
 Finally, we show an interesting separation between our adaptive algorithm and vanilla mirror 
 descent even in the case where $s_t = 0$ for all $t$. For simplicity, we restrict our attention to the vector 

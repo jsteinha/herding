@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{import, subfiles}
+\usepackage{hyperref, icml2014, times}
+\usepackage{tabularx}
+\input{latex-defs.tex}
+
+%\allowdisplaybreaks
+
+\icmltitlerunning{Adaptive Exponentiated Gradient}
+
+\begin{document} 
+
+\twocolumn[
+\icmltitle{Adaptive Exponentiated Gradient}
+
+\icmlauthor{Jacob Steinhardt}{jsteinhardt@cs.stanford.edu}
+\icmladdress{Stanford University,
+             353 Serra Street, Stanford, CA 94305 USA}
+\icmlauthor{Jonathan Huggins}{jhuggins@mit.edu}
+\icmladdress{MIT CSAIL,
+             77 Massachusetts Avenue, Cambridge, MA 02139 USA}
+\icmlauthor{Percy Liang}{pliang@cs.stanford.edu}
+\icmladdress{Stanford University,
+             353 Serra Street, Stanford, CA 94305 USA}
+
+
+% You may provide any keywords that you 
+% find helpful for describing your paper; these are used to populate 
+% the "keywords" metadata in the PDF but will not be shown in the document
+\icmlkeywords{online learning, optimistic, adaptive, matrix multiplicative weights}
+
+\vskip 0.3in
+]
+
+\begin{abstract} 
+We present an adaptive variant of the exponentiated gradient algorithm, 
+achieving regret that depends only on the variance of the best retrospective 
+expert. This generalizes and improves a result by 
+\cite{hazan2010variation}. Our analysis is conceptually clean and brings together 
+two recent developments in online learning, as well as a novel construction 
+using an auxiliary instance of follow the regularized leader to tune a regret 
+bound. Using the machinery developed, we are also able to extend our results 
+to the matrix case, presenting an \emph{adaptive matrix exponentiated gradient} 
+algorithm. Our proof in this case involves a novel analysis tool generalizing 
+follow the regularized leader to vector-valued payoffs, which may be of 
+independent interest.
+\end{abstract} 
+
+\subfile{introduction.tex}
+\subfile{algorithms.tex}
+
+\bibliography{adaptive}
+\bibliographystyle{icml2014}
+
+\end{document} 
