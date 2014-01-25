@@ -6,4 +6,46 @@
 We now state our two main algorithms and their associated 
 regret bounds.
 
+\begin{theorem}
+Suppose that $\|z_t\|_{\infty} \leq 1$ and $\eta \leq \frac{1}{2}$. 
+Consider the updates and predictions given by:
+\begin{itemize}
+\item $x_{1,i} = -\log(n)$
+\item $m_{t} = \frac{1}{t} \sum_{s=1}^{t-1} z_s$
+\item $w_{t,i} = \exp(x_{t,i} - \eta m_{t,i})$
+\item $x_{t+1,i} = x_{t,i} - \eta z_{t,i} - \eta^2 (z_{t,i} - m_{t,i})^2$
+\end{itemize}
+Then 
+\begin{align}
+\nonumber
+\lefteqn{\sum_{t=1}^T w_t^Tz_t \leq} \\
+ & \sum_{t=1}^T w^Tz_t + \frac{\log(n)}{\eta} + \eta \left[ 4\log(T+1) + \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_i)^2 \right].
+\end{align}
+\end{theorem}
+Note that this algorithm constraints $w$ to be non-negative. If this is 
+undesirable, we can overcome this restriction by writing $w = w_{+} - w_{-}$ 
+and making separate updates to $w_{+}$ and $w_{-}$. (The $w_{-}$ updates behave 
+as if they had observed a gradient of $-z_t$ rather than $z_t$. This is explained 
+in more detail in \cite{kivinen1997}.)
+
+Our second algorithm pertains to the matrix case:
+\begin{theorem}
+Suppose that $Z_t$ is symmetric and has eigenvalues bounded between $-1$ and $1$. 
+Let $\eta \leq \frac{1}{2}$. Consider the updates and predictions given by:
+\begin{itemize}
+\item $X_1 = -\log(n)I$
+\item $M_t = \frac{1}{t} \sum_{s=1}^{t-1} Z_s$
+\item $W_t = \exp(X_t - \eta M_t)$
+\item $X_{t+1} = X_t - \eta Z_t - \eta^2 (Z_t - M_t)$
+\end{itemize}
+Then
+\begin{align}
+\sum_{t=1}^T \Tr(W_t^{\top}Z_t) \leq & \sum_{t=1}^T \Tr(W^{\top}Z_t) + \frac{\log(n)}{\eta} \\
+ & + \eta \left[ 4\log(T+1) + \sum_{t=1}^T \Tr(W(Z_t-M)^2)\right].
+\end{align}
+\end{theorem}
+Moreover, both of these bounds continue to hold for the normalized variants of the 
+algorithms, e.g. if we replace $w_t$ with $w_t/\|w_t\|_1$ or $W_t$ with 
+$W_t/\Tr(W_t)$.
+
 \end{document}
