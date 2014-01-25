@@ -3,6 +3,109 @@
 
 \section{Adaptive Optimistic Learning} 
 \label{sec:machinery}
+In this section we present a framework for \emph{adaptive optimistic learning}. 
+This combines the framework of adaptive learning presented in \cite{orabona2013general} with 
+the framework of optimistic learning in \cite{rakhlin2012}. While the combination is 
+straightforward, we will show that in our case the combination of the two yields meaningfully 
+better results than using either one in isolation. The adaptive optimistic mirror descent 
+algorithm thus obtained is given in Algorithm~\ref{alg:adaptive-optimistic}.
 
+\begin{algorithm}
+\caption{Adaptive Optimistic Mirror Descent}
+\label{alg:adaptive-optimistic}
+\begin{algorithmic}
+\STATE $\theta_1 = 0$
+\FOR{$t=1$ {\bfseries to} $T$}
+  \STATE Choose $w_t = \nabla \psi_t^*(\theta_t - \eta m_t)$
+  \STATE Observe $z_t$ and suffer loss $w_t^{\top}z_t$
+  \STATE Update $\theta_{t+1} = \theta_t - \eta z_t$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+The key regret bound for Algorithm~\ref{alg:adaptive-optimistic} is 
+given in Theorem~\ref{thm:adaptive-optimistic}:
+\begin{theorem}
+Algorithm~\ref{alg:adaptive-optimistic} achieves regret bounded by
+\begin{equation}
+\frac{1}{\eta}\left(\psi_1^*(\theta_1) + \psi_{T+1}(w) + \sum_{t=1}^{T} \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t - \eta m_t) + \eta w_t^{\top}m_t\right).
+\end{equation}
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+As an immediate consequence, we have
+\begin{corollary}
+\label{cor:a-o1}
+Suppose that $\psi_{t+1}$ is chosen so that $\psi_{t+1}^*(\theta_t - \eta z_t) \leq \psi_t^*(\theta_t - \eta m_t) - \eta w_t^{\top}(z_t - m_t)$. Then
+\begin{equation}
+\Regret(w) \leq \frac{\psi_1^*(\theta_1) + \psi_{T+1}(w)}{\eta}.
+\end{equation}
+\end{corollary}
+\begin{proof}
+TODO
+\end{proof}
+Finally, we consider a simplified version of Algorithm~\ref{alg:adaptive-optimistic}, 
+which corresponds to choosing $\psi_t(w) = \psi(w) + \eta^2 w^{\top} \sum_{s=1}^{t-1} u_s$ 
+for some fixed function $\psi$.
+
+\begin{algorithm}
+\caption{Adaptive optimistic mirror distance (additive version)}
+\label{alg:a-o2}
+
+\begin{algorithmic}
+\STATE Initialize $\theta_1$ arbitrarily
+\FOR{$t=1$ {\bfseries to} $T$}
+  \STATE Choose $w_t = \nabla \psi^*(\theta_t - \eta m_t)$
+  \STATE Observe $z_t$ and suffer loss $w_t^{\top}z_t$
+  \STATE Update $\theta_{t+1} = \theta_t - \eta z_t - \eta^2 u_t$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\begin{corollary}
+\label{cor:a-o2}
+Suppose that $u_t$ is chosen so that $\psi^*(\theta_t - \eta z_t - \eta^2 u_t) \leq \psi^*(\theta_t - \eta m_t) - \eta w_t^{\top}(z_t - m_t)$. 
+Then 
+\begin{equation}
+\Regret(w) \leq \frac{\psi^*(\theta_1)}{\eta} + \eta w^{\top} \sum_{t=1}^T u_t.
+\end{equation}
+\end{corollary}
+\begin{proof}
+TODO
+\end{proof}
+To give some intuition for the condition in Corollary~\ref{cor:a-o2}, note that 
+$w_t = \nabla \psi^*(z_t - \eta m_t)$, and so, since $\psi^*$ is convex, we have
+$\psi^*(\theta_t - \eta z_t) \geq \psi^*(\theta_t - \eta m_t) - \eta w_t^{\top}(z_t - m_t)$. 
+The term $\eta^2 u_t$ is thus a second-order correction to flip the sign of the inequality 
+(by taking a Taylor expansion, one can show that $\eta^2$ is the right order of magnitude for 
+the correction term). 
+
+\paragraph{Application to exponentiated gradient.} We now show how to apply 
+Corollary~\ref{cor:a-o2} to obtain an adaptive exponentiated gradient algorithm.
+\begin{proposition}[Adaptive Exponentiated Gradient]
+\label{prop:aeg}
+Consider the updates given by $\theta_{1,i} = -\log(n)$ and 
+$\theta_{t+1,i} = \theta_{t,i} - \eta z_{t,i} - \eta^2 (z_{t,i} - m_{t,i})^2$, 
+with prediction $w_{t,i} = \exp(\theta_{t,i} - \eta m_{t,i})$. For this 
+algorithm,
+\begin{equation}
+\Regret(w) \leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_{t,i})^2.
+\end{equation}
+\end{proposition}
+\begin{proof}
+TODO
+\end{proof}
+Note that in the case that $m_{t,i} = 0$, the update is 
+$\theta_{t+1,i} = \theta_{t,i} - \eta z_{t,i} - \eta^2 z_{t,i}^2$, whereas multiplicative 
+updates by $1 - \eta z_{t,i}$ would correspond to 
+$\theta_{t+1,i} = \theta_{t,i} + \log(1 - \eta z_{t,i})$. Since 
+$-\eta z_{t,i} - \eta^2 z_{t,i}^2 \leq \log(1 - \eta z_{t,i})$ when 
+$|\eta z_{t,i}| \leq \frac{1}{2}$, we can think of these updates as a second-order 
+under-approximation to (\ref{eqn:mw2}), which however can more naturally incorporate 
+the optimistic updates based on $m_t$.
+
+In the next section, we will show how to adaptively choose $m_t$ to optimize the regret bound 
+in Proposition~\ref{prop:aeg}.
 
 \end{document}
