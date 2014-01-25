@@ -1,0 +1,105 @@
+\documentclass[paper_icml.tex]{subfiles}
+\begin{document}
+
+\section{Two Types of Updates} 
+\label{sec:mw12}
+Our point of departure is the two different types of multiplicative updates 
+mentioned in the introduction. For simplicity we will consider the setting of 
+learning from experts, although our later theorems will hold in greater 
+generality. In this setting there are $n$ experts, and the learner maintains a 
+probability distribution $w_t \in \Delta_n$ over the experts, which gets 
+updated in each of $T$ rounds. After selecting the distribution $w_t$, 
+the loss vector $w_t \in [-1,1]^n$ of each of the experts is revealed, and the 
+learner incurs loss $w_t^{\top}z_t$. The learner's goal is to minimize 
+the regret $\sup_{w \in \Delta_n} \Regret(w)$, where
+\[ \Regret(w) \eqdef \sum_{t=1}^T w_t^{\top}z_t - \sum_{t=1}^T w^{\top}z_t. \]
+We consider two types of updates for the weight vector $w_t$. In both cases 
+$w_1$ is initialized as $w_{1,i} = \frac{1}{n}$ for $1 \leq i \leq n$, but 
+the updates differ, as in (\ref{eqn:mw1}) and (\ref{eqn:mw2}) below:
+\begin{align}
+\label{eqn:mw1}
+w_{t+1,i} &\propto w_{t,i}\exp(-\eta z_{t,i})\\
+\label{eqn:mw2}
+w_{t+1,i} &\propto w_{t,i}(1-\eta z_{t,i})
+\end{align}
+The regret bounds for each of (\ref{eqn:mw1}) and (\ref{eqn:mw2}) are 
+well-known \cite{people}, but we include them below for completeness.
+\begin{theorem}
+\label{thm:mw12}
+For any $0 < \eta \leq \frac{1}{2}$, the updates (\ref{eqn:mw1}) and 
+(\ref{eqn:mw2}) enjoy regret, respectively,
+\begin{align}
+\label{eqn:mw1-regret}
+\Regret(w) &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \sum_{t=1}^T w_{t,i}z_{t,i}^2 \\
+\label{eqn:mw2-regret}
+\Regret(w) &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2
+\end{align}
+\end{theorem}
+To understand why (\ref{eqn:mw2-regret}) may be a better bound than 
+(\ref{eqn:mw1-regret}), suppose that the best expert has a loss identically 
+equal to zero.\footnote{Of course, if we knew that this was the case ahead of 
+time, there would be far better algorithms; we use this scenario purely for 
+illustrative purposes.} Then the optimal $w$ places all mass on this expert, 
+and (\ref{eqn:mw2-regret}) reduces to $\frac{\log(n)}{\eta} = 2\log(n)$ for 
+$\eta = \frac{1}{2}$.
+
+More formally, define a sequence of losses $z_t$ to be \emph{quasi-realizable} 
+if one of the experts has identically zero loss and all other experts 
+have non-negative cumulative loss, i.e. $\sum_{t=1}^T z_{t,i} \geq 0$. It is 
+apparent by the argument above that (\ref{eqn:mw2}) achieves asymptotically 
+constant (as a function of $T$) regret for any quasi-realizable sequence. In 
+contrast, for \emph{any} step size $\eta$, there exists a quasi-realizable 
+sequence such that (\ref{eqn:mw1}) suffers regret $\Omega(\sqrt{T})$:
+\begin{proposition}
+\label{prop:separation}
+If the updates (\ref{eqn:mw1}) are used with a step size of $\eta$, then for 
+any $T$ there exists a quasi-realizable sequence of losses and a vector $w$ 
+such that $\Regret(w) = \Omega(\sqrt{T})$.
+\end{proposition}
+This establishes that the apparent separation between (\ref{eqn:mw1}) and 
+(\ref{eqn:mw2}) is real and not an artifact of the analysis. We remark that 
+this separation does \emph{not} exist in the realizable case (when all losses 
+are non-negative). In this case both (\ref{eqn:mw1}) and (\ref{eqn:mw2}) enjoy 
+$O(1)$ regret as a function of $T$.
+
+Finally, note that (\ref{eqn:mw2}) cannot be realized as mirror descent for any 
+fixed regularizer. This is because, for any mirror descent algorithm, the 
+prediction at time $t+1$ must be a function of $\sum_{t=1}^T z_t$, which is 
+not the case for (\ref{eqn:mw2}). Instead, we obtain (\ref{eqn:mw2}) in terms of 
+an \emph{adaptive regularizer} $\psi_t(w)$. The mirror descent updates for 
+such a regularizer are given by 
+\[ w_{t} = \nabla \psi_t^*\left(-\eta \sum_{s=1}^{t-1} z_s\right). \]
+See \cite{orabona2013general} for a more complete exposition. For convenience, 
+define $\theta_t \eqdef -\eta \sum_{s=1}^{t-1} \theta_s$. The important 
+observation in our context is that, by definition of $\psi_{T+1}^*$, 
+\begin{align}
+- \eta w^{\top} \sum_{t=1}^T z_t &\leq \psi_{T+1}(w) + \psi_{T+1}^*(\theta_{T+1}) \\
+ &= \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^T \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t).
+\end{align}
+Motivated by this, we note that if we could choose $\psi_{t+1}$ so that 
+$\psi_{t+1}^*(\theta_{t+1}) \leq \psi_{t}^*(\theta_t) - \eta w_t^{\top}z_t$, 
+then re-arranging would yield a regret bound of $\frac{\psi_1^*(\theta_1) + \psi_{T+1}(w)}{\eta}$.
+\begin{proposition}
+Define $\lambda_{t,i} \eqdef \sum_{s=1}^{t-1} \log(1-\eta z_{s,i})$ and let
+\[ \psi_t(w) \eqdef \sum_{i=1}^n w_i\log(w_i) + (\theta_t - \lambda_t)^{\top}w. \]
+Then adaptive mirror descent with regularizer $\psi_t$ corresponds exactly to 
+the updates (\ref{eqn:mw2}), and 
+$\psi_{t+1}^*(\theta_{t+1}) \leq \psi_t^*(\theta_t) - \eta w_t^{\top}z_t$. 
+The corresponding regret bound is
+\begin{align}
+\Regret(w) &\leq \frac{\psi_1^*(\theta_1) + \psi_{T+1}(w)}{\eta} \\
+% &= \frac{\log(n)+\sum_{i=1}^n w_i\log(w_i)}{\eta} + \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i} + \frac{\log(1-\eta z_{t,i})}{\eta} \\
+ &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2.
+\end{align}
+\end{proposition}
+\begin{proof}
+By standard properties of Fenchel conjugates, we have
+\begin{align}
+\nabla \psi_t^*(\theta_t) &= \argmin_w \psi_t(w) - \theta_t^{\top}w \\
+ &= \argmin_w \sum_{i=1}^n w_i\log(w_i) - \lambda_t^{\top}w.
+\end{align}
+From here we see that 
+$w_{t,i} \propto \exp(\lambda_{t,i}) = \prod_{s=1}^{t-1} (1-\eta z_{s,i})$, 
+so that $w_{t,i}$ does indeed correspond to the update in (\ref{eqn:mw2}). 
+\end{proof}
+\end{document}
