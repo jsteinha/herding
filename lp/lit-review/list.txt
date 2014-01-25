@@ -76,23 +76,29 @@ MAYBE CITE Second-Order Non-Stationary Online Learning for Regression
 -Table 1 could provide useful inspiration
 CITE Less Regret via Online Conditioning
   -adaptive step size for additive updates (or potentially decomposable updates more generally)
-CITE A Generalized Online Mirror Descent with Applications to Classification and Regression
-  -Lemma 1 in their paper is the main proof technique we use
 CITE Adaptive regularization of weight vectors
   -AROW paper
+CITE A second-order Perceptron algorithm
+  -perceptron with adaptive whitening
+CITE "Adaptive Bound Optimization for Online Convex Optimization"
+  -couldn't easily understand what they were doing
 
-A second-order Perceptron algorithm
-Efficient online and batch learning using forward backward splitting
-Composite objective mirror descent
-Dual averaging methods for regularized stochastic learning and online optimization
+CITE A Generalized Online Mirror Descent with Applications to Classification and Regression
+  -Lemma 1 in their paper is the main proof technique we use
+  -Excellent quote from the conclusion:
+    "One interesting direction to pursue is the derivation and analysis of algorithms based on time-varying
+     versions of the entropic regularizers used by the EG and Winnow algorithms. More in general, it would
+     be useful to devise a more systematic approach to the design of adaptive regularizers enojoying a given
+     set of desired properties, such as invariance to rescalings. This should help in obtaining more examples of
+     adaptation mechanisms that are not based on second-order information."
 
-Convex games in banach spaces
 
-"Adaptive Bound Optimization for Online Convex Optimization"
-"Adaptive Subgradient Methods for Online Learning and Stochastic Optimization"
+CITE "Adaptive Subgradient Methods for Online Learning and Stochastic Optimization"
   -for them eta = O(1), for us it is O(1/sqrt(T))
   -their updated regularizer is doing most of the work to achieve convergence
   -for us it's a correction term to get better bounds (e.g. in terms of best expert)
+
+MAYBE CITE? Efficient online and batch learning using forward backward splitting
 
 
 
@@ -100,6 +106,10 @@ Boosting / Frank-Wolfe (LATER):
 CITE "Pegasos: Primal Estimated sub-GrAdient SOlver for SVM", 2011
 -super-relevant from the perspective of the Frank-Wolfe stuff, they basically use the 
   fixed-step-size version to solve an SVM
+CITE Composite objective mirror descent
+  -pushes the strongly convex term into the optimization, cite for Frank-Wolfe
+CITE Dual averaging methods for regularized stochastic learning and online optimization
+  -this is basically just the online version of Frank-Wolfe
 READ Stochastic Methods for l1-regularized Loss Minimization", 2011
   -VERY relevant to Frank-Wolfe
   -may also have good experiments / references
