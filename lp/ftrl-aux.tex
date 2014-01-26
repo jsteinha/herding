@@ -18,7 +18,7 @@ leader:
 \label{prop:ftrl-aux}
 Suppose that we choose $m_{t,i} = \frac{1}{t} \sum_{s=1}^{t-1} z_{s,i}$. 
 Then, for all $i$, 
-\[ \sum_{t`=1}^T (z_{t,i} - m_{t,i})^2 \leq \sum_{t=1}^T (z_{t,i} - m^*_i)^2 + 4\log(T+1). \]
+\[ \sum_{t=1}^T (z_{t,i} - m_{t,i})^2 \leq \sum_{t=1}^T (z_{t,i} - m^*_i)^2 + 4\log(T+1). \]
 \end{proposition}
 \begin{proof}
 TODO
@@ -32,8 +32,8 @@ obtain the following regret bound, which improves the bound presented in
 \cite{hazan2010variation}:
 \begin{corollary}
 The EG-Variance algorithm achieves a regret bound of
-%\[ \Regret(w) \leq \frac{1 + (\log(n)-1)\|w\|_1 + \sum_{i=1}^n w_i\log(w_i)}{\eta} + \eta \left[ \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_i^*)^2 + 4\|w\|_1\log(T) \right]. \]
-\[ \Regret(w) \leq \frac{\log(n)}{\eta} + \eta \left[ \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_i^*)^2 + 4\log(T) \right]. \]
+%\[ \Regret(w) \leq \frac{1 + (\log(n)-1)\|w\|_1 + \sum_{i=1}^n w_i\log(w_i)}{\eta} + \eta \left[ \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_i^*)^2 + 4\|w\|_1\log(T+1) \right]. \]
+\[ \Regret(w) \leq \frac{\log(n)}{\eta} + \eta \left[ \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_i^*)^2 + 4\log(T+1) \right]. \]
 \end{corollary}
 
 \end{document}
