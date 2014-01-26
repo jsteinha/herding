@@ -7,7 +7,7 @@ The exponentiated gradient algorithm is a powerful tool for performing online
 learning in the presence of many irrelevant features 
 \cite{kivinen1997, littlestone1988}. One common application of exponentiated 
 gradient is to the learning from experts setting, in which it is also known 
-as the weighted majority algorithm \cite{wm} and entertains regret bounds of the 
+as the weighted majority algorithm \cite{littlestone1989wm} and entertains regret bounds of the 
 form 
 \[ \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \sum_{t=1}^T w_{t,i}z_{t,i}^2, \]
 where $w_t$ is the weight vector of the learner at time $t$ and $z_t$ is the 
@@ -72,15 +72,16 @@ If we could set $m_t$ to be $m^*$, then we would achieve the bound in
 (\ref{eqn:variance-regret}). Unfortunately, $m^*$ is only known after observing 
 the full sequence of gradients. To overcome this, we learn $m^*$ itself in an 
 online fashion, choosing the $m_t$ according to a Follow the Regularized Leader 
-(FTRL) algorithm \cite{ftrl}. The regret bound thus obtained is given in 
-Theorem~\ref{thm:variance-vector}, which improves a result by 
+(FTRL) algorithm \cite{hazan2011ftrl}. The regret bound thus obtained is given in 
+Corollary~\ref{cor:EG-variance}, which improves a result by 
 \cite{hazan2010variation}.
 
 Finally, we extend all these results to the matrix setting, where $W_t$ is now 
 a positive semidefinite matrix, possibly constrained to have trace $1$ 
 (in analogy with the simplex). This setting has already been extensively studied 
-\cite{lotsofpeople} and is important in obtaining online bounds for various 
-combinatorial optimization problems \cite{morepeople}. Using the machinery so 
+\cite{tsuda2005matrix, arora2007combinatorial} and is important in 
+obtaining online and approximation bounds for various combinatorial optimization 
+problems \cite{arora2007combinatorial, hazan2012near}. Using the machinery so 
 far developed, all of our results extend straightforwardly to the matrix setting, 
 with the exception of the auxiliary FTRL algorithm for estimating $M^*$. In this 
 case we need a new algorithm and analysis tool: a variant of FTRL for 
@@ -119,19 +120,19 @@ been explored, though \cite{hazan2010variation} provide an ad hoc algorithm
 that is similar to one of ours.
 
 Other notions of ``adaptive'' weights have also been explored; though unrelated 
-to the current work, we briefly mention them for completeness. The first notion 
-notion of adaptivity pertains to time-varying experts: here the desire is to 
-obtain regret relative to the best \emph{schedule} of experts, where the number 
-of switches in the schedule is bounded. This is explored in \cite{switching}. 
+to the current work, we briefly mention them for completeness. The first 
+notion, which has occasionally been referred to as adaptivity, pertains to time-varying experts: here the desire is to obtain regret relative to the best \emph{schedule} of experts, 
+where the schedule is in some way restricted to drift slowly over time 
+\cite{auer1998tracking, kleinberg2010regret, chiang2012online}. 
 The other slightly more related notion is an adaptive step size, where the step 
 size $\eta$ changes as a function of time (often at a fixed schedule of 
 $1/\sqrt{T}$, but sometimes in a more sophisticated fashion). This idea is used 
 extensively throughout the literature but a few particularly relevant papers are 
-\cite{adaptive-step}.
+\cite{hazan2007adaptive, orabona2013dimension}.
 
-Finally, we note that the exponentiated gradient itself has been analyzed 
+Finally, we note that the exponentiated gradient algorithm itself has been analyzed 
 and applied in various settings. One common setting, using a hinge-like loss, 
-is the Winnow Algorithm \cite{winnow}, which has been carefully analyzed in 
-\cite{winnow-careful}.
+is the Winnow Algorithm \cite{littlestone1988}, which has been carefully analyzed in 
+\cite{sabato2012learning}.
 
 \end{document}
