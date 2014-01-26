@@ -1,0 +1,118 @@
+\documentclass[paper_icml.tex]{subfiles}
+\begin{document}
+
+\section{Extension to Matrices} 
+\label{sec:matrix}
+We now extend our results to the matrix setting. Here $W$ is a positive semidefinite 
+matrix. The analogue to the simplex is constrainint $\Tr(W)$ to be $1$. Instead of a vector 
+of losses $z_t$, we have a matrix of losses $Z_t$, which is assumed to be symmetric and to 
+have all eigenvalues between $-1$ and $1$. The loss in round $t$ is $\Tr(W_t^{\top}Z_t)$. 
+Since all matrices involves are symmetric, we will typically suppress the transpose and 
+just write $\Tr(W_tZ_t)$. Note that we can embed the vector setting in the matrix setting 
+by restricting to diagonal matrices.
+
+We start with an extension of Proposition~\ref{prop:aeg} to the matrix setting:
+\begin{proposition}
+\label{prop:maeg}
+Consider the updates given by $\Theta_1 = -\log(n)I$ and 
+$\Theta_{t+1} = \Theta_t - \eta Z_t - \eta^2 (Z_t - M_t)^2$, 
+with prediction $W_t = \exp(\Theta_t - \eta M_t)$. For this algorithm,
+\begin{equation}
+\Regret(w) \leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \Tr(W(Z_t-M_t)^2).
+\end{equation}
+\end{proposition}
+\begin{proof}
+TODO
+\end{proof}
+We would now, as in Section~\ref{sec:ftrl-aux}, like to learn $M_t$ adaptively 
+to be competitive with the best fixed value $M^*$. However, it isn't even clear 
+that such a best fixed value exists (since the optimal value may depend on $W$). 
+Lemma~\ref{lem:global-opt} addresses this issue (proved in slightly greater 
+generality for later convenience):
+\begin{lemma}
+\label{lem:global-opt}
+For any $\delta \geq 0$, define $M^* \eqdef \frac{1}{T+\delta} \sum_{t=1}^T Z_t$. Then, for 
+any $M' \neq M^*$, we have
+\[ \delta (M^*)^2 + \sum_{t=1}^T (Z_t-M^*)^2 \preceq \delta (M')^2 + \sum_{t=1}^T (Z_t-M')^2. \]
+\end{lemma}
+\begin{proof}
+Write $M' = M^* + D$. Then we have
+\begin{align}
+\lefteqn{\delta(M')^2 + \sum_{t=1}^T (Z_t - M')^2} \\
+ &= \delta(M^*+D)^2 + \sum_{t=1}^T (Z_t - M^* - D)^2 \\
+ &= \delta(M^*)^2 + \sum_{t=1}^T (Z_t - M^*)^2 \\
+\nonumber
+ &\phantom{==} + \left[\delta M^* + \sum_{t=1}^T M^*-Z_t\right]D \\
+\nonumber
+ &\phantom{==} + D\left[\delta M^* + \sum_{t=1}^T M^*-Z_t\right] + TD^2 \\
+ &= \delta(M^*)^2 + \sum_{t=1}^T (Z_t-M^*)^2 + TD^2 \\
+ &\succeq \delta(M^*)^2 + \sum_{t=1}^T (Z_t-M^*)^2,
+\end{align}
+which completes the lemma.
+\end{proof}
+Setting $\delta$ to $0$, we now see that $\frac{1}{T} \sum_{t=1}^T Z_t$ is the 
+optimal value of $M^*$ for any $W \succeq 0$, in analogy with the vector case. We 
+remark that Lemma~\ref{lem:global-opt} is almost purely algebraic, and only relies 
+on the property that $D^2 \succeq 0$ for any symmetric matrix $D$. We could obtain 
+a similar lemma for any partially ordered algebra equipped with an adjoint operator 
+$*$ such that $a^{*}a \succeq 0$ for all elements $a$ of the algebra.
+
+Lemma~\ref{lem:global-opt} gives us a target value for the $M_t$, but we cannot 
+simply apply the standard Follow the Regularized Leader lemma. This is because 
+we need a result of the form
+\[ \sum_{t=1}^T (Z_t - M_t)^2 \preceq \sum_{t=1}^T (Z_t - M^*) + \epsilon I, \]
+which cannot be straightforwardly expressed as a regret bound. We deal with this 
+by deriving a generalization of the FTRL algorithm, which we call FTRL-$\sK$. 
+This is an algorithm in which losses are vector-valued and we obtain regret relative 
+to a partial ordering defined by a cone $\sK$.
+
+An important notion is that of a \emph{global optimum}. For a function $f : X \to \bR^n$ 
+and a cone $\sK \subset \bR^n$, we say that $f$ has a global optimum relative to 
+$\sK$ if there exists an $x$ such that $f(x) \leq_{\sK} f(y)$ for all $y \in X$.
+
+\begin{lemma}
+\label{lem:ftrl-k}
+Suppose that for all $1 \leq t \leq T+1$, there 
+exists a global minimizer $M_t$ of 
+$\psi(X) + \sum_{s=1}^{t-1} f_s(X)$. Then for all $M$,
+\[ \sum_{t=1}^T f_t(M_t)-f_t(M) \leq_{\sK} \psi(M) - \psi(M_1) + \sum_{t=1}^T f_t(M_{t}) - f_t(M_{t+1}). \]
+\end{lemma}
+\begin{proof}
+We will prove the lemma by induction on $T$. Note that the lemma is equivalent to showing that 
+\[ \psi(M_1) + \sum_{t=1}^T f_t(M_{t+1}) \leq_{\sK} \psi(M) + \sum_{t=1}^T f_t(M) \]
+for all $M$.
+
+In the base case $T = 0$, we have
+\[ \psi(M_1) \leq_{\sK} \psi(M), \]
+which follows from the fact that $M_1$ is a global minimizer of $\psi$ and 
+hence $\psi(M_1) \leq_{\sK} \psi(M)$ for all $M$. For the inductive step, suppose that
+\[ \sum_{t=1}^{T-1} f_t(M_{t+1}) \leq_{\sK} \psi(M) \sum_{t=1}^{T-1} f_t(M) \]
+for all $M$, and invoke this for the particular choice $M = M_{T+1}$. Then we have
+\begin{align}
+\lefteqn{\psi(M_1) + \sum_{t=1}^T f_t(M_{t+1})} \\
+ &= \psi(M_1) + \sum_{t=1}^{T-1} f_t(M_{t+1}) + f_T(M_{T+1}) \\
+ &\leq_{\sK} \psi(M_{T+1}) + \sum_{t=1}^{T-1} f_t(M_{T+1}) + f_T(M_{T+1}) \\
+ &= \psi(M_{T+1}) + \sum_{t=1}^T f_t(M_{T+1}) \\
+ &\leq_{\sK} \psi(M) + \sum_{t=1}^T f_t(M)
+\end{align}
+for all $M$, where we use the fact that $M_{T+1}$ is a global minimizer of $\psi(M) + \sum_{t=1}^T f_t(M)$ for 
+the last inequality. This completes the inductive hypothesis and hence the proof.
+\end{proof}
+
+As a corollary, we have (compare to Proposition~\ref{prop:ftrl-aux}):
+\begin{corollary}
+\label{cor:ftrl-k-aux}
+Suppose that we choose $M_t = \frac{1}{t} \sum_{s=1}^{t-1} Z_s$. Then
+\[ \sum_{t=1}^T (Z_t - M_t)^2 \preceq \sum_{t=1}^T (Z_t - M^*)^2 + 4\log(T+1)I, \]
+for $M^* \eqdef \frac{1}{T} \sum_{t=1}^T Z_t$.
+\end{corollary}
+Combining Proposition~\ref{prop:maeg} with Corollary~\ref{cor:ftrl-k-aux} gives a 
+regret bound for the MEG-Variance algorithm, whose updates are given in 
+Table~\ref{tab:algorithms}.
+\begin{corollary}
+\label{cor:maeg-variance}
+The MEG-Variance algorithm achieves a regret bound of
+\[ \Regret(w) \leq \frac{\log(n)}{\eta} + \eta \left[ \sum_{t=1}^T \Tr(W(Z_t-M^*)^2) + 4\log(T+1) \right]. \]
+\end{corollary}
+
+\end{document}
