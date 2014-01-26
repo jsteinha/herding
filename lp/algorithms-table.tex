@@ -1,0 +1,25 @@
+\documentclass[paper_icml.tex]{subfiles}
+\begin{document}
+
+\AtBeginEnvironment{tabular}{\setlength{\arraycolsep}{1pt}}
+\begin{table*}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline 
+Name & Initialization & Update & Prediction & Source \\
+\hline 
+EG & & $x_{t+1} = x_t - \eta z_t$ & $\exp(x_t)$ & \cite{kivinen1997} \\
+\hline 
+MW & & $x_{t+1} = x_t + \log(1 - \eta z_t)$ & $\exp(x_t)$ & \cite{cesa2007} \\
+\hline 
+Variation-MW & & $\begin{array}{rl} x_{t+1,i} &= x_{t,i} - \eta z_{t,i} - \eta^2 (z_{t,i}-m_{t,i})^2 \\ m_t &= \frac{1}{t} \sum_{s=1}^{t-1} z_s \end{array}$ & $\exp(z_t)$ & \cite{hazan2010variation} \\
+\hline 
+EG-Variance & & $\begin{array}{rl} x_{t+1,i} &= x_{t,i} - \eta z_{t,i} - \eta^2 (z_{t,i}-m_{t,i})^2 \\ m_t &= \frac{1}{t} \sum_{s=1}^{t-1} z_s \end{array}$ & $\exp(z_t - \eta m_t)$ & this paper \\
+ \hline 
+MEG-Variance & & $\begin{array}{rl} X_{t+1} &= X_t - \eta Z_t - \eta^2 (Z_t - M_t)^2 \\ M_t &= \frac{1}{t} \sum_{s=1}^{t-1} Z_s \end{array}$ & $\exp(Z_t - \eta M_t)$ & this paper \\
+ \hline 
+\end{tabular}
+\caption{An overview of known adaptive exponentiated gradient algorithms.}
+\label{tab:algorithms}
+\end{table*}
+
+\end{document}
