@@ -1,7 +1,40 @@
 \documentclass[paper_icml.tex]{subfiles}
 \begin{document}
 
-\section{Conclusion} 
+\section{Discussion} 
 \label{sec:conclusion}
+We have presented an adaptive exponentiated gradient algorithm, 
+which attains regret bounded by the variance of the best expert in retrospect. 
+Recently \cite{duchi2011adagrad} have proposed an adaptive subgradient algorithm, 
+and it is interesting to compare to their result. They define the quantity 
+$\gamma_{T,i} \eqdef \sqrt{\sum_{t=1}^T z_{t,i}^2}$, and obtain regret in terms 
+of $\|w\|_{\infty} \sum_{i=1}^n \gamma_{T,i}$. For an appropriately chosen 
+$\eta$ our algorithm achieves a similar regret bound on the simplex of
+\[ \sqrt{\log(n) \sum_{i=1}^n w_i \gamma_{T,i}^2} \leq \sqrt{\vphantom{\sum_{i=1}^n}\log(n)\|w\|_{\infty}}\sqrt{\sum_{i=1}^n \gamma_{T,i}^2}, \]
+which is worse due to the $\log(n)$ factor but better because we pay in terms of 
+$\|\gamma_T\|_2$ rather than $\|\gamma_T\|_1$. Our method may therefore perform 
+better when the cumulative updates are relatively dense and homogeneous.
+
+When we move beyond the simplex, we obtain a similar regret bound but the 
+$\log(n)$ term is replaced by (roughly) a $\log(n) + \|w\|_1\log(\|w\|_1)$ term. 
+%The overall regret is then $\sqrt{(\log(n) + \|w\|_1\log(\|w\|_1))\|w\|_{\infty}}\|\gamma_T\|_2$, 
+%in comparison to the adagrad regret of $\|w\|_{\infty}\|\gamma_T\|_1$. 
+In addition to the $\log(n)$ term that was there before, we now pay for (ignoring 
+the $\log(\|w\|_1)$ term) $\sqrt{\|w\|_1\|w\|_{\infty}}$ as opposed to 
+$\|w\|_{\infty}$, but are again compensated by measuring $\gamma_T$ in the 
+$2$-norm rather than the $1$-norm. In analogy with the preceding paragraph, 
+we may expect to perform well when 
+the optimal predictor $w$ is sparse but the cumulative squared gradient 
+$\gamma_T$ is dense. It would be interesting to perform an empirical comparison 
+of the two algorithms to understand how they perform in various settings.
+
+Finally, we think that the idea of treating the regret bound as a quantity to 
+itself be optimized in an online fashion is quite interesting. While the bounds 
+thus obtained are particularly nice for adaptive exponentiated gradient 
+(because we obtain guarantees in terms of the best fixed expert), there are no 
+obstacles to applying the same techniques to other settings as well, such 
+as trying to minimize $\sum_{t=1}^T \|z_t - m_t\|_*^2$ in the standard mirror 
+descent bound. We believe that such ``auxiliary online optimization'' techniques, 
+when applied under the optimistic learning framework, have the potential to greatly improve the performance of online learning algorithms.
 
 \end{document}
