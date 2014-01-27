@@ -40,12 +40,12 @@ in response to previously observed vectors $z_t$. We obtain a
 particularly natural interpretation of the updates as performing a form of 
 second-order correction on the gradient step.
 
-By exploiting this connection, we show that the perhaps more natural update 
-of $\exp(-\eta z_{t,i} - \eta^2 z_{t,i}^2)$ achieves the same regret bound 
-as in (\ref{eqn:mw-regret}), and that both updates continue to enjoy this 
-regret even when generalized from the simplex to an arbitrary convex set 
-(including all of $\bR^n$, which corresponds to unconstrained exponentiated 
-gradient). 
+% By exploiting this connection, we show that the perhaps more natural update 
+% of $\exp(-\eta z_{t,i} - \eta^2 z_{t,i}^2)$ achieves the same regret bound 
+% as in (\ref{eqn:mw-regret}), and that both updates continue to enjoy this 
+% regret even when generalized from the simplex to an arbitrary convex set 
+% (including all of $\bR^n$, which corresponds to unconstrained exponentiated 
+% gradient). 
 
 Examining (\ref{eqn:mw-regret}) more closely, we see that we should expect 
 to perform well when the best expert $i$ has losses consistently close to zero: 
@@ -91,15 +91,17 @@ FTRL lemma is given in Lemma~\ref{lem:ftrl-k} and may be of independent interest
 For convenience, we summarize our contributions below:
 \begin{itemize}
 \item An interpretation of the multiplicative weights update as 
-      exponentiated gradient with an adaptive regularizer.
-\item An improved exponentiated gradient algorithm based on adaptive 
-      updates to an entropic regularizer.
-\item Further improvements to exponentiated gradient based on optimistic 
-      predictions and online learning of the mean gradient.
-\item An adaptive matrix exponentiated gradient, with similar improvements 
-      based on learning the mean gradient.
+      exponentiated gradient with an adaptive regularizer (Section~\ref{sec:mw12}).
+%\item An improved exponentiated gradient algorithm based on adaptive 
+%      updates to an entropic regularizer.
+\item An improved exponentiated gradient algorithm based on an adaptive 
+      regularizer, optimistic predictions, and online learning of the 
+      mean gradient (Sections~\ref{sec:machinery} and~\ref{sec:ftrl-aux}).
+\item An adaptive matrix exponentiated gradient algorithm, 
+      with similar improvements based on learning the mean gradient 
+      (Section~\ref{sec:matrix}).
 \item A generalization of Follow the Regularized Leader to vector-valued 
-      loss functions.
+      loss functions (Lemma~\ref{lem:ftrl-k}).
 \end{itemize}
 
 \paragraph{Related work.} Our work contributes to an already rich literature 

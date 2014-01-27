@@ -22,18 +22,46 @@ algorithm thus obtained is given in Algorithm~\ref{alg:adaptive-optimistic}.
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
+Note that Algorithm~\ref{alg:adaptive-optimistic} does not contain a 
+projection step back onto the feasible domain $S$. If $\psi_t$ is defined to be 
+infinite outside of $S$, then $w_t$ will always lie in $S$ and hence the 
+projection step is unnecessary. (However, modifying $\psi_t$ in this way may 
+complicate the analysis, i.e. by giving $\psi_t^*$ a more complicated form.)
 
-The key regret bound for Algorithm~\ref{alg:adaptive-optimistic} is 
-given in Theorem~\ref{thm:adaptive-optimistic}:
+The regret bound for Algorithm~\ref{alg:adaptive-optimistic} is 
+given in Theorem~\ref{thm:adaptive-optimistic}. A key observation is that 
+the regret is in terms of $z_t - m_t$ rather than $z_t$ (so the closer 
+$m_t$ is to $z_t$, the smaller the regret; this will be more apparent 
+in various corollaries).
 \begin{theorem}
 \label{thm:adaptive-optimistic}
 Algorithm~\ref{alg:adaptive-optimistic} achieves regret bounded by
-\begin{equation}
-\frac{1}{\eta}\left(\psi_1^*(\theta_1) + \psi_{T+1}(w) + \sum_{t=1}^{T} \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t - \eta m_t) + \eta w_t^{\top}m_t\right).
-\end{equation}
+\begin{dmath}
+\label{eqn:regret-1}
+\frac{1}{\eta}\left(\psi_1^*(\theta_1) + \psi_{T+1}(w) + \sum_{t=1}^{T} \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t - \eta m_t) + \eta w_t^{\top}(z_t-m_t)\right).
+\end{dmath}
 \end{theorem}
 \begin{proof}
-TODO
+First note that $\psi_t^*$ is convex and that 
+$w_t = \nabla \psi_t^*(\theta_t - \eta m_t)$. It thus follows that 
+$\psi_t^*(\theta_t) \geq \psi_t^*(\theta_t - \eta m_t) + \eta m_t^{\top}z_t$. 
+Then, by definition of the Fenchel conjugate together with telescoping sums, we 
+have, for any $w$, 
+\begin{align*}
+\lefteqn{\hskip -0.1in w^{\top}\theta_{T+1} - \psi_{T+1}(w)} \\
+\hskip 0.1in  &\leq \psi_{T+1}^*(\theta_{T+1}) \\
+  &= \psi_1^*(\theta_1) + \sum_{t=1}^{T} \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t) \\
+  &\leq \psi_1^*(\theta_1) + \sum_{t=1}^{T} \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t-\eta m_t) - \eta w_t^{\top}m_t.
+\end{align*}
+Re-arranging and expanding $\theta_{T+1}$, we have
+\begin{dmath}
+-\eta w^{\top} \sum_{t=1}^T z_t \leq \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^{T} \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t-\eta m_t) - \eta w_t^{\top}m_t.
+\end{dmath}
+Adding $\eta \sum_{t=1}^T w_t^{\top}z_t$ to both sides, we obtain
+\begin{dmath}
+\eta \Regret(w) \leq \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^T \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t) + \eta w_t^{\top}(z_t-m_t),
+\end{dmath}
+which yields the desired result.
 \end{proof}
 As an immediate consequence, we have
 \begin{corollary}
@@ -44,11 +72,16 @@ Suppose that $\psi_{t+1}$ is chosen so that $\psi_{t+1}^*(\theta_t - \eta z_t) \
 \end{equation}
 \end{corollary}
 \begin{proof}
-TODO
+Since $\theta_{t+1} = \theta_t - \eta z_t$, if the condition in the corollary 
+holds then the sum in the regret bound (\ref{eqn:regret-1}) is bounded above 
+term-wise by zero. 
+Hence we obtain $\Regret(w) \leq \frac{1}{\eta}\left(\psi_1^*(\theta_1) + \psi_{T+1}(w)\right)$, as was to be shown.
 \end{proof}
 Finally, we consider a simplified version of Algorithm~\ref{alg:adaptive-optimistic}, 
 which corresponds to choosing $\psi_t(w) = \psi(w) + \eta^2 w^{\top} \sum_{s=1}^{t-1} u_s$ 
-for some fixed function $\psi$.
+for some fixed function $\psi$. In this case, we define 
+$\psi_S^*(w) \eqdef \sup_{w \in S} w^{\top}x - \psi(w)$, which 
+will allow us to more easily handle restrictions on the domain $S$.
 
 \begin{algorithm}
 \caption{Adaptive optimistic mirror distance (additive version)}
@@ -57,7 +90,7 @@ for some fixed function $\psi$.
 \begin{algorithmic}
 \STATE Initialize $\theta_1$ arbitrarily
 \FOR{$t=1$ {\bfseries to} $T$}
-  \STATE Choose $w_t = \nabla \psi^*(\theta_t - \eta m_t)$
+  \STATE Choose $w_t = \nabla \psi_S^*(\theta_t - \eta m_t)$
   \STATE Observe $z_t$ and suffer loss $w_t^{\top}z_t$
   \STATE Update $\theta_{t+1} = \theta_t - \eta z_t - \eta^2 u_t$
 \ENDFOR
@@ -69,9 +102,14 @@ for some fixed function $\psi$.
 Suppose that $u_t$ is chosen so that $\psi^*(\theta_t - \eta z_t - \eta^2 u_t) \leq \psi^*(\theta_t - \eta m_t) - \eta w_t^{\top}(z_t - m_t)$. 
 Then 
 \begin{equation}
-\Regret(w) \leq \frac{\psi^*(\theta_1)}{\eta} + \eta w^{\top} \sum_{t=1}^T u_t.
+\Regret(w) \leq \frac{\psi_S^*(\theta_1)}{\eta} + \eta w^{\top} \sum_{t=1}^T u_t.
 \end{equation}
 \end{corollary}
+Note that, importantly, the conditions of Corollary~\ref{cor:a-o2} are in terms 
+of $\psi^*$, while the regret bound and the choice of $w_t$ are in terms of 
+$\psi_S^*$. This means that, once we construct an algorithm for the 
+unconstrained case, we then achieve a regret bound under arbitrary convex 
+constraints.
 \begin{proof}
 TODO
 \end{proof}
@@ -83,19 +121,44 @@ The term $\eta^2 u_t$ is thus a second-order correction to flip the sign of the 
 the correction term). 
 
 \paragraph{Application to exponentiated gradient.} We now show how to apply 
-Corollary~\ref{cor:a-o2} to obtain an adaptive exponentiated gradient algorithm.
+Corollary~\ref{cor:a-o2} to obtain an adaptive exponentiated gradient algorithm. 
+We will state it here in the case of the simplex, since the bounds in this 
+case are particularly easy to interpret. Note, however, that our analysis 
+goes via Corollary~\ref{cor:a-o2}, and hence applies to arbitrary convex 
+constraints.
 \begin{proposition}[Adaptive Exponentiated Gradient]
 \label{prop:aeg}
-Consider the updates given by $\theta_{1,i} = -\log(n)$ and 
+Consider the updates given by $\theta_{1,i} = 0$ and 
 $\theta_{t+1,i} = \theta_{t,i} - \eta z_{t,i} - \eta^2 (z_{t,i} - m_{t,i})^2$, 
-with prediction $w_{t,i} = \exp(\theta_{t,i} - \eta m_{t,i})$. For this 
-algorithm,
+with prediction $w_{t,i} \propto \exp(\theta_{t,i} - \eta m_{t,i})$. Then, 
+assuming $\|z_t\|_{\infty} \leq 1$, $\|m_t\|_{\infty} \leq 1$ and 
+$0 < \eta \leq \frac{1}{4}$, we have
 \begin{equation}
 \Regret(w) \leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_{t,i})^2.
 \end{equation}
 \end{proposition}
 \begin{proof}
-TODO
+We note that, for $S$ equal to the simplex $\Delta_n$ and 
+$\psi(w) = \sum_{i=1}^n w_i\log(w_i)$, the $w_t$ is equal to 
+$\nabla \psi_S^*(\theta_t - \eta m_t)$. It therefore suffices 
+to check that the condition of Corollary~\ref{cor:a-o2} is satisfied with 
+$u_{t,i} = (z_{t,i}-m_{t,i})^2$. 
+Note that $\psi^*(\theta) = \sum_{i=1}^n \exp(\theta_i)$. We then have
+\begin{dgroup*}
+\begin{dmath*} \lefteqn{\psi^*(\theta_{t} - \eta z_t - \eta^2 u_t)} 
+\end{dmath*}\begin{dmath*}  = \sum_{i=1}^n \exp(\theta_{t,i} - \eta z_{t,i} - \eta^2 (z_{t,i} - m_{t,i})^2) 
+\end{dmath*}\begin{dmath*}  = \sum_{i=1}^n \exp(\theta_{t,i} - \eta m_{t,i})\exp(-\eta (z_{t,i} - m_{t,i}) - \eta^2 (z_{t,i} - m_{t,i})^2) 
+\end{dmath*}\begin{dmath*}  \leq \sum_{i=1}^n \exp(\theta_{t,i} - \eta m_{t,i})(1 - \eta (z_{t,i} - m_{t,i})) 
+\end{dmath*}\begin{dmath*}  = \sum_{i=1}^n \exp(\theta_{t,i} - \eta m_{t,i}) - \eta \sum_{i=1}^n \exp(\theta_{t,i} - \eta m_{t,i}) (z_{t,i} - m_{t,i}) 
+\end{dmath*}\begin{dmath*}  = \psi^*(\theta_t - \eta m_t) - \eta \nabla \psi^*(\theta_t - \eta m_t)^{\top} (z_t - m_t).
+\end{dmath*}
+\end{dgroup*}
+The one inequality we made use of was $\exp(-x-x^2) \leq 1-x$ for $|x| < \frac{1}{2}$.
+This verifies the condition of Corollary~\ref{cor:a-o2}, yielding a regret bound 
+of $\frac{\psi_S^*(0) + \psi(w)}{\eta} + \eta \sum_{i=1}^n w^{\top} u_t$. 
+Finally, we note that $\psi_S^*(0) = \log(n)$, 
+$\psi(w) = \sum_{i=1}^n w_i\log(w_i) \leq 0$, and 
+$u_{t,i} = (z_{t,i} - m_{t,i})^2$, which completes the proof.
 \end{proof}
 Note that in the case that $m_{t,i} = 0$, the update is 
 $\theta_{t+1,i} = \theta_{t,i} - \eta z_{t,i} - \eta^2 z_{t,i}^2$, whereas multiplicative 

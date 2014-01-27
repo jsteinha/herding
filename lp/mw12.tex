@@ -18,9 +18,9 @@ $w_1$ is initialized as $w_{1,i} = \frac{1}{n}$ for $1 \leq i \leq n$, but
 the updates differ, as in (\ref{eqn:mw1}) and (\ref{eqn:mw2}) below:
 \begin{align}
 \label{eqn:mw1}
-w_{t+1,i} &\propto w_{t,i}\exp(-\eta z_{t,i})\\
+w_{t+1,i} &\propto w_{t,i}\exp(-\eta z_{t,i}) \tag{MW1}\\
 \label{eqn:mw2}
-w_{t+1,i} &\propto w_{t,i}(1-\eta z_{t,i})
+w_{t+1,i} &\propto w_{t,i}(1-\eta z_{t,i}) \tag{MW2}
 \end{align}
 The regret bounds for each of (\ref{eqn:mw1}) and (\ref{eqn:mw2}) are 
 well-known \cite{shalev2011, cesa2007}, but we include them below for completeness.
@@ -30,9 +30,10 @@ For any $0 < \eta \leq \frac{1}{2}$, the updates (\ref{eqn:mw1}) and
 (\ref{eqn:mw2}) enjoy regret, respectively,
 \begin{align}
 \label{eqn:mw1-regret}
-\Regret(w) &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \sum_{t=1}^T w_{t,i}z_{t,i}^2 \\
+\Regret(w) &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \sum_{t=1}^T w_{t,i}z_{t,i}^2 %\tag{MW1-regret}
+ \\
 \label{eqn:mw2-regret}
-\Regret(w) &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2
+\Regret(w) &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2 %\tag{MW2-regret}
 \end{align}
 \end{theorem}
 To understand why (\ref{eqn:mw2-regret}) may be a better bound than 
@@ -46,7 +47,7 @@ $\eta = \frac{1}{2}$.
 More formally, define a sequence of losses $z_t$ to be \emph{quasi-realizable} 
 if one of the experts has identically zero loss and all other experts 
 have non-negative cumulative loss, i.e. $\sum_{t=1}^T z_{t,i} \geq 0$. It is 
-apparent by the argument above that (\ref{eqn:mw2}) achieves asymptotically 
+apparent by the preceding paragraph that (\ref{eqn:mw2}) achieves asymptotically 
 constant (as a function of $T$) regret for any quasi-realizable sequence. In 
 contrast, for \emph{any} step size $\eta$, there exists a quasi-realizable 
 sequence such that (\ref{eqn:mw1}) suffers regret $\Omega(\sqrt{T})$:
@@ -95,12 +96,12 @@ The corresponding regret bound is
 \end{align}
 \end{proposition}
 We will be able to prove this more easily with the machinery developed in 
-Section~\ref{sec:machinery}, but we also prove it here directly.
+Section~\ref{sec:machinery}, but we prove it here directly.
 \begin{proof}
 By standard properties of Fenchel conjugates, we have
 \begin{align}
-\nabla \psi_t^*(\theta_t) &= \argmin_w \psi_t(w) - \theta_t^{\top}w \\
- &= \argmin_w \sum_{i=1}^n w_i\log(w_i) - \lambda_t^{\top}w.
+\nabla \psi_t^*(\theta_t) &= \argmin_{w \in \Delta_n} \psi_t(w) - \theta_t^{\top}w \\
+ &= \argmin_{w \in \Delta_n} \sum_{i=1}^n w_i\log(w_i) - \lambda_t^{\top}w.
 \end{align}
 From here we see that 
 $w_{t,i} \propto \exp(\lambda_{t,i}) = \prod_{s=1}^{t-1} (1-\eta z_{s,i})$, 
@@ -108,25 +109,31 @@ so that $w_{t,i}$ does indeed correspond to the update in (\ref{eqn:mw2}).
 
 Next, we exploit the property that the Fenchel conjugate of $\psi(w) + c^{\top}w$ 
 is $\psi^*(\theta - c)$, together with the fact that the Fenchel conjugate of 
-negentropy is logsumexp, to obtain
-\begin{align}
-\psi_{t+1}^*(\theta_{t+1}) &= \log\left(\sum_{i=1}^n \exp(\theta_{t+1,i} - (\theta_{t+1,i}-\lambda_{t+1,i}))\right) \\
- &= \log\left(\sum_{i=1}^n \exp(\lambda_{t+1,i})\right) \\
- &= \log\left(\sum_{i=1}^n \exp(\lambda_{t,i} + \log(1 - \eta z_{t,i}))\right) \\
- &= \log\left(\sum_{i=1}^n \exp(\lambda_{t,i})(1 - \eta z_{t,i})\right) \\
- &= \log\left(\sum_{i=1}^n \exp(\lambda_{t,i}) - \eta \sum_{i=1}^n \exp(\lambda_{t,i})z_{t,i}\right) \\
- &\leq \log\left(\sum_{i=1}^n \exp(\lambda_{t,i})\right) - \eta \frac{\sum_{i=1}^n \exp(\lambda_{t,i})z_{t,i}}{\sum_{i=1}^n \exp(\lambda_{t,i})} \\
+$\psi_1(w) = \sum_{i=1}^n w_i\log(w_i)$ is $\psi_1^*(\theta) = \log\left(\sum_{i=1}^n \exp(\theta_i)\right)$, 
+to obtain
+%\begin{small}
+\begin{align*}
+\psi_{t+1}^*(\theta_{t+1}) &= \psi_1^*(\theta_{t+1}-(\theta_{t+1}-\lambda_{t+1})) \\
+ &= \psi_1^*(\lambda_{t+1}) \\
+ &= \log(\sum_{i=1}^n \exp(\lambda_{t+1,i})) \\
+ &= \log(\sum_{i=1}^n \exp(\lambda_{t,i} + \log(1 - \eta z_{t,i}))) \\
+ &= \log(\sum_{i=1}^n \exp(\lambda_{t,i})(1 - \eta z_{t,i})) \\
+ &= \log(\sum_{i=1}^n \exp(\lambda_{t,i}) - \eta \sum_{i=1}^n \exp(\lambda_{t,i})z_{t,i}) \\
+ &\leq \log(\sum_{i=1}^n \exp(\lambda_{t,i})) - \eta \frac{\sum_{i=1}^n \exp(\lambda_{t,i})z_{t,i}}{\sum_{i=1}^n \exp(\lambda_{t,i})} \\
  &= \psi_t^*(\theta_t) - \eta w_t^{\top}z_t.
-\end{align}
+\end{align*}
+%\end{small}
 Thus by the observations following (\ref{eqn:telescope}), $\Regret(w)$ is bounded by 
 $\frac{\psi_1^*(\theta_1) + \psi_{T+1}(w)}{\eta}$. Now using the fact that 
 $-\eta z - \log(1-\eta z) \leq \eta^2 z^2$ when $|\eta z| \leq \frac{1}{2}$, and also the 
 fact that $\sum_i w_i\log(w_i) \leq 0$, we have
-\begin{align}
-\Regret(w) &\leq \frac{\psi_1^*(\theta_1) + \psi_{T+1}(w)}{\eta} \\
- &= \frac{\log(n) + \sum_{i=1}^n w_i\log(w_i) + (\theta_{T+1}-\lambda_{T+1})^{\top}w}{\eta} \\
+\begin{align*}
+\lefteqn{\hskip -0.1in \eta\Regret(w)} \\
+\hskip 0.1in &\leq \psi_1^*(\theta_1) + \psi_{T+1}(w) \\
+ &= \log(n) + \sum_{i=1}^n w_i\log(w_i) %\nonumber \\ &\phantom{==}
+    + (\theta_{T+1}-\lambda_{T+1})^{\top}w \\
  &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2,
-\end{align}
+\end{align*}
 which completes the proposition.
 \end{proof}
 In the next section, we will present a more general framework for \emph{adaptive updates}, 
