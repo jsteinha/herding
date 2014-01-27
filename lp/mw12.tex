@@ -26,7 +26,7 @@ The regret bounds for each of (\ref{eqn:mw1}) and (\ref{eqn:mw2}) are
 well-known \cite{shalev2011, cesa2007}, but we include them below for completeness.
 \begin{theorem}
 \label{thm:mw12}
-For any $0 < \eta \leq \frac{1}{2}$, the updates (\ref{eqn:mw1}) and 
+For any $0 < \eta \leq \frac{1}{2}$ and $\|z_t\|_{\infty} \leq 1$, the updates (\ref{eqn:mw1}) and 
 (\ref{eqn:mw2}) enjoy regret, respectively,
 \begin{align}
 \label{eqn:mw1-regret}
@@ -71,12 +71,13 @@ an \emph{adaptive regularizer} $\psi_t(w)$. The mirror descent updates for
 such a regularizer are given by 
 \[ w_{t} = \nabla \psi_t^*\left(-\eta \sum_{s=1}^{t-1} z_s\right). \]
 See \cite{orabona2013general} for a more complete exposition. For convenience, 
-define $\theta_t \eqdef -\eta \sum_{s=1}^{t-1} \theta_s$. The important 
+define $\theta_t \eqdef -\eta \sum_{s=1}^{t-1} z_s$. The important 
 observation in our context is that, by definition of $\psi_{T+1}^*$, 
 \begin{align}
-- \eta w^{\top} \sum_{t=1}^T z_t &\leq \psi_{T+1}(w) + \psi_{T+1}^*(\theta_{T+1}) \\
 \label{eqn:telescope}
- &= \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^T \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t).
+\lefteqn{\hskip -0.1in - \eta w^{\top} \sum_{t=1}^T z_t} \\
+\nonumber \hskip 0.1in &\leq \psi_{T+1}(w) + \psi_{T+1}^*(\theta_{T+1}) \\
+\nonumber &= \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^T \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t). 
 \end{align}
 Motivated by this, we note that if we could choose $\psi_{t+1}$ so that 
 $\psi_{t+1}^*(\theta_{t+1}) \leq \psi_{t}^*(\theta_t) - \eta w_t^{\top}z_t$, 
@@ -129,7 +130,7 @@ $-\eta z - \log(1-\eta z) \leq \eta^2 z^2$ when $|\eta z| \leq \frac{1}{2}$, and
 fact that $\sum_i w_i\log(w_i) \leq 0$, we have
 \begin{align*}
 \lefteqn{\hskip -0.1in \eta\Regret(w)} \\
-\hskip 0.1in &\leq \psi_1^*(\theta_1) + \psi_{T+1}(w) \\
+\hskip 0.1in &\leq \psi_1^*(0) + \psi_{T+1}(w) \\
  &= \log(n) + \sum_{i=1}^n w_i\log(w_i) %\nonumber \\ &\phantom{==}
     + (\theta_{T+1}-\lambda_{T+1})^{\top}w \\
  &\leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n w_i \sum_{t=1}^T z_{t,i}^2,

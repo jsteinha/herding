@@ -4,30 +4,31 @@
 \section{Extension to Matrices} 
 \label{sec:matrix}
 We now extend our results to the matrix setting. Here $W$ is a positive semidefinite 
-matrix. The analogue to the simplex is constrainint $\Tr(W)$ to be $1$. Instead of a vector 
+matrix. The analogue to the simplex is constraining $\Tr(W)$ to be $1$. Instead of a vector 
 of losses $z_t$, we have a matrix of losses $Z_t$, which is assumed to be symmetric and to 
 have all eigenvalues between $-1$ and $1$. The loss in round $t$ is $\Tr(W_t^{\top}Z_t)$. 
-Since all matrices involves are symmetric, we will typically suppress the transpose and 
+Since all matrices involved are symmetric, we will typically suppress the transpose and 
 just write $\Tr(W_tZ_t)$. Note that we can embed the vector setting in the matrix setting 
 by restricting to diagonal matrices.
 
 We start with an extension of Proposition~\ref{prop:aeg} to the matrix setting:
 \begin{proposition}
 \label{prop:maeg}
-Consider the updates given by $\Theta_1 = -\log(n)I$ and 
+Consider the updates given by $\Theta_1 = 0$ and 
 $\Theta_{t+1} = \Theta_t - \eta Z_t - \eta^2 (Z_t - M_t)^2$, 
-with prediction $W_t = \frac{\exp(\Theta_t - \eta M_t)}{\Tr(\exp(\Theta_t - \eta M_t))}$. For this algorithm,
+with prediction $W_t = \frac{\exp(\Theta_t - \eta M_t)}{\Tr(\exp(\Theta_t - \eta M_t))}$. For $0 < \eta \leq \frac{1}{4}$, $\|Z_t\|_{op} \leq 1$, and $\|M_t\|_{op} \leq 1$, we have
 \begin{equation}
-\Regret(w) \leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \Tr(W(Z_t-M_t)^2).
+\Regret(w) \leq \frac{\log(n)}{\eta} + \eta \sum_{i=1}^n \Tr(W(Z_t-M_t)^2)
 \end{equation}
+for all $W \succeq 0$ with $\Tr(W) = 1$.
 \end{proposition}
 \begin{proof}
 When $\psi(W) = \Tr(W\log(W))$ and $S$ consists of positive semidefinite 
 matrices with trace $1$, the prediction $W_t$ corresponds to 
 $\nabla \psi_S^*(\Theta_t - \eta M_t)$. So, again, it suffices to check 
-that the condition of Corolarry~\ref{cor:a-o2} is satisfies for 
+that the condition of Corollary~\ref{cor:a-o2} is satisfies for 
 $U_t = (Z_t - M_t)^2$. To do so, we need to make use of the 
-Golden-Thompson inequality $\Tr(\exp(A+B)) \preceq \Tr(\exp(A)\exp(B))$, 
+Golden-Thompson inequality $\Tr(\exp(A+B)) \preceq \Tr(\exp(A)\exp(B))$ \cite{golden, thompson}, 
 together with the fact that $-X-X^2 \preceq \log(I-X)$ for 
 $-\frac{1}{2}I \preceq X \preceq \frac{1}{2}I$. We then have
 \begin{align*}
@@ -44,14 +45,13 @@ Finally, noting that $\psi_S^*(0) = \log(n)$, $\psi(W) = \Tr(W\log(W)) \leq 0$, 
 $U_t = (Z_t - M_t)^2$ completes the proof.
 \end{proof}
 We would now, as in Section~\ref{sec:ftrl-aux}, like to learn $M_t$ adaptively 
-to be competitive with the best fixed value $M^*$. However, it isn't even clear 
+to be competitive with the best fixed value $M^*$. However, it is no longer clear 
 that such a best fixed value exists (since the optimal value may depend on $W$). 
 Lemma~\ref{lem:global-opt} addresses this issue (proved in slightly greater 
 generality for later convenience):
 \begin{lemma}
 \label{lem:global-opt}
-For any $\delta \geq 0$, define $M^* \eqdef \frac{1}{T+\delta} \sum_{t=1}^T Z_t$. Then, for 
-any $M' \neq M^*$, we have
+For any $\delta \geq 0$, define $M^* \eqdef \frac{1}{T+\delta} \sum_{t=1}^T Z_t$. Then, for any symmetric matrix $M'$, we have
 \begin{equation*} \delta (M^*)^2 + \sum_{t=1}^T (Z_t-M^*)^2 \preceq \delta (M')^2 + \sum_{t=1}^T (Z_t-M')^2. \end{equation*}
 \end{lemma}
 \begin{proof}
@@ -76,17 +76,17 @@ $*$ such that $a^{*}a \succeq 0$ for all elements $a$ of the algebra.
 Lemma~\ref{lem:global-opt} gives us a target value for the $M_t$, but we cannot 
 simply apply the standard Follow the Regularized Leader lemma. This is because 
 we need a result of the form
-\[ \sum_{t=1}^T (Z_t - M_t)^2 \preceq \sum_{t=1}^T (Z_t - M^*) + \epsilon I, \]
+\[ \sum_{t=1}^T (Z_t - M_t)^2 \preceq \sum_{t=1}^T (Z_t - M^*)^2 + \epsilon I, \]
 which cannot be straightforwardly expressed as a regret bound. We deal with this 
 by deriving a generalization of the FTRL algorithm, which we call FTRL-$\sK$. 
 This is an algorithm in which losses are vector-valued and we obtain regret relative 
 to a partial ordering defined by a cone $\sK$.
 
-An important notion is that of a \emph{global optimum}. For a function $f : X \to \bR^n$ 
-and a cone $\sK \subset \bR^n$, we say that $f$ has a global optimum relative to 
-$\sK$ if there exists an $x$ such that $f(x) \leq_{\sK} f(y)$ for all $y \in X$.
+An important notion is that of a \emph{global minimizer}. For a function $f : X \to \bR^n$ 
+and a cone $\sK \subset \bR^n$, we say that $x$ is a global minimizer of $f$ 
+relative to $\sK$ if $f(x) \leq_{\sK} f(y)$ for all $y \in X$.
 
-\begin{lemma}
+\begin{lemma}[FTRL-$\sK$]
 \label{lem:ftrl-k}
 Suppose that for all $1 \leq t \leq T+1$, there 
 exists a global minimizer $M_t$ of 
@@ -96,9 +96,7 @@ $\psi(M) + \sum_{s=1}^{t-1} f_s(M)$. Then for all $M$,
 \begin{proof}
 We will prove the lemma by induction on $T$. Note that the lemma is equivalent to showing that 
 \[ \psi(M_1) + \sum_{t=1}^T f_t(M_{t+1}) \leq_{\sK} \psi(M) + \sum_{t=1}^T f_t(M) \]
-for all $M$.
-
-In the base case $T = 0$, we have
+for all $M$. In the base case $T = 0$, we have
 \[ \psi(M_1) \leq_{\sK} \psi(M), \]
 which follows from the fact that $M_1$ is a global minimizer of $\psi$ and 
 hence $\psi(M_1) \leq_{\sK} \psi(M)$ for all $M$. For the inductive step, suppose that
@@ -106,19 +104,20 @@ hence $\psi(M_1) \leq_{\sK} \psi(M)$ for all $M$. For the inductive step, suppos
 for all $M$, and invoke this for the particular choice $M = M_{T+1}$. Then we have
 \begin{align*}
 \lefteqn{\psi(M_1) + \sum_{t=1}^T f_t(M_{t+1})} \\
- &= \psi(M_1) + \sum_{t=1}^{T-1} f_t(M_{t+1}) + f_T(M_{T+1}) \\
- &\leq_{\sK} \psi(M_{T+1}) + \sum_{t=1}^{T-1} f_t(M_{T+1}) + f_T(M_{T+1}) \\
+ &= \psi(M_1) + \left[\sum_{t=1}^{T-1} f_t(M_{t+1})\right] + f_T(M_{T+1}) \\
+ &\leq_{\sK} \psi(M_{T+1}) + \left[\sum_{t=1}^{T-1} f_t(M_{T+1})\right] + f_T(M_{T+1}) \\
  &= \psi(M_{T+1}) + \sum_{t=1}^T f_t(M_{T+1}) \\
  &\leq_{\sK} \psi(M) + \sum_{t=1}^T f_t(M)
 \end{align*}
 for all $M$, where we use the fact that $M_{T+1}$ is a global minimizer of $\psi(M) + \sum_{t=1}^T f_t(M)$ for 
-the last inequality. This completes the inductive hypothesis and hence the proof.
+the last inequality. This completes the induction and hence the proof.
 \end{proof}
 
 As a corollary, we have (compare to Proposition~\ref{prop:ftrl-aux}):
 \begin{corollary}
 \label{cor:ftrl-k-aux}
-Suppose that we choose $M_t = \frac{1}{t} \sum_{s=1}^{t-1} Z_s$. Then
+Suppose that we choose $M_t = \frac{1}{t} \sum_{s=1}^{t-1} Z_s$. Then, assuming 
+$\|Z_t\|_{op} \leq 1$ for all $t$, we have
 \[ \sum_{t=1}^T (Z_t - M_t)^2 \preceq 2\sum_{t=1}^T (Z_t - M^*)^2 + 6I, \]
 for $M^* \eqdef \frac{1}{T} \sum_{t=1}^T Z_t$.
 \end{corollary}
@@ -131,11 +130,11 @@ $M_t$ obeys Lemma~\ref{lem:ftrl-k} with $\psi(M) = M^2$ and $f_t(M) = (M-Z_t)^2$
 Hence we have
 \begin{dgroup*}
 \begin{dmath*} \sum_{t=1}^T (Z_t - M_t)^2 - (Z_t - M^*)^2
-\end{dmath*}\begin{dmath*} = (M^*)^2 + \sum_{t=1}^T (Z_t - M_t)^2 - (Z_t - M_{t+1})^2 
-\end{dmath*}\begin{dmath*} = (M^*)^2 + \sum_{t=1}^T Z_t(M_{t+1} - M_t) + (M_{t+1}-M_t)Z_t + M_t^2 - M_{t+1}^2 
+\end{dmath*}\begin{dmath*} \preceq (M^*)^2 + \sum_{t=1}^T (Z_t - M_t)^2 - (Z_t - M_{t+1})^2 
+\end{dmath*}\begin{dmath*} = (M^*)^2 + \sum_{t=1}^T \left[Z_t(M_{t+1} - M_t) + (M_{t+1}-M_t)Z_t + M_t^2 - M_{t+1}^2 \right]
 \end{dmath*}\begin{dmath*} = (M^*)^2 + M_1^2 - M_{T+1}^2 + \sum_{t=1}^T \frac{1}{t+1}\left[ Z_t(Z_t-M_t) + (Z_t-M_t)Z_t\right] 
-\end{dmath*}\begin{dmath*} \leq I + \sum_{t=1}^T \frac{Z_t^2}{\gamma (t+1)^2} + \gamma (Z_t - M_t)^2 
-\end{dmath*}\begin{dmath*} \leq I + \frac{I}{\gamma} + \gamma \sum_{t=1}^T (Z_t - M_t)^2.
+\end{dmath*}\begin{dmath*} \preceq I + \sum_{t=1}^T \frac{Z_t^2}{\gamma (t+1)^2} + \gamma (Z_t - M_t)^2 
+\end{dmath*}\begin{dmath*} \preceq I + \frac{I}{\gamma} + \gamma \sum_{t=1}^T (Z_t - M_t)^2.
 \end{dmath*}
 \end{dgroup*}
 Re-arranging yields
@@ -149,7 +148,7 @@ regret bound for the MEG-Variance algorithm, whose updates are given in
 Table~\ref{tab:algorithms}.
 \begin{corollary}
 \label{cor:maeg-variance}
-The MEG-Variance algorithm achieves a regret bound of
+For $0 < \eta \leq \frac{1}{4}$ and $\|Z_t\|_{op} \leq 1$, the MEG-Variance algorithm achieves a regret bound of
 \begin{dmath}\Regret(w) \leq \frac{\log(n)}{\eta} + \eta \left[ \sum_{t=1}^T \Tr(W(Z_t-M^*)^2) + 4\log(T+1) \right].\end{dmath} 
 \end{corollary}
 

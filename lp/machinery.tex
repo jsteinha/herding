@@ -38,7 +38,7 @@ in various corollaries).
 Algorithm~\ref{alg:adaptive-optimistic} achieves regret bounded by
 \begin{dmath}
 \label{eqn:regret-1}
-\frac{1}{\eta}\left(\psi_1^*(\theta_1) + \psi_{T+1}(w) + \sum_{t=1}^{T} \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t - \eta m_t) + \eta w_t^{\top}(z_t-m_t)\right).
+\frac{1}{\eta}\left(\psi_1^*(\theta_1) + \psi_{T+1}(w) + \sum_{t=1}^{T} \left[\psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t - \eta m_t) + \eta w_t^{\top}(z_t-m_t)\right]\right).
 \end{dmath}
 \end{theorem}
 \begin{proof}
@@ -55,11 +55,11 @@ have, for any $w$,
 \end{align*}
 Re-arranging and expanding $\theta_{T+1}$, we have
 \begin{dmath}
--\eta w^{\top} \sum_{t=1}^T z_t \leq \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^{T} \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t-\eta m_t) - \eta w_t^{\top}m_t.
+-\eta w^{\top} \sum_{t=1}^T z_t \leq \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^{T} [\psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t-\eta m_t) - \eta w_t^{\top}m_t].
 \end{dmath}
 Adding $\eta \sum_{t=1}^T w_t^{\top}z_t$ to both sides, we obtain
 \begin{dmath}
-\eta \Regret(w) \leq \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^T \psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t) + \eta w_t^{\top}(z_t-m_t),
+\eta \Regret(w) \leq \psi_{T+1}(w) + \psi_1^*(\theta_1) + \sum_{t=1}^T [\psi_{t+1}^*(\theta_{t+1}) - \psi_t^*(\theta_t) + \eta w_t^{\top}(z_t-m_t)],
 \end{dmath}
 which yields the desired result.
 \end{proof}
@@ -139,7 +139,7 @@ $0 < \eta \leq \frac{1}{4}$, we have
 \end{proposition}
 \begin{proof}
 We note that, for $S$ equal to the simplex $\Delta_n$ and 
-$\psi(w) = \sum_{i=1}^n w_i\log(w_i)$, the $w_t$ is equal to 
+$\psi(w) = \sum_{i=1}^n w_i\log(w_i)$, $w_t$ is equal to 
 $\nabla \psi_S^*(\theta_t - \eta m_t)$. It therefore suffices 
 to check that the condition of Corollary~\ref{cor:a-o2} is satisfied with 
 $u_{t,i} = (z_{t,i}-m_{t,i})^2$. 

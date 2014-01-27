@@ -11,13 +11,13 @@ optimizing $m_t$. Clearly, the optimal value of $m_t$ is $m_t = z_t$. However,
 this would require perfect knowledge of the future. Suppose we are less ambitious 
 and only want to be competitive with the best fixed value of $m_t$. This optimal value 
 is $m^* \eqdef \frac{1}{T} \sum_{t=1}^T z_t$, but we still have the issue that 
-we do not $m^*$ ahead of time. However, we have now cast the problem in the familiar 
+we do not know $m^*$ ahead of time. However, we have now cast the problem in the familiar 
 regret minimzation framework, and can use the machinery of follow the regularized 
-leader \cite{hazan2011ftrl}:
+leader \cite{hazan2011ftrl} to prove:
 \begin{proposition}
 \label{prop:ftrl-aux}
-Suppose that we choose $m_{t,i} = \frac{1}{t} \sum_{s=1}^{t-1} z_{s,i}$. 
-Then, for all $i$, 
+Suppose that we choose $m_{t,i} = \frac{1}{t} \sum_{s=1}^{t-1} z_{s,i}$ and that 
+$\|z_s\|_{\infty} \leq 1$. Then for all $i$ we have
 \[ \sum_{t=1}^T (z_{t,i} - m_{t,i})^2 \leq 2\sum_{t=1}^T (z_{t,i} - m^*_i)^2 + 6. \]
 \end{proposition}
 \begin{proof}
@@ -39,14 +39,15 @@ which for $\gamma = \frac{1}{2}$ yields the desired result.
 \end{proof}
 Combining Proposition~\ref{prop:ftrl-aux} with Proposition~\ref{prop:aeg} yields 
 the algorithm titled EG-Variance in Table~\ref{tab:algorithms}. This algorithm has the 
-same updates as an algorithm given by \cite{hazan2010variation}, but uses the 
+same updates as the algorithm given by \cite{hazan2010variation}, but uses the 
 optimistic prediction $\exp(\theta_t - \eta m_t)$ rather than $\exp(\theta_t)$. 
 As a straightforward consequence of Propositions~\ref{prop:aeg} and~\ref{prop:ftrl-aux}, we 
 obtain the following regret bound, which improves the bound presented in 
 \cite{hazan2010variation}:
 \begin{corollary}
 \label{cor:EG-variance}
-The EG-Variance algorithm achieves a regret bound of
+For $0 < \eta \leq \frac{1}{4}$ and $\|z_t\|_{\infty} \leq 1$, the EG-Variance 
+algorithm achieves a regret bound of
 %\[ \Regret(w) \leq \frac{1 + (\log(n)-1)\|w\|_1 + \sum_{i=1}^n w_i\log(w_i)}{\eta} + \eta \left[ \sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_i^*)^2 + 4\|w\|_1\log(T+1) \right]. \]
 \begin{equation*}\Regret(w) \leq \frac{\log(n)}{\eta} + \eta \left[ 2\sum_{i=1}^n w_i \sum_{t=1}^T (z_{t,i} - m_i^*)^2 + 6 \right].\end{equation*} 
 \end{corollary}
