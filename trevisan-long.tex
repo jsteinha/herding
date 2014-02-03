@@ -1,0 +1,226 @@
+\documentclass[11pt]{article}
+\usepackage{import}
+\input{../latex-utils/defs.tex}
+\usepackage{fullpage}
+
+\title{Computational Indistinguishability via Boosting}
+\author{Jacob Steinhardt\footnote{Based on Trevisan et al, 2010.}}
+\begin{document}
+\maketitle
+
+\section{Setup}
+Suppose we have a family $\sF$ of functions $f : X \to [0,1]$. We 
+say that $h$ has complexity $C$ relative to $f$ if it can be obtained 
+from elements of $f$ via at most $C$ of the following operations:
+\begin{enumerate}
+\item addition: $f,g \mapsto f+g$
+\item multiplication: $f,g \mapsto f\cdot g$
+\item multiplication by scalars: $c,f \mapsto c \cdot f$
+\item thresholding: $f \mapsto \bI[f(x) \leq t]$
+\end{enumerate}
+Note that two-sided thresholding such as $\bI[s \leq f(x) \leq t]$ can be 
+expressed as $\bI[f(x) \leq t] \cdot \bI[-f(x) \leq -s]$ and so has complexity 
+$4$ relative to $\sF$. We will denote by $\sF[C]$ the space of $h : X \to [0,1]$ 
+with complexity at most $C$ relative to $\sF$.
+
+Given a distribution $\mu$ on $X$, we say that $g$ and $h$ are 
+\emph{$\epsilon$-indistinguishable} relative to $\sF$ if 
+$|\bE_{\mu}[f(x)(g(x)-h(x))] \leq \epsilon$ for all $f \in \sF$. 
+
+\section{Main Result}
+The main result is the following:
+
+\begin{theorem}
+\label{thm:luca}
+Let $\sF$ be any family of functions $f : X \to [0,1]$, let $\mu$ be a 
+distribution on $X$, and let $g$ be any function $g : X \to [0,1]$. Then 
+there exists an $h$ with complexity $O(1/\epsilon^2)$ relative to $\sF$ that is 
+$\epsilon$-indistinguishable from $g$ relative to $\sF$. Furthermore, $\bE_{\mu}[g(x)] = \bE_{\mu}[h(x)]$.
+\end{theorem}
+
+\begin{proof}
+Assume WLOG that $\sF = -\sF$, so that we need only prove indistinguishability 
+in one direction. Also, assume that $1 \in \sF$, so that $\bE_{\mu}[g(x)] \approx \bE_{\mu}[h(x)]$ (we can 
+make them exactly equal by slightly adjusting $h$ post-hoc).
+
+We use the following stochastic gradient descent algorithm:
+\begin{itemize}
+\item $h_0 = 0$
+\item $f_i \in \argmax_{f \in \sF} \bE_{\mu}[f(x)(h_i(x)-g(x))]$
+\item $h_{i+1} = \min(\eta \sum_{j \leq i} f_j, 1)$
+\end{itemize}
+This is online gradient descent with regularizer $\frac{1}{2\eta}\bE_{\mu}[h(x)^2]$, so we get the regret bound:
+\begin{align*}
+\sum_{i=0}^{k-1} \bE_{\mu}[f_i(x)(h_i(x)-g(x))] &\leq \sum_{i=0}^k \bE_{\mu}[f_i(x)(g(x)-g(x))] + \frac{1}{2\eta}\bE_{\mu}[g(x)^2] + \frac{\eta}{2}\sum_{i=0}^{k-1} \bE_{\mu}[f_i(x)^2] \\
+ &\leq \frac{1}{2\eta} + \frac{k\eta}{2}.
+\end{align*}
+Setting $\eta = \frac{1}{\sqrt{k}}$ yields 
+\[ \sum_{i=0}^k \bE_{\mu}[(h_i(x)-g(x))f_i(x)] \leq \sqrt{k}, \]
+meaning that $\bE_{\mu}[(h_i(x)-g(x))f_i(x)] \leq \frac{1}{\sqrt{k}}$ for some $i < k$. 
+Since $f_i$ is by construction the maximizer of $\bE[(h_i(x)-g(x))f(x)]$, we have that 
+$\bE[(h_i(x)-g(x))f(x)] \leq \frac{1}{\sqrt{k}}$ for all $f \in \sF$ for some $i < k$. Letting 
+$k = \frac{1}{\epsilon^2}$ then gives us $\epsilon$-distinguishability relative to $\sF$.
+
+Since $\min(\cdot, 1)$ can be implemented in $O(1)$ steps and $k = \frac{1}{\epsilon^2}$, we 
+then have that $h_i$ has complexity $O\left(\frac{1}{\epsilon^2}\right)$ relative to $\sF$, which 
+proves the theorem.
+\end{proof}
+
+\begin{remark}
+Note that the theorem still holds (possibly with different constants) if we replace $[0,1]$ by any 
+bounded set; in particular, with $[-1,1]$ (this fact is used in Trevisan et al. although here we will 
+only use $[0,1]$).
+\end{remark}
+
+%We can also prove a slightly strengthened version of the theorem:
+%\begin{theorem}
+%\label{thm:luca-strong}
+%Under the same conditions as Theorem~\ref{thm:luca}, we can obtain a 
+%function $h : X \to \mathbb{R}_{\geq 0}$ that is a non-negative \emph{linear} 
+%combination of $O(1/\epsilon^2)$ members of $\sF$, and such that $g$, $h$, 
+%and $\min(h,1)$ are all mutually $\epsilon$-indistinguishable. Furthermore, 
+%$\bE_{\mu}[g(x)] = \bE_{\mu}[\min(h(x),1)]$.
+%\end{theorem}
+%\begin{remark}
+%In this version of the theorem, the proof will no longer hold if we replace $[0,1]$ by $[-1,1]$: 
+%the non-negativity of the co-domain is important.
+%\end{remark}
+%\begin{proof}
+%Perform stochastic gradient descent as before, but now with the loss function 
+%$l_f(h) = \bE_{\mu}\left[f(x) \cdot \frac{h(x) + \min(h(x),1)}{2}\right]$. Also, for this 
+%version, do not project $h$ but simply perform the gradient update $h_{i+1} = h_i + \eta \partial_h l_f(h)$. 
+%If we actually compute this update, we get
+%\[ h_{i+1}(x) = f(x) \cdot \frac{1 + \bI[h_i(x) < 1]}{2}. \]
+%Note that $h$ and $f$ are both non-negative, so we can conclude the following:
+%\begin{itemize}
+%\item If $l_f(h) < \frac{\epsilon}{2}$, then $\bE_{\mu}[f(x)h(x)] < \epsilon$ and 
+%      $\bE_{\mu}[f(x)\min(h(x),1)] < \epsilon$. Therefore, 
+%\end{itemize}
+%\end{proof}
+
+\section{Corollaries}
+\subsection{Dense Model Theorem}
+Theorem~\ref{thm:luca} has many interesting corollaries. The first is the dense model theorem. Call 
+a distribution $p$ \emph{$\delta$-dense} relative to $q$ if $p(x) \leq \frac{q(x)}{\delta}$: that is, 
+$p$ is $\delta$-dense if it is never too much more likely than $q$. This implies in particular that 
+there is a rejection sampler for $p$ with proposal distribution $q$ and acceptance rate at least $\delta$.
+
+\begin{theorem}[Dense Model Theorem]
+Suppose that $X$ is a finite set, let $p_U$ be the uniform distribution 
+on $X$, and let $\sF$ be a family of functions $f : X \to [0,1]$. 
+Let $p_D$ and $p_R$ be distributions such that $p_R$ and $p_U$ have moments in $\sF[C]$ differing 
+by at most $\epsilon$: $|\bE_{p_R}[f(x)]-\bE_{p_U}[f(x)]| \leq \epsilon$ for all $f \in \sF[C]$.
+Suppose also that $p_D$ is $\delta$-dense in $p_R$. Then, if $C \geq O(1/\epsilon^2)$, 
+there is a distribution $p_M$ that is $(\delta-\epsilon)$-dense in $p_U$, and whose moments in $\sF$ 
+differ from $p_D$ by at most $\frac{3\epsilon}{\delta}$.
+\end{theorem}
+
+\begin{proof}
+Let $g(x) = 1-\delta\frac{p_D(x)}{p_R(x)}$. Let $h(x)$ be an $\epsilon$-indistinguishable function 
+with respect to the measure $p_R$ and the family $\sF$, and define $p_M(x) \propto 1-h(x)$.
+
+First, let us compute the normalization constant of $p_M$. We have:
+\begin{align*}
+\sum_{x} p_M(x) &= |X|\bE_{p_U}[(1-h(x))] \\
+ &= |X|(\bE_{p_R}[(1-h(x))] \pm \epsilon) \\
+ &= |X|(\bE_{p_R}[(1-g(x))] \pm \epsilon) \\
+ &= |X|(\delta \pm \epsilon).
+\end{align*}
+
+It follows that $p_M(x) \leq \frac{1-h(x)}{|X|(\delta-\epsilon)} \leq \frac{1}{|X|(\delta-\epsilon)}$ and 
+hence $p_M$ is $(\delta-\epsilon)$-dense in $p_U$.
+
+To get indistinguishability, we need to show that $|\bE_{p_D}[f(x)]-\bE_{p_M}[f(x)]|$ is always small. 
+We do this by showing that $p_D(x)$ and $p_M(x)$ are both close to $\frac{1-h(x)}{\delta}$. Indeed, we have
+\begin{align*}
+\left|\bE_{p_D}[f(x)]-\bE_{p_U}\left[\frac{1-h(x)}{\delta}f(x)\right]\right| &\leq \left|\bE_{p_D}[f(x)]-\bE_{p_R}\left[\frac{1-h(x)}{\delta}f(x)\right]\right| + \frac{\epsilon}{\delta} \\
+ &\leq \left|\bE_{p_D}[f(x)]-\bE_{p_R}\left[\frac{1-g(x)}{\delta}f(x)\right]\right| + \frac{2\epsilon}{\delta} \\
+ &= \left|\bE_{p_D}[f(x)]-\bE_{p_R}\left[\frac{p_D(x)}{p_R(x)}f(x)\right]\right| + \frac{2\epsilon}{\delta} \\
+ &= \frac{2\epsilon}{\delta},
+\end{align*}
+as well as
+\begin{align*}
+\left|\bE_{p_M}[f(x)] - \bE_{p_U}\left[\frac{1-h(x)}{\delta}f(x)\right]\right| &= \left|\bE_{p_M}[f(x)] - \frac{\sum_{x} 1-h(x)}{\delta|X|} \bE_{p_M}[f(x)]\right| \\
+ &= \left|\bE_{p_M}[f(x)] - \frac{(\delta \pm \epsilon)|X|}{\delta |X|} \bE_{p_M}[f(x)] \right| \\
+ &\leq \frac{\epsilon}{\delta} |\bE_{p_M}[f(x)]| \\
+ &\leq \frac{\epsilon}{\delta}.
+\end{align*}
+These two inequalities complete the proof.
+\end{proof}
+
+\begin{remark}
+Note that the construction also shows that $p_M \in \sF[C]$. Since $p_M$ has high density relative to $p_U$, 
+we can build a rejection sampler for $p_M$ using the uniform distribution as a proposal, and hence sample $p_M$ 
+efficiently. If we set $R = U$, then this implies in particular that every $\delta$-dense distribution has 
+an indistinguishable distribution that can be efficiently sampled.
+\end{remark}
+
+%\begin{remark}
+%Note that we only need to multiply functions in $\sF$ once, when we consider $\frac{1-h(x)}{\delta} f(x)$. 
+%So suppose that $\sF$ is defined by some collection $\phi : X \to \{0,1\}^d$ of binary features. Also 
+%imagine that $R$ and $U$ have identical \emph{second} moments with respect to $\phi$: 
+%$\bE_{p_U}[\phi(x)\phi(x)^T] = \bE_{p_R}[\phi(x)\phi(x)^T]$. (We'll also assume that one of the features 
+%is identically equal to $1$, so that this also implies that $R$ and $U$ have identical first moments.)
+%
+%By the construction in Theorem~\ref{thm:luca}, $h(x) = \min(\eta \sum_{i=1}^k \phi_i(x), 1)$. 
+%For the result of the dense model theorem to hold, we need $\bE_{p_U}[h(x)\phi(x)] = \bE_{p_R}[h(x)\phi(x)]$, 
+%or equivalently
+%\[ \bE_{p_U}[\min(\eta \sum_{i=1}^k \phi_i(x), 1)\phi(x)] = \bE_{p_R}[\min(\eta \sum_{i=1}^k \phi_i(x), 1)\phi(x)]. \]
+%Without the $\min$, we would be in good shape. It turns out we can modify our construction so that the $\min$ affects 
+%things by at most $\epsilon$, so that these expectations are indeed within $\epsilon$ of each other.
+%\end{remark}
+\subsection{Szemeredi Regularity Lemma}
+\begin{theorem}[Szemeredi]
+Let $G$ be a graph with edge set $E$. Then there exists a partition of $V$ into $M$ components $V_1,\ldots,V_M$ and a 
+function $w : \{1,\ldots,M\} \times \{1,\ldots,M\} \to [0,1]$ such that if $A \subset V_i$ and $B \subset V_j$ then 
+the number of edges $e(A,B)$ between $A$ and $B$ satisfies $|A||B|w(i,j)-\epsilon|V|^2 \leq e(A,B) \leq |A||B|w(i,j) + \epsilon|V|^2$. Furthermore, 
+we can take $M = 2^{O(1/\epsilon^2)}$.
+\end{theorem}
+
+\begin{proof}
+Let $\sF$ consist of all functions from $V \times V$ to $\{0,1\}$ of the form $f_{A,B}(u,v) = \bI[u \in A] \bI[v \in B]$. Let $g(u,v) = \bI[(u,v) \in E]$. 
+Then there exists some $h = \sum_{i=1}^k c_i f_{A_i,B_i}$ with $k = O(1/\epsilon^2)$ that is $\epsilon$-indistinguishable from $g$ with respect to $\sF$. 
+We can then partition $V$ into $2^{2k}$ sets $V_1,\ldots,V_{2^{2k}}$ such that $h$ is piecewise constant on each $V_i \times V_j$ (just let the $V_j$ consist of all 
+intersections of the $A_i$ and the $B_i$ or their complements). We can then define $w(i,j)$ to be the constant value that $h$ takes on $V_i \times V_j$.
+In particular, indistinguishability gives us $|\sum_{u \in A, v \in B} h(u,v) - g(u,v)| \leq \epsilon |V|^2$, 
+or equivalently $|w(i,j)|A||B|-e(A,B)| \leq \epsilon |V|^2$, which proves the theorem.
+\end{proof}
+
+\subsection{Impaggliazo Hard-Core Set Lemma}
+\begin{theorem}
+Let $X$ be a set and $p_U$ the uniform distribution over that 
+set. Let $\sF$ be a family of boolean functions and let 
+$g$ be a boolean function such that $p_U[f(x)=g(x)] \leq 1-\delta$ 
+for all $f \in \sF[C]$, with $C \geq O(1/(\delta\epsilon)^2)$. Then 
+there exists a distribution $p_M \in \sF[C]$ such that $p_M(x) \leq \frac{1}{\delta |X|}$ 
+for all $x \in X$, and 
+$p_M[f(x)=g(x)] \leq \frac{1}{2}+\epsilon$ for all $f \in \sF$.
+\end{theorem}
+Intuitively, this means that if $g$ is somewhat hard to match by any function 
+with complexity $C$ relative to $\sF$, then there is some ``core'' of $X$ that 
+is hard for any element of $\sF$ to match at all.
+\begin{proof}
+Let $h \in \sF[C]$ be $(\delta\epsilon)$-indistinguishable from $g$ 
+relative to $\sF$. Let $p_M(x) \propto |g(x)-h(x)|$. First, we note that 
+$\bE_{p_U}[|g(x)-h(x)|] \geq \delta$, or else $\bI[h(x) \leq t]$ would match 
+$g(x)$ on more than $1-\delta$ of the inputs for some $t$. Therefore, 
+$\sum_{x \in X} |g(x)-h(x)| \geq \delta |X|$ and hence $p_M(x) \leq \frac{|g(x)-h(x)|}{\delta |X|} \leq \frac{1}{\delta |X|}$, 
+which establishes the first condition.
+
+To finish, note the identity 
+\begin{align*}
+|g(x)-h(x)| \bI[f(x)=g(x)] &= \frac{1}{2}|g(x)-h(x)| + \frac{1}{2}|g(x)-h(x)|(-1)^{f(x)-g(x)} \\
+ &= \frac{1}{2}|g(x)-h(x)| - \frac{1}{2}(g(x)-h(x))(-1)^{f(x)-g(x)+g(x)} \\ 
+ &= \frac{1}{2}|g(x)-h(x)| - \frac{1}{2}(g(x)-h(x))(-1)^{f(x)} \\
+ &= \frac{1}{2}|g(x)-h(x)| + \left(f(x)-\frac{1}{2}\right) (g(x)-h(x)).
+\end{align*}
+It then follows that 
+\begin{align*}
+p_M[\bI[f(x)=g(x)]] &= \frac{\sum_{x} \frac{1}{2}|g(x)-h(x)| + \sum_{x} \left(f(x)-\frac{1}{2}\right) (g(x)-h(x))}{\sum_{x} |g(x)-h(x)|} \\
+ &= \frac{1}{2} + \frac{\sum_{x} f(x)(g(x)-h(x))}{\sum_{x} |g(x)-h(x)|} \\
+ &\leq \frac{1}{2} \frac{\epsilon\delta}{\delta} \\
+ &= \frac{1}{2} + \epsilon,
+\end{align*}
+which yields the desired result.
+\end{proof}
+\end{document}

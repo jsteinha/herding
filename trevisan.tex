@@ -1,0 +1,53 @@
+\documentclass[11pt]{article}
+\usepackage{import}
+\input{../latex-utils/defs.tex}
+\usepackage{fullpage}
+
+\title{Shorter Proof of The Indistinguishability Theorem}
+\begin{document}
+\maketitle
+
+\section{Conditional Gradient}
+Suppose we have a bilinear form $\langle \cdot, \cdot \rangle$ on 
+$\sX \times \sY$ together with convex functions $\phi(x)$ and $\psi(y)$. 
+We can consider the two-argument loss function
+\[ L(x,y) = \phi(x) + \langle x, y \rangle - \psi(y). \]
+We know by the minimax theorem that $L$ has a saddle point $(x^*,y^*)$; 
+conditional gradient obtains for us an approximate saddle point with 
+desired properties. Given a sequence of weights $\alpha_t$, 
+let $\hat{x}_t$ be the weighted average of $x_{1:t}$ with respect 
+to the weights $\alpha_{1:t}$:
+\[ \hat{x}_t \eqdef \frac{\sum_{s=1}^t \alpha_sx_s}{\sum_{s=1}^t \alpha_s}. \]
+Then the conditional gradient algorithm is:
+\begin{align*}
+    x_t &\in \argmin_x \phi(x) + \langle x, y_t \rangle \\
+y_{t+1} &\in \argmax_y \langle \hat{x}_t, y \rangle - \psi(y).
+\end{align*}
+Assuming that $\phi$ is strongly convex with respect to a norm $\|\cdot\|$, 
+and letting $\|\cdot\|_*$ denote the dual norm and $r \eqdef \sup_{y} \|y\|_*$, 
+we have the bound (for $\alpha_t = t$):
+\[ \sup_{y} L(\hat{x}_t, y) \leq \sup_{y} L(x^*, y) + \frac{8r^2}{T}. \]
+
+\section{Indistinguishability}
+To apply conditional gradient to indistinguishability, let $\sX$ be the space 
+of functions $f : S \to [0,1]$ and let $\sY = \operatorname{Conv}(\sF)$. Then 
+define 
+\[ L(h,f) = \frac{\eta}{2} \bE_{\mu}[h(s)^2] + \bE_{\mu}[h(s)f(s)] - \bE_{\mu}[g(s)f(s)]. \]
+This corresponds to setting $\phi(h) = \frac{\eta}{2} \bE_{\mu}[h(s)^2]$, $\langle h, f \rangle = \bE_{\mu}[h(s)f(s)]$, 
+and $\psi(f) = \bE_{\mu}[g(s)f(s)]$. If we let $D(g,h)$ denote 
+the discrepancy between $g$ and $h$, then note that
+\[ D(g,h) \leq \sup_{f} L(h,f) \leq D(g,h) + \frac{\eta}{2}. \]
+Also note that $f_t \in \sF$ for all $t$ and that $h_t = \max(\min(\frac{1}{\eta}f_t,1),0)$. Finally, 
+$\phi$ is strongly convex with respect to the norm $\|h\| = \sqrt{\eta \bE_{\mu}[h(s)^2]}$, which 
+has the dual norm $\|f\|_* = \sqrt{\eta^{-1} \bE_{\mu}[f(s)^2]}$. Since $0 \leq f(s) \leq 1$, we then have 
+$r^2 \leq \frac{1}{\eta}$ and so our bound yields
+\begin{align*}
+D(g,\hat{h}_T) &\leq \sup_f L(\hat{h}_t, f) \\
+ &\leq \sup_f L(h^*, f) + \frac{8}{\eta T} \\
+ &\leq D(g, h^*) + \eta + \frac{8}{\eta T} \\
+ &\leq \eta + \frac{8}{\eta T}.
+\end{align*}
+Letting $\eta = \sqrt{8/T}$ and $T = 32/\epsilon^2$, 
+we re-obtain the indistinguishability theorem.
+
+\end{document}

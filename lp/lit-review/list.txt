@@ -103,6 +103,7 @@ MAYBE CITE? Efficient online and batch learning using forward backward splitting
 
 
 Boosting / Frank-Wolfe (LATER):
+The Frank-Wolfe Algorithm: New Results, and Connections to Statistical Boosting
 CITE "Pegasos: Primal Estimated sub-GrAdient SOlver for SVM", 2011
 -super-relevant from the perspective of the Frank-Wolfe stuff, they basically use the 
   fixed-step-size version to solve an SVM
