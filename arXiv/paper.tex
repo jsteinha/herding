@@ -1,33 +1,31 @@
-\documentclass{article}
+\documentclass[reqno,oneside,a4paper]{amsart}
 \usepackage{import, subfiles}
-\usepackage{hyperref, icml2014}
+\usepackage{natbib}
+\usepackage{hyperref}
 \usepackage{tabularx}
+\usepackage{chngpage}
 \input{latex-defs.tex}
 
 \allowdisplaybreaks
 
-\icmltitlerunning{Herding and Boosted Mirror Descent}
-
 \begin{document} 
 
-\twocolumn[
-\icmltitle{Herding and its Generalizations via Boosted Mirror Descent}
+\title{Conjugate Gradient, Boosting, and Herding: \\ 
+	   Connections and Application}
+	   
+\thanks{The authors contributed equally to this work.}
 
-\icmlauthor{Jonathan Huggins \NA{add footnote on authorship}}{jhuggins@mit.edu}
-\icmladdress{MIT CSAIL,
-             77 Massachusetts Avenue, Cambridge, MA 02139 USA}
-\icmlauthor{Jacob Steinhardt}{jsteinhardt@cs.stanford.edu}
-\icmladdress{Stanford University,
-             353 Serra Street, Stanford, CA 94305 USA}
+\author[J.~H.~Huggins]{Jonathan H.~Huggins}
+\address{Massachusetts Institute of Technology}
+\urladdr{http://jhuggins.org/}
+\email{jhuggins@mit.edu}
 
+\author[J.~Steinhardt]{Jacob Steinhardt}
+\address{Stanford University}
+\urladdr{http://cs.stanford.edu/~jsteinhardt/}
+\email{jsteinhardt@cs.stanford.edu}
 
-% You may provide any keywords that you 
-% find helpful for describing your paper; these are used to populate 
-% the "keywords" metadata in the PDF but will not be shown in the document
-\icmlkeywords{boosting, optimization, mirror descent, frank-wolfe, conjugate gradient descent, herding}
-
-\vskip 0.3in
-]
+\keywords{boosting, optimization, mirror descent, Frank-Wolfe, conjugate gradient descent, herding, graph sparsification}
 
 \begin{abstract} 
 Much has been learned about herding since it was first proposed.
@@ -43,6 +41,8 @@ a more cohesive picture of the connections between herding,
 conditional gradient descent, and maximum entropy. 
 \end{abstract} 
 
+\maketitle
+
 \subfile{introduction.tex}
 \subfile{boosted-mirror-descent.tex}
 \subfile{herding-connection.tex}
@@ -54,4 +54,4 @@ conditional gradient descent, and maximum entropy.
 \bibliography{herding}
 \bibliographystyle{icml2014}
 
-\end{document} 
+\end{document} \maketitle

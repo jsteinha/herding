@@ -1,0 +1,109 @@
+\documentclass[reqno,oneside,a4paper]{amsart}
+%\usepackage{jhh-misc}
+\usepackage{hyperref}
+\usepackage{epsfig}
+\usepackage{framed}
+\usepackage{natbib}
+\usepackage{subfig}
+\usepackage{xspace}
+\usepackage[normalem]{ulem}
+
+\input{latex-defs.tex}
+
+\begin{document}
+
+\title{Supplementary Material for ``Herding and its Generalizations via Boosted Mirror Descent''} 
+\author{}
+\date{}
+
+\maketitle
+
+\appendix
+
+\section{CGD, MD, and Boosted MD}
+
+The \bmd algorithms are very closely related to \cgd and \md. \dual and \cgd are related as follows. \dual minimizes $g + R^{*}$ while \cgd minimizes $h^{*} + f^{*}$. Make the identifications $h^{*} = R^{*}$ and $f^{*} = g$ and note the conditions on the functions being optimized are equivalent. Then with $\rho_{t} = \alpha_{t+1}/A_{t+1}$, we can rewrite the \cgd updates as 
+\[
+x_{t} &= \partial R^{*}(-\bar y_{t})  \\
+y_{t} &= \partial g^{*}(x_{t}) \\
+\bar y_{t+1} &= A_{t+1}^{-1}\sum_{s \le t+1} \alpha_{t} y_{t},
+\]
+which is identical to the \dual if we make the substitutions $x_{t} \to -\theta_{t}$ and $y_{t} \to -u_{t}$. 
+
+We similarly relate \primal and \md. \primal minimizes $g + R^{*}$ while \md minimizes $h + f$. Make the identifications $h = g$ and $f = R^{*}$ and note the conditions of $h$ and $g$ are the same. Letting $\rho_{t+1} = \alpha_{t}/A_{t}$, we can rewrite the \md updates as 
+\[
+y_{t} &= \partial R^{*}(x_{t}) \\
+\bar y_{t} &= \partial g^{*}((1 - \rho_{t+1})\partial g(x_{t}) - \rho_{t+1}y_{t}) \\
+x_{t+1} &= \partial g^{*}(-\bar y_{t}), 
+\]
+where $\bar y_{t}$ is the same as above. Making the substitutions $y_{t} \to \theta_{t}$ and $x_{t} \to u_{t}$ completes the identification of the two methods. 
+
+Finally, note that if we write $\alpha_{t} = \rho_{t}/\prod_{s=1}^{t} (1 - \rho_{s})$, we have $A_{t} = \prod_{s=1}^{t} (1 - \rho_{s})$ and hence $\alpha_{t} / A_{t} = \rho_{t}$. Hence, up to a change in index, we have a bijection between the $\rho_{t}$ and the $\alpha_{t}$. 
+
+\section{Proof Lemma used in $q$-Herding Convergence Proof}
+
+Two simple equalities were used in the proof of the convergence rate of $q$-herding. We now provide proofs. Using the fact that $x^{n} - y^{n} = (x - y)\sum_{i=0}^{n-1}x^{i-1}y^{n-i-1}$, for the first inequality we have
+\(
+x^{p} - py^{p-1}x + (p-1)y^{p}
+&= x^{p} - y^{p} - py^{p-1}x + py^{p} \\
+&= (x - y)\sum_{r=0}^{p-2} (y^{r}x^{p-r-1} - y^{p-1}) \\
+&= (x - y)^{2}\sum_{r=0}^{p-2}\sum_{s=0}^{p-r-2}x^{p-r-s-2}y^{r+s} \\
+&\le (x - y)^{2}\sum_{r=0}^{p-2}\sum_{s=0}^{p-r-2}\max(x, y)^{p-2} \\
+&= {p \choose 2}(x - y)^{2}\max(x, y)^{p-2}.
+\)
+For the second inequality we have
+\(
+(y-z)^{2}\max(x,y)^{p-2} 
+&\le 4\max(y,z)^{2}\max(x,y)^{p-2} \\
+&\le 4\max(x,y,z)^{p}.
+\)
+
+%\section{Proof of Key Lemma}
+%
+%We now prove the key lemma, which we restate here, used in the convergence proofs of the \bmd algorithms.  
+%\begin{lemma}
+%\label{lem:bregman}
+%Let $z_1,\ldots,z_T$ be vectors and let $f(x)$ be a strictly convex 
+%function. Define $\hat{z}_t$ to be $\frac{1}{A_t} \sum_{s=1}^t \alpha_s z_s$.
+%
+%Let $x_1,\ldots,x_T$ be chosen via $x_{t+1} = \arg\min_{x} f(x) + \langle \hat{z}_t, x\rangle$. 
+%Then for any $x^*$ we have
+%\begin{align*}
+%\lefteqn{\frac{1}{A_T} \sum_{t=1}^T \{\alpha_t(f(x_t) + \langle z_t, x_t \rangle)\}} \\
+%\phantom{+} &\leq f(x^*) + \langle \hat{z}_t, x^* \rangle + \frac{1}{A_T} \sum_{t=1}^T A_t D_{f}(x_t \| x_{t+1}). 
+%\end{align*}
+%\end{lemma}
+%\begin{proof}
+%First note that, if $x_0 = \arg\min f(x) + \langle z, x \rangle$, 
+%then $\nabla f(x_0) = -z$.
+%
+%%\NA{JNS: In the following proof, (2) is by the update formula for $x_{t+1}$ together with the preceding observation.  (3) is applying (2). (4) and (5) are re-arranging the sum. (6) is definition of Bregman divergence. (7) is the observation again. (8) is the definition of $x_{T+1}$.}
+%
+%Now note that
+%\begin{align}
+%\alpha_{t}z_{t} 
+%&= A_{t}\hat z_{t} - A_{t-1}\hat z_{t-1} \\
+%&= - A_{t}\nabla f(x_{t+1}) + A_{t-1} \nabla f(x_{t}),
+%\end{align}
+%so we have
+%\begin{align}
+%\lefteqn{\sum_{t=1}^T \{\alpha_t(f(x_t) + \langle z_t, x_t \rangle)\}} \\
+% &= \sum_{t=1}^T \{\alpha_t f(x_t) + \langle A_{t-1} \nabla f(x_t) - A_t \nabla f(x_{t+1}), x_t \rangle\} \\
+% &= \sum_{t=1}^T \{\alpha_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle\} \\
+% & \quad - A_{T}\langle \nabla f(x_{T+1}), x_{T+1} \rangle
+%\end{align}
+%\begin{align}
+% &= \sum_{t=1}^T \{A_t f(x_t) - \langle A_{t} \nabla f(x_{t+1}), x_t-x_{t+1} \rangle - A_t f(x_{t+1})\}  \\
+% &\quad+ A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
+% &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\}  \\
+% &\quad+ A_T(f(x_{T+1}) - \langle \nabla f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
+% &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x_{T+1}) + \langle \hat{z}_T, x_{T+1} \rangle) \\
+% &\leq \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x^*) + \langle \hat{z}_T, x^* \rangle). 
+%\end{align}
+%Dividing both sides by $A_T$ completes the proof.
+%\end{proof}
+
+
+
+\end{document}
+

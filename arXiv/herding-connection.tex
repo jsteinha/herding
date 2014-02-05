@@ -1,0 +1,171 @@
+\documentclass[paper.tex]{subfiles}
+\begin{document}
+\section{Application to Herding}
+\label{sec:herding}
+
+We now derive herding as a special case of \dual. The standard setup for herding is as follows: we are given a 
+space $\sS$ and a feature mapping $\phi : \sS \to \sH$ for some 
+reproducing kernel Hilbert space $\sH$ \cite{Hofmann:2008}. 
+We define $\Delta_{\sS}$ to be the simplex 
+of probability distributions over $\sS$ and define the marginal polytope 
+$\sM \defined \{\bE_{v \sim x}[\phi(v)] \mid x \in \Delta_{\sS}\}$.
+
+The goal of herding is to construct samples $v_1,\ldots,v_T \in \sS$ 
+such that $\|\frac{1}{T}\sum_{t=1}^T \phi(v_t)-\bar{\phi}\|_{\sH}^2$ 
+is minimized for some given $\bar{\phi} \in \sM$. One can typically
+think of $\bar \phi$ as being the expected value of $\phi$ under some 
+distribution $x_{0} \in \Delta_{\sS}$. 
+
+The herding algorithm uses the following updates\footnote{The original 
+algorithm includes an additional $\bar{\phi}$ term in the third bullet 
+point and indexes $x_t$ as $x_{t+1}$.} \citep[][equations (1) and (2)]{Chen:2010a}:
+\begin{enumerate}
+\item $w_1 = \bar{\phi}$
+\item $v_t \in \arg\max_{v \in \sS} \ip{w_t}{\phi(v)}$
+\item $w_{t+1} = \sum_{s=1}^t [\bar{\phi}-\phi(v_s)]$
+\end{enumerate}
+If we define $y_t \defined -w_t/t$, then these updates are equivalent to
+\begin{enumerate}
+\item $y_1 = -\bar{\phi}$
+\item $x_t \in \arg\min_{x \in \Delta_{\sS}} \ip{\bE_{x}\phi}{y_t}$
+\item $y_{t+1} = \frac{1}{t} \sum_{s=1}^t \bE_{x}\phi - \bar{\phi}$
+\end{enumerate}
+Note that we have replaced the point $v_t$ with a distribution $x_t$. 
+This does not change the algorithm as $\ip{\bE_{x}\phi}{y_t}$ will 
+always be minimized at an extreme point of $\Delta_{\sS}$, which corresponds 
+to a point mass.
+
+The above updates correspond to \dual for $X = \Delta_{\sS}$, $Y = \sH$, 
+$\blf{x}{y} = \ip{\bE_{x}\phi}{y}_{\sH}$, $\alpha_t = 1$, $\psi \equiv 0$, and
+$R(y) = \ip{\bar{\phi}}{y}_{\sH} + \frac{1}{2}\|y\|_{\sH}^2$.
+To see this, note that 
+\begin{align}
+\arg\min_{y \in \sH} \blf{x}{y} - R(y)
+ &= \arg\min_{y \in \sH} \ip{\bE_{x}\phi-\bar{\phi}}{y}_{\sH} - \frac{1}{2}\|y\|_{\sH}^2 \\
+ &= \bE_u[\phi(x)] - \bar{\phi}.
+\end{align}
+For $x = 0$, this gives us the first bullet point. For $x = \bar{x}_t$, 
+this gives us the third bullet point. Finally, the second bullet point 
+is already in the form given in \dual.
+
+Note that $R$ is strongly convex with respect to $\|\cdot\|_{\sH}$ and that 
+$R^*(u) = \frac{1}{2}\|\bar{\phi}-\bE_{x}\phi\|_{\sH}^2$. We can 
+therefore apply Corollary~\ref{thm:method-2} to obtain the bound
+\begin{align*}
+\lefteqn{\frac{1}{2}\|\bar{\phi}-\frac{1}{T}\sum_{t=1}^T \phi(x_t)\|_2^2} \\
+ &\leq \inf_{u^*} \frac{1}{2}\|\bar{\phi}-\bE_{u^*}[\phi(x)]\|_2^2 + \frac{2r^2\log(T+1)}{T} \\
+ &= \frac{2r^2\log(T+1)}{T},
+\end{align*}
+where $r \defined \sup_{m \in \sM} \|m\|_2$. This is a slightly weaker 
+version of the typical herding bound on MMD.
+
+If we do not restrict $\alpha_{t}$ to be 1, we obtain a class of algorithms
+we call {\em $\alpha_{t}$-weighted herding}. For the $\alpha_t = t$ we obtain 
+a stronger bound of $\frac{8r^2}{T}$.
+
+\subsection{$q$-herding}
+\label{sec:infinite-case}
+
+The convergence bound for herding implicitly assumes that 
+$\sM$ is bounded in norm. Assuming that $\sS$ is compact 
+and that $\sH$ is finite-dimensional, this will always be true. However, in 
+the infinite-dimensional case this may no longer be true. 
+For instance, consider $\sS = \{1,\ldots,N\}$ and let 
+$\phi : \sS \to \ell^3(\bZ_{\geq 0})$ be
+defined by $\phi(n)_i = \frac{1}{\sqrt{n+i}}$. Then 
+$\|\phi(n)\|_2 = \infty$ for each $n \in \sS$, and so herding 
+yields no convergence guarantees. Indeed, the algorithm 
+does not even necessarily make sense: since $y$ is 
+no longer guaranteed to have finite $\ell^2$ norm, the 
+inner product $\ip{\phi(v)}{y}$ may not be defined.
+
+Note, however, that in this case
+$\|\phi(n)\|_3 = \sqrt[3]{\sum_{i=0}^{\infty} (n+i)^{-3/2}} < \infty$.
+(In fact, the maximum is equal to
+$\|\phi(1)\|_3 = \sqrt[3]{\zeta(3/2)} < 1.378$.) This motivates 
+a generalization of herding in which we minimize 
+$\|\bE_{x}[\phi]-\bar{\phi}\|_3^3$ instead of 
+$\|\bE_{x}[\phi]-\bar{\phi}\|_2^2$.
+
+More generally, for any 
+$p \geq 2$ and $q$ such that $\frac{1}{p} + \frac{1}{q} = 1$, we can take 
+$h \equiv 0$ and $R(y) = \ip{\bar{\phi}}{y} + \frac{1}{q}\|y\|_q^q$. 
+Then $R^*(u) = \frac{1}{p}\|\bE_{x}\phi-\bar{\phi}\|_p^p$. And 
+$\left(\frac{\partial R^*}{\partial v}\right)_i = \sign(v_i) \cdot |v_i|^{p-1}$. 
+Therefore, define the ``correction function'' $C_p$ by
+\begin{equation}
+C_p(u)_i \defined \sign(v_i) \cdot |v_i|^{p-1}.
+\end{equation}
+We obtain the following \emph{$q$-herding} updates:
+\begin{itemize}
+\item $y_{1} = C_p(-\bar{\phi})$
+\item $v_{t} \in \arg\min_{v \in \sS} \ip{\phi(v)}{y_t}$
+\item $y_{t+1} = C_p\left(\frac{1}{t} \sum_{s=1}^t \phi(v_s)-\bar{\phi}\right)$
+\end{itemize}
+Note that $\|C_p(v)\|_q^q = \sum_{i} |v_i|^{q(p-1)} = \sum_{i} |v_i|^p = \|u\|_p^p$. 
+Therefore, $C_p(v) \in \ell^q(\bZ_{\geq 0})$ whenever $v \in \ell^p(\bZ_{\geq 0})$. By 
+H\"{o}lder's inequality, it follows that $\ip{u}{y_t}$ exists for all 
+$v \in \ell^p(\bZ_{\geq 0})$ and hence the $q$-herding updates are well-defined.
+
+We now show that $q$-herding converges at a rate of $O(T^{-1/p})$. By Proposition~\ref{prop:method-2}, we know that
+\begin{align}
+\frac{1}{p}\|\bar{\phi}-\frac{1}{T}\sum_{t=1}^T \phi(v_t)\|_p^p \leq \frac{1}{A_T} \sum_{t=1}^T A_tD_{R^*}(\bar{v}_{t+1}\|\bar{v}_t).
+\end{align}
+We can no longer use Corollary~\ref{cor:method-2} since $\|\cdot\|_p^p$ is not strongly convex. 
+Instead, we use the following two inequalities (proofs are given in the Supplementary Material):
+\begin{lemma}
+Let $x, y \in \bR_{\geq 0}$. Then:
+\begin{equation*}
+x^p-py^{p-1}x+(p-1)y^p \leq \binom{p}{2}(x-y)^2\max(x,y)^{p-2}
+\end{equation*}
+and
+\begin{equation*}
+(y-z)^2\max(x,y)^{p-2} \leq 4\max(x,y,z)^p
+\end{equation*}
+\end{lemma}
+Using these, we obtain the bound
+\(
+\lefteqn{D_{R^{*}}(\bar{v}_{t+1} \| \bar{v}_t)} \\
+ &= \frac{1}{p} \sum_{i} \bar{v}_{t+1,i}^p - p\bar{v}_{t+1,i}\bar{v}_{t,i}^{p-1} + (p-1)\bar{v}_{t,i}^{p} \\
+ &\leq \frac{1}{p}\binom{p}{2} \sum_i (\bar{v}_{t+1,i}-\bar{v}_{t,i})^2\max(\bar{v}_{t+1,i},\bar{v}_{t,i})^{p-2} \\
+ &= \frac{1}{p}\binom{p}{2}\frac{\alpha_{t+1}^2}{A_{t+1}^2} \sum_i (u_{t+1,i}-\bar{v}_{t})^2\max(\bar{v}_{t+1,i},\bar{v}_{t,i})^{p-2} \\
+ &\leq 2(p-1)\frac{\alpha_{t+1}^2}{A_{t+1}^2} \sum_i \max(\bar{v}_{t,i},\bar{v}_{t+1,i},u_{t+1,i})^p \\
+ &\leq 2(p-1)\frac{\alpha_{t+1}^2}{A_{t+1}^2} \sum_i \bar{v}_{t,i}^p+\bar{v}_{t+1,i}^p+u_{t+1,i}^p \\
+ &\leq 6(p-1)\frac{\alpha_{t+1}^2}{A_{t+1}^2} r_p^p
+\)
+Plugging back in yields a convergence rate of $\frac{6(p-1)r_p^p(\log(T)+1)}{T}$ for $\alpha_t = 1$ 
+and $\frac{24(p-1)r_p^p}{T}$ for $\alpha_t = t$. We therefore obtain a convergence rate of $O(T^{-1/p})$ 
+in the $\ell^p$ norm, even if $\sM$ is not bounded in the $\ell^2$ norm.
+
+\subsection{Herding and Maximum Entropy}
+\label{sec:max-ent}
+
+\citet{Welling:2009a} and \citet{Bach:2012b} have observed that herding appears to be approximately building 
+samples from the maximum entropy distribution for a given collection of moment 
+constraints. In this section we present a herding-style algorithm that more 
+explicitly yields a maximum-entropy distribution. Our hope is that comparing 
+the two algorithms may help to make the connection between herding and maximum 
+entropy more explicit.
+
+The key idea is to use the primal regularizer $\psi(x) = -\eta H(x)$, where 
+$H(x)$ is the entropy of $x$ and $\eta \in \bR_{>0}$. We will still use 
+$R(y) = \ip{\bar{\phi}}{y} + \frac{1}{2} \|y\|_{\sH}^2$.
+In this case, the \dual updates are
+\begin{itemize}
+\item $y_1 = -\bar{\phi}$
+\item $x_t(v) \propto \exp\left(-\frac{1}{\eta}\ip{\phi(v)}{y_t}\right)$
+\item $y_{t+1} = \bE_{\bar{x}_t}\phi - \bar\phi$.
+\end{itemize}
+Corollary~\ref{cor:method-2} implies that, for 
+$\bar{x}_T = \frac{1}{T} \sum_{t=1}^T x_t$, we have
+\begin{align*}
+\lefteqn{-\eta H(\bar{x}_T) + \|\bar{\phi}-\bE_{\bar{x}_T}[\phi(x)]\|_{\sH}^2} \\
+ &\leq \inf_{x} -\eta H(x) + \|\bar{\phi}-\bE_{x}\phi\|_{\sH}^2 + \frac{2r^2\log(T+1)}{T} \\
+ &\leq -\eta H_{\max}(\bar{\phi}) + \frac{2r^2\log(T+1)}{T},
+\end{align*}
+where $H_{\max}(\bar{\phi})$ is the maximum entropy of any distribution whose 
+moments are $\bar{\phi}$.
+
+Note that as $\eta \to 0$, $u_{t}$ concentrates around its mode, converging to a delta function at the herding sample location. It is thus possible that, under the proper regularity conditions, it can be shown using entropically regularized \bmd that herding converges to a distribution that is close to the maximum entropy distribution. However, we leave this line of investigation for future work. 
+
+\end{document}

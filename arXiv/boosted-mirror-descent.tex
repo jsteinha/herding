@@ -1,0 +1,173 @@
+\documentclass[paper.tex]{subfiles}
+\begin{document}
+
+\section{Boosted Mirror Descent}
+\label{sec:algorithm}
+
+Our results primarily rely on a pair of novel convex optimization algorithms we call primal and dual boosted mirror descent. They are inspired by the decomposition used in \cite{Bach:2012b}.
+
+\subsection{Convex Optimization}
+
+Before introducing the boosted mirror descent (\bmd) algorithms, we establish notation and recall some basic definitions related to convex optimization.
+
+Let $f$ be a real function whose domain is a normed inner product space. The {\em convex conjugate} $f^{*}$ of $f$ is defined as
+\[
+f^{*}(x') \eqdef \max_{x} \ip{x}{x'} - f(x).
+\]
+If $f$ is proper, lower semi-continuous, and convex, then by the 
+Fenchel-Moreau theorem $f = f^{**}$, i.e.
+\[
+f(x) = \max_{x'} \ip{x}{x'} - f^{*}(x').
+\]
+Throughout the paper, we will assume without further notice that functions are proper and lower semi-continuous when required. The (sub)gradients of $f^{*}$ and $f$ can be defined as any argument that maximizes the previous two equations:
+\[
+\partial f^{*}(x') &\in \argmax_{x} \ip{x}{x'} - f(x) \\
+\partial f(x) &\in \argmax_{x'} \ip{x}{x'} - f^{*}(x').
+\]
+
+In order to prove fast convergence, we will require additional assumptions beyond convexity. 
+Define the \emph{Bregman divergence} of a convex function to be
+\[
+D_f(x \| x') = f(x)-\ip{\partial f(x')}{x'-x} - f(x'), 
+\]
+which is a measure of ``how convex'' $f$ is between $x$ and $x'$. 
+We say that a function $f$ is \emph{strongly convex with respect 
+to a norm $\|\cdot\|$} if
+\[
+D_f(x \| x') \geq \frac{1}{2}\|x-x'\|^2
+\]
+A related notion is \emph{strong smoothness}: a convex function $f$ 
+is \emph{strongly smooth with respect to $\|\cdot\|$} if
+\[ D_f(x \| x') \leq \frac{1}{2}\|x-x'\|^2 \]
+An important result is that $f$ is strongly convex with respect to $\|\cdot\|$ 
+if and only if its Fenchel conjugate $f^*$ is strongly smooth with respect 
+to the dual norm $\|\cdot\|_*$.
+
+\subsection{The Boosted Mirror Descent Algorithms}
+
+We can now define the \bmd  algorithms. Let $X$ and $Y$ be convex subsets 
+of the Banach spaces $\mcX$ and $\mcY$, respectively, and let 
+$\blf{\cdot}{\cdot}$ be a bilinear map on $\mcX \times \mcY$; typically 
+$\blf{\cdot}{\cdot}$ will correspond to an inner product.
+% but we will use the bracket notation for convenience even when this is not the case.
+Consider the two-argument loss function $L : X \times Y \to \reals$ 
+defined as
+\[
+L(x,y) = \psi(x) + \blf{x}{y} - R(y)
+\]
+for which we wish to find arguments that obtain $L_{*} = \min_{x}\max_{y} L(x, y)$. Taking only the maximum, we have the one-argument loss function
+\[
+L(x)
+&= \psi(x) + \max_{y \in \Theta} \left\{\blf{x}{y} - R(y) \right\} \\
+&= \psi(x) + R^{*}(x).
+\]
+We can think of $\psi$ as a \emph{primal regularizer} and $R$ as a \emph{dual regularizer}.  The pair of regularization functions $\psi$ and $R$ define a flexible class of functions to optimize, as seen from the following examples:
+\begin{enumerate}
+\item Let $X$ be the probability simplex over a space $\sS$, let $\phi : \sS \to \reals^d$ be a collection 
+      of statistics, and let $Y$ be the unit $L^1$ ball in $\reals^d$. Let $\psi(x) = 0$, 
+      $\blf{x}{y} = y^T\bE_{v \sim x}[\phi(v)]$, and 
+      $R(y) = \blf{x_0}{y}$. Then $L(x)$ is the 
+      \emph{maximum mean discrepancy} between $x$ and $x_0$ relative to $\phi$.
+\item \NA{JHH: I don't remember what this example what supposed to be}
+	  Let $\psi(x) = 0$ and $R(y) = S^*(i^{-1}(y))$ where $S^*$ is the 
+      convex conjugate of any strongly convex function $S : U \to \bR$. Then $L(x) = S(x)$ 
+      as long as $i^{-1}(\Theta) = \sB_{U}$.
+\item Let $X = Y = \reals^d$. Let $\blf{x}{y} = \ip{x}{y}$, $\psi(x) = \|x\|_1$, $R(x) = \blf{x_0}{y} + \frac{1}{2} \|y\|_2^2$. 
+      Then $L(x) = \|x\|_1 + \frac{1}{2} \|x-x_0\|_2^2$. 
+\end{enumerate}
+
+We will assume 
+throughout that $\psi$ and $R$ are both convex functions, and furthermore that 
+$\arg\max_{x} \psi(x) + \blf{x}{y}$ can be efficiently 
+computed for all values of $y$.
+
+%In this paper we will consider a family of methods for minimizing $L(x)$, 
+%which are based on Bach's generalization of the Frank-Wolfe algorithm and can 
+%be interpreted as boosted mirror descent.
+
+Mirror descent, combined with boosting, yields an algorithm for finding 
+``saddle points'' of $L(x, y)$. 
+For notational convenience, for a sequence of weights $\alpha_1,\alpha_2,\ldots$ 
+let 
+\(
+\bar{x}_t = \frac{\sum_{s=1}^t \alpha_{s}x_{s}}{A_{t}} 
+\quad \text{and} \quad 
+\bar{y}_t = \frac{\sum_{s=1}^t \alpha_{s}y_{s}}{A_{t}},
+\quad \text{where} \quad 
+A_{t} \defined \sum_{s=1}^t \alpha_s.
+\)
+
+Then 
+the {\em primal boosted mirror descent} (\primal) algorithm is:
+\begin{enumerate}
+\item $x_1 \in \arg\min_x \psi(x)$
+\item $y_{t} \in \arg\max_{y \in \Theta} \blf{y}{x_t} - R(y) = \partial R^{*}(x_{t})$
+\item $x_{t+1} \in \arg\min_{x} \psi(x) + \blf{x}{\bar{y}_t} = \partial \psi^{*}(-\bar y_{t})$
+\end{enumerate}
+As long as $\psi$ is strongly convex, for the proper choice of $\alpha_{t}$ we obtain the 
+bound (see Corollary~\ref{cor:method-1}):
+\begin{equation}
+\sup_{y \in \Theta} L(\bar{x}_T, y) \leq L_{*} + O(1/T).
+\end{equation}
+In other words, $\bar{x}_T$ is close to being a global minimum of $L(x)$.
+However, it is often the case that $\psi$ is not strongly convex but $R$ is strongly convex. As we shall see, this will be the case for our application to herding.
+In this case we may wish to use the following slightly different algorithm, which we call {\em dual boosted mirror descent} (\dual):
+\begin{enumerate}
+\item $y_1 \in \arg\max_{y} R(y)$
+\item $x_t \in \arg\min_{x} \psi(x) + \blf{x}{y_t} = \partial \psi^{*}(-y_{t})$
+\item $y_{t+1} \in \arg\max_{y \in \Theta} \langle y, \bar{x}_t \rangle - R(y) = \partial R^{*}(\bar x_{t})$
+\end{enumerate}
+We then obtain the following bound 
+when $R$ is strongly convex (see Corollary~\ref{cor:method-2}):
+\[ \sup_{y \in \Theta} L(\bar{x}_T, y) \leq L_{*} + O(1/T). \]
+
+
+
+\subsection{Connections to Other Gradient Descent Algorithms}
+
+As suggested by their names, the \bmd algorithms are closely related: they are dual to each other in the sense that 
+performing \primal on $L(x,y)$ is the same as performing \dual on $L'(y, x) \eqdef -L(x,y)$. This relationship is obvious by inspection of the update equations:
+\(
+\text{Primal} && \text{Dual} \\
+y_{t} &= \partial R^{*}(x_{t}) & y_{t+1} &= \partial R^{*}(\bar x_{t}) \\
+x_{t+1} &= \partial \psi^{*}(-\bar y_{t}) & x_t &= \partial \psi^{*}(-y_{t})
+\)
+This duality is analogous to that between mirror descent and conjugate gradient descent \citep{Bach:2012b}. \md minimizes $g(x) + f(x)$ and requires that $g$ be $\alpha$-strongly convex while \cgd minimizes $f^{*}(x) + g^{*}(x)$ and requires that $g$ be $\alpha$-strongly convex. The update equations for \md are
+\(
+y_{t} &= \partial f(x_{t})  \\
+\bar y_{t} &=  (1 - \rho_{t+1})\partial g(x_{t}) - \rho_{t+1}y_{t}  \\
+x_{t+1} &=  \partial g^{*}(\bar y_{t}) 
+\)
+and for \cgd are
+\(
+ y_{t+1} &= \partial f(x_{t}) \\
+\bar y_{t+1} &= (1 - \rho_{t})\bar y_{t} + \rho_{t} y_{t+1}  \\
+x_{t} &= \partial g^{*}(-\bar y_{t}).
+\)
+In fact, the \bmd algorithms are very closely related to \cgd and \md: \cgd can be obtained from \dual and \md obtained from \primal. The relationships are given in Table~\ref{tab:connections}. The table also shows how $\alpha_{t}$-weighted herding and $q$-herding --- which are discussed in the next section --- are obtained from \bmd. 
+
+\renewcommand{\arraystretch}{1.5}
+\begin{center}
+\begin{table}[t]
+\begin{adjustwidth}{-.5in}{-.5in}
+\caption{Formulation of herding and convex optimization algorithms in terms of \bmd. Full details relating \md and \cgd to \bmd are given in the Supplementary Material. See also \citet{Bach:2012b}.}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\begin{tabularx}{1.15\textwidth}{L|lllcL}
+Algorithm 			& $\psi(x)$ 	& $R(y)$ & $\alpha_{t}$ & \bmd Algorithm & Notes 
+\\ \hline
+herding 			& 0			& $\blf{\bar x}{y} + \frac{1}{2} \| y \|_{\sH}^{2}$ 	& 1				 	& \dual & 
+\\
+$\alpha_{t}$-weighted herding 	& 0	& $\blf{\bar x}{y} + \frac{1}{2} \| y \|_{\sH}^{2}$ 	& unconstrained 	& \dual & $\sum_{s =1}^{t} \alpha_{t} > 0~\forall t$
+\\ 
+$q$-herding			& 0			& $\blf{\bar\phi}{y} + \frac{1}{q} \| y \|_{q}^{q}$ 	& unconstrained 	& \dual & $1 \le q \le 2$
+\\ 
+\md					& $g(x)$	& $f^{*}(y)$				& $\rho_{t}/\prod_{s=1}^{t} (1 - \rho_{s})$				& \primal & 
+\\ 
+\cgd				& $f^{*}(y)$& $g(x)$					& $\rho_{t}/\prod_{s=1}^{t} (1 - \rho_{s})$				& \dual &
+\\
+\end{tabularx}
+\label{tab:connections}
+\end{adjustwidth}
+\end{table}
+\end{center}
+\end{document}

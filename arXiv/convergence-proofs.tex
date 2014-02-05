@@ -1,0 +1,201 @@
+\documentclass[paper.tex]{subfiles}
+
+\begin{document}
+\section{Convergence Proofs}
+\label{sec:proofs}
+We now prove the convergence results cited in Section~\ref{sec:algorithm}. 
+Throughout this section, assume that $\alpha_1,\ldots,\alpha_T$ is 
+a sequence of real numbers and that $A_t = \sum_{s=1}^t \alpha_s > 0$. 
+Also recall that the Bregman divergence is given by 
+$ D_f(x \| x') = f(x)-\ip{\partial f(x')}{x'-x} - f(x')$.
+
+Our proofs hinge on the following key lemma:
+%, whose proof is given in the Supplementary Material:
+%%% MAIN LEMMA %%%
+\begin{lemma}
+\label{lem:bregman}
+Let $z_1,\ldots,z_T$ be an arbitrary sequence and let $f(x)$ be a strictly convex 
+function. Define $\bar{z}_t = \frac{1}{A_t} \sum_{s=1}^t \alpha_s z_s$.
+
+Let $x_1,\ldots,x_T$ be chosen such that $x_{t+1} \in \arg\min_{x} f(x) + \ip{x}{\bar{z}_t}$. 
+Then for any $x^*$ we have
+\begin{align*}
+\frac{1}{A_T} \sum_{t=1}^T \{\alpha_t(f(x_t) + \ip{x_{t}}{z_{t}})\}
+&\leq f(x^*) + \ip{x^{*}}{\bar{z}_t} + \frac{1}{A_T} \sum_{t=1}^T A_t D_{f}(x_t \| x_{t+1}). 
+\end{align*}
+\end{lemma}
+
+%%% START PROOF %%%
+\begin{proof}
+First note that, if $x_0 = \arg\min f(x) + \ip{x}{z}$, 
+then $\partial f(x_0) = -z$.
+
+%\NA{JNS: In the following proof, (2) is by the update formula for $x_{t+1}$ together with the preceding observation.  (3) is applying (2). (4) and (5) are re-arranging the sum. (6) is definition of Bregman divergence. (7) is the observation again. (8) is the definition of $x_{T+1}$.}
+
+Now note that
+\begin{align}
+\alpha_{t}z_{t} 
+&= A_{t}\bar z_{t} - A_{t-1}\bar z_{t-1} \\
+&= - A_{t}\partial f(x_{t+1}) + A_{t-1} \partial f(x_{t}),
+\end{align}
+so we have
+\begin{align*}
+\sum_{t=1}^T \{\alpha_t(f(x_t) + \ip{x_{t}, z_{t}})\}
+ &= \sum_{t=1}^T \{\alpha_t f(x_t) + \langle A_{t-1} \partial f(x_t) - A_t \partial f(x_{t+1}), x_t \rangle\} \\
+ &= \sum_{t=1}^T \{\alpha_t f(x_t) - \langle A_{t} \partial f(x_{t+1}), x_t-x_{t+1} \rangle\} \\
+ & \quad - A_{T}\langle \partial f(x_{T+1}), x_{T+1} \rangle \\
+ &= \sum_{t=1}^T \{A_t f(x_t) - \langle A_{t} \partial f(x_{t+1}), x_t-x_{t+1} \rangle - A_t f(x_{t+1})\}  \\
+ &\quad+ A_T(f(x_{T+1}) - \langle \partial f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
+ &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\}  \\
+ &\quad+ A_T(f(x_{T+1}) - \langle \partial f(x_{T+1}), x_{T+1} \rangle) \nonumber \\
+ &= \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x_{T+1}) + \langle \bar{z}_T, x_{T+1} \rangle) \\
+ &\leq \sum_{t=1}^T \{A_tD_f(x_t \| x_{t+1})\} + A_T(f(x^*) + \langle \bar{z}_T, x^* \rangle). 
+\end{align*}
+Dividing both sides by $A_T$ completes the proof.
+\end{proof}
+%%% END PROOF %%%
+
+We also note that $D_f(x_t \| x_{t+1}) = D_{f^*}(\bar{z}_{t+1} \| \bar{z}_t)$. 
+This form of the bound will often be more useful to us.
+\begin{lemma}
+\label{lem:convexity}
+Suppose that $D_f(x' \| x) \geq \frac{1}{2}\|x-x'\|^2$ for some 
+norm $\|\cdot\|$ (i.e.\ $f$ is strongly 
+convex with respect to $\|\cdot\|$).
+Then $D_{f^*}(x' \| x) \leq \frac{1}{2}\|x-x'\|_{*}^2$.
+\end{lemma}
+
+
+%%% ALGORITHM 1 ANALYSIS %%%
+% Convergence proposition
+\begin{proposition}[Convergence of \primal]
+\label{prop:method-1}
+For the \primal algorithm, 
+\begin{equation}
+\sup_{y} L(\bar{x}_T, y) \leq \sup_{y} L(x^*, y) + \frac{1}{A_T} \sum_{t=1}^T A_tD_\psi(x_t \| x_{t+1}).
+\end{equation}
+\end{proposition}
+\begin{proof}
+Note that $L(x_t, y_t) = \max_{y} L(x_t, y)$ by construction. 
+Also note that, if we invoke Lemma~\ref{lem:bregman} with $f = \psi$ and 
+$z_t = y_t$ then we get the inequality
+\begin{align}
+\frac{1}{A_T} \sum_{t=1}^T \alpha_t L(x_t, y_t) 
+&\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(x^*, y_t) \\
+&\quad + \frac{1}{A_T} \sum_{t=1}^T A_tD_\psi(x_t \| x_{t+1}). \nonumber
+\end{align}
+Combining these together, we get the string of inequalities
+\begin{align*}
+L(\bar{x}_T, y) 
+ &= L\left(\frac{1}{A_T} \sum_{t=1}^T \alpha_tx_t, y\right) \\
+ &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(x_t, y) \\
+ &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(x_t, y_t) \\
+ &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(x^*, y_t) + \frac{1}{A_T} \sum_{t=1}^T A_t D_\psi(x_t \| x_{t+1}) \\
+ &\leq \sup_{y} L(x^*, y) + \frac{1}{A_T} \sum_{t=1}^T A_tD_\psi(x_t \| x_{t+1}),
+\end{align*}
+as was to be shown.
+\end{proof}
+
+% Convergence rate theorem
+\begin{theorem}
+\label{thm:method-1}
+Suppose that $\psi$ is strongly convex with respect to a norm $\|\cdot\|$ 
+and let $r = \sup_{y} \|y\|_{*}$. Then 
+\[ \sup_{y} L(\bar{x}, y) \leq \sup_{y} L(x^*, y) + \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}. \]
+\end{theorem}
+\begin{proof}
+By Lemma~\ref{lem:convexity}, we have 
+\begin{align*}
+D_\psi(x_t \| x_{t+1}) &= D_{h^*}(\bar{y}_{t+1} \| \bar{y}_{t}) \\
+ &\leq \frac{1}{2}\|\bar y_{t+1}-\bar y_{t}\|_{*}^2 \\
+ &= \frac{1}{2}\left\|\frac{\sum_{s \leq t}\alpha_sy_s}{\sum_{s \leq t} \alpha_s} - \frac{\sum_{s \leq t+1}\alpha_sy_s}{\sum_{s \leq t+1} \alpha_s}\right\|_{*}^2 \\
+ &= \frac{1}{2}\left\|\frac{\alpha_{t+1}}{A_tA_{t+1}} \sum_{s \leq t} \alpha_sy_s - \frac{\alpha_{t+1}}{A_{t+1}} y_{t+1}\right\|_{*}^2 \\
+ &\leq \frac{1}{2} \left(\frac{\alpha_{t+1}}{A_tA_{t+1}} \sum_{s \leq t} \alpha_s\|y_s\|_{*}^2 + \frac{\alpha_{t+1}}{A_{t+1}} \|y_{t+1}\|_{*}^2\right)^2 \\
+ &\leq \frac{2r^2\alpha_{t+1}^2}{A_{t+1}^2}.
+\end{align*}
+It follows that 
+\begin{align*}
+\frac{1}{A_T} \sum_{t=1}^T A_tD_\psi(x_t \| x_{t+1}) &\leq \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}.
+\end{align*}
+\end{proof}
+
+% Convergence rate corollary 
+\begin{corollary} 
+\label{cor:method-1}
+Under the hypotheses of Theorem \ref{thm:method-1}, for $\alpha_{t} = 1$ we have
+\[ \sup_{y} L(\bar{x}, y) \leq \sup_{y} L(x^*, y) + \frac{2r^2 (\log (T) + 1)}{T}. \]
+and for $\alpha_t = t$ we have
+\[ \sup_{y} L(\bar{x}, y) \leq \sup_{y} L(x^*, y) + \frac{8r^2}{T}. \]
+\end{corollary}
+\begin{proof}
+If we let $\alpha_t = 1$, then $A_t = t$ and $\frac{\alpha_{t+1}^2A_t}{A_{t+1}^2} = \frac{t}{(t+1)^{2}} \le \frac{1}{t}$.
+We therefore get
+\begin{equation}
+\frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2} \leq \frac{2r^2}{T} \sum_{t=1}^{T}\frac{1}{t} \leq \frac{2r^2(\log (T) + 1)}{T+1}.
+\end{equation}
+If we let $\alpha_t = t$, then $A_t = \frac{t(t+1)}{2}$ and 
+$\frac{\alpha_{t+1}^2A_t}{A_{t+1}^2} = \frac{2(t+1)^2t(t+1)}{(t+1)^2(t+2)^2} = \frac{2t(t+1)}{(t+2)^2} \leq 2$.
+We therefore get
+\begin{equation}
+\frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2} \leq \frac{4r^2}{T(T+1)} \sum_{t=1}^{T}2 = \frac{8r^2}{T+1},
+\end{equation}
+which completes the proof.
+\end{proof}
+
+%%% ALGORITHM 2 ANALYSIS %%%
+% Convergence proposition
+\begin{proposition}[Convergence of \dual]
+\label{prop:method-2}
+Consider the updates $x_t \in \arg\min_{x} \psi(x) + \langle y_t, u \rangle$ 
+and $y_{t+1} \in \arg\max_{y} \langle y, \bar{x}_t \rangle - R(y)$. 
+Then we have 
+\begin{equation}
+\sup_{y} L(\bar{x}, y) \leq \sup_{y} L(x^*, y) + \frac{1}{A_T} \sum_{t=1}^T A_tD_{R}(y_t \| y_{t+1}).
+\end{equation}
+\end{proposition}
+\begin{proof}
+If we invoke Lemma~\ref{lem:bregman} with $f=R$ and $z_t=-x_t$, then we get 
+the inequality
+\begin{align}
+\frac{1}{A_T} \sum_{t=1}^T -\alpha_t L(x_t, y_t) 
+&\leq \frac{1}{A_T} \sum_{t=1}^T -\alpha_t L(x_t, y^*) \\
+&\quad - \frac{1}{A_T} \sum_{t=1}^T A_tD_R(y_t \| y_{t+1}). \nonumber
+\end{align}
+Re-arranging yields
+\begin{align}
+\frac{1}{A_T }\sum_{t=1}^T \alpha_t L(x_t, y^*) 
+&\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(x_t, y_t) \\
+&\quad+ \frac{1}{A_T} \sum_{t=1}^T A_tD_R(y_t \| y_{t+1}). 
+\end{align}
+Now, we have the following string of inequalities:
+\begin{align*}
+L(\bar{x}, y) &= L\left(\frac{1}{A_T} \sum_{t=1}^T \alpha_t x_t, y\right) \\
+ &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(x_t, y) \\
+ &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(x_t, y_t) + \frac{1}{A_T} \sum_{t=1}^T A_t D_R(y_t \| y_{t+1}) \\
+ &= \frac{1}{A_T} \sum_{t=1}^T \alpha_t \inf_{x} L(u, y_t) + \frac{1}{A_T} \sum_{t=1}^T A_tD_R(y_t \| y_{t+1}) \\
+ &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t L(x^*, y_t) + \frac{1}{A_T} \sum_{t=1}^T A_tD_R(y_t \| y_{t+1}) \\
+ &\leq \frac{1}{A_T} \sum_{t=1}^T \alpha_t \sup_{y} L(x^*, y) + \frac{1}{A_T} \sum_{t=1}^T A_tD_R(y_t \| y_{t+1}) \\
+ &= \sup_{y} L(x^*, y) + \frac{1}{A_T} \sum_{t=1}^T A_tD_R(y_t \| y_{t+1}),
+\end{align*}
+as was to be shown.
+\end{proof}
+
+% Convergence rate theorem
+\begin{theorem}
+\label{thm:method-2}
+Suppose that $R$ is strongly convex with respect to a norm $\|\cdot\|$ 
+and let $r = \sup_{x} \|u\|_{*}$. Then 
+\[ \sup_{y} L(\bar{x}, y) \leq \sup_{y} L(x^*, y) + \frac{2r^2}{A_T} \sum_{t=1}^T \frac{\alpha_{t+1}^2A_t}{A_{t+1}^2}. \]
+\end{theorem}
+\begin{corollary}
+\label{cor:method-2}
+Under the hypotheses of Theorem \ref{thm:method-2}, for $\alpha_t = 1$ we have
+\[ \sup_{y} L(\bar{x}, y) \leq \sup_{y} L(x^*, y) + \frac{2r^2(\log(T) + 1)}{T} \]
+and for $\alpha_t = t$ we have
+\[ \sup_{y} L(\bar{x}, y) \leq \sup_{y} L(x^*, y) + \frac{8r^2}{T} \]
+\end{corollary}
+\begin{proof}[Proofs]
+The proofs are identical to those for \primal.
+\end{proof}
+
+\end{document}

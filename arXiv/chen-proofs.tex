@@ -1,0 +1,64 @@
+\documentclass[paper.tex]{subfiles}
+
+\begin{document}
+\section{An Upper Bound in Infinite Dimensions}
+\label{sec:chen-proofs}
+
+An intriguing aspect of classical herding is that it is known to have a convergence rate of 
+$O(1/T^2)$ under suitable conditions, as was shown in \citet{Chen:2010a}. In this section, 
+we will need to assume that $\psi(x)$ is the indicator function for $X$ (i.e. $0$ on $X$ and 
+$\infty$ outside of it) and that $R(y) = \ip{x_0}{y} + R_0(y)$, where 
+$R_0$ exhibits \emph{quadratic scaling}: $R_0(sy) = s^2R_0(y)$. Note that 
+this implies that $R_0^*(x-x_0) = R^*(x)$.
+For simplicity 
+we will focus on the case $\alpha_t = 1$. Then we have 
+the following bound:
+\begin{theorem}
+\label{thm:chen}
+Suppose that $R$ is strongly convex with respect to the norm $\|\cdot\|$ and 
+let $r_* \eqdef \sup_{x \in U} \|x\|_*$. Also suppose that $\psi \equiv 0$ and 
+that $R_0$ exhibits quadratic scaling as above. Define 
+\[ \gamma^* \eqdef \inf_{y \in y} \sup_{x \in U} \frac{\ip{-y}{x-x_0}}{\sqrt{R(y)}}. \]
+Then $R(y_{t+1}) \leq \frac{2r_*^2+(2r_*^2/\gamma_*)^2}{t^2}$ as long 
+as $\gamma^* > 0$.
+\end{theorem}
+This corresponds to Proposition 1 of \citet{Chen:2010b} for $R_{0}(y) = \frac{1}{2}\|y\|_2^2$. Note that if there is an $\ell^2$ ball of radius $\epsilon$ 
+around $x_0$ that is contained in $u$ then $\gamma^* \geq \frac{\epsilon}{r_*}$ 
+in this case, which is how Chen's result follows from ours.
+\begin{proof}[Proof of Theorem~\ref{thm:chen}]
+The key quantity we will analyze is $(t-1)^2R(y_t)$. Note that we have
+\begin{align*}
+\lefteqn{(t-1)^2R(y_t) - t^2R(y_{t+1})} \\
+ &= (t-1)^2R^*(\bar{x}_{t-1})-t^2R^*(\bar{x}_t) \\
+ &= (t-1)^2R^*(\bar{x}_{t-1})-t^2R_0^*(\bar{x}_t-x_{0}) \\
+ &= (t-1)^2\left[R^*(\bar{x}_{t-1})-R_0^*((t/(t-1))(\bar{x}_t-x_{0}))\right] \\
+ &= (t-1)^2\left[R^*(\bar{x}_{t-1})-R^*\left(\frac{t\bar{x}_t-x_{0}}{t-1}\right)\right] \\
+ &= (t-1)^2\left[\ip{\partial R^*(\bar{x}_{t-1})}{\bar{x}_{t-1}-\frac{t\bar{x}_t-x_{0}}{t-1}}-D_{R^*}\left(\frac{t\bar{x}_t-x_{0}}{t-1} \middle\| \bar{x}_{t-1}\right)\right] \\
+ &\geq (t-1)^2\left[\ip{y_t}{-\frac{1}{t-1}(x_t-x_{0})}-\frac{1}{2}\left\|\frac{x_t-x_{0}}{t-1}\right\|_*^2\right] \\
+ &= -(t-1)\ip{y_t}{x_t-x_{0}}-\frac{1}{2}\|x_t-x_{0}\|_*^2 \\
+ &= -(t-1)\left[\inf_{x \in U} \ip{y_t}{x} - \ip{y_t}{x_{0}}\right]-\frac{1}{2}\|x_t-x_{0}\|_*^2 \\
+ &\geq (t-1)\sqrt{R(y_t)}\left[\inf_{y} \sup_{x \in U} \frac{\ip{-y}{x-x_0}}{\sqrt{R(y_t)}}\right]-2r_*^2 \\
+ &= \sqrt{(t-1)^2R(y_t)}\gamma^*-2r_*^2.
+\end{align*}
+There are now two possibilities for each $t$:
+\begin{enumerate}
+\item $t^2R(y_{t+1}) < (t-1)^2R(y_t)$, or
+\item $(t-1)^2R(y_t) \leq \frac{4r_*^4}{(\gamma^*)^2}$.
+\end{enumerate}
+In particular, consider the value of $t$ for which 
+$t^2R(y_{t+1})$ is maximized. Then by assumption 
+case $1$ cannot hold and so $(t-1)^2R(y_t) \leq \frac{4r_*^4}{(\gamma^*)^2}$.
+But then by applying the above sequence of inequalities 
+we also have 
+\begin{align*}
+\lefteqn{t^2R(y_{t+1}) - (t-1)^2R(y_t)} \\
+ &\leq 2r_*^2 - \sqrt{(t-1)^2R(y_t)}\gamma^* \\
+ &\leq 2r_*^2,
+\end{align*}
+hence $t^2R(y_{t+1}) \leq 2r_*^2 + \frac{4r_*^4}{(\gamma_*)^2}$. 
+Since $t^2R(y_{t+1})$ was maximal by assumption, we have
+$R(y_{t+1}) \leq \frac{2r_*^2+(2r_*/\gamma_*)^2}{t^2}$, which 
+completes the proof.
+\end{proof}
+
+\end{document}
