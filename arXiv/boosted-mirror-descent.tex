@@ -12,17 +12,17 @@ Before introducing the boosted mirror descent (\bmd) algorithms, we establish no
 
 Let $f$ be a real function whose domain is a normed inner product space. The {\em convex conjugate} $f^{*}$ of $f$ is defined as
 \[
-f^{*}(x') \eqdef \max_{x} \ip{x}{x'} - f(x).
+f^{*}(x') \eqdef \sup_{x} \ip{x}{x'} - f(x).
 \]
 If $f$ is proper, lower semi-continuous, and convex, then by the 
 Fenchel-Moreau theorem $f = f^{**}$, i.e.
 \[
-f(x) = \max_{x'} \ip{x}{x'} - f^{*}(x').
+f(x) = \sup_{x'} \ip{x}{x'} - f^{*}(x').
 \]
 Throughout the paper, we will assume without further notice that functions are proper and lower semi-continuous when required. The (sub)gradients of $f^{*}$ and $f$ can be defined as any argument that maximizes the previous two equations:
 \[
-\partial f^{*}(x') &\in \argmax_{x} \ip{x}{x'} - f(x) \\
-\partial f(x) &\in \argmax_{x'} \ip{x}{x'} - f^{*}(x').
+\partial f^{*}(x') &\in \arg\sup_{x} \ip{x}{x'} - f(x) \\
+\partial f(x) &\in \arg\sup_{x'} \ip{x}{x'} - f^{*}(x').
 \]
 
 In order to prove fast convergence, we will require additional assumptions beyond convexity. 
@@ -55,10 +55,10 @@ defined as
 \[
 L(x,y) = \psi(x) + \blf{x}{y} - R(y)
 \]
-for which we wish to find arguments that obtain $L_{*} = \min_{x}\max_{y} L(x, y)$. Taking only the maximum, we have the one-argument loss function
+for which we wish to find arguments that obtain $L_{*} = \inf_{x}\sup_{y} L(x, y)$. Taking only the maximum, we have the one-argument loss function
 \[
 L(x)
-&= \psi(x) + \max_{y \in \Theta} \left\{\blf{x}{y} - R(y) \right\} \\
+&= \psi(x) + \sup_{y \in Y} \left\{\blf{x}{y} - R(y) \right\} \\
 &= \psi(x) + R^{*}(x).
 \]
 We can think of $\psi$ as a \emph{primal regularizer} and $R$ as a \emph{dual regularizer}.  The pair of regularization functions $\psi$ and $R$ define a flexible class of functions to optimize, as seen from the following examples:
@@ -71,14 +71,14 @@ We can think of $\psi$ as a \emph{primal regularizer} and $R$ as a \emph{dual re
 \item \NA{JHH: I don't remember what this example what supposed to be}
 	  Let $\psi(x) = 0$ and $R(y) = S^*(i^{-1}(y))$ where $S^*$ is the 
       convex conjugate of any strongly convex function $S : U \to \bR$. Then $L(x) = S(x)$ 
-      as long as $i^{-1}(\Theta) = \sB_{U}$.
+      as long as $i^{-1}(Y) = \sB_{U}$.
 \item Let $X = Y = \reals^d$. Let $\blf{x}{y} = \ip{x}{y}$, $\psi(x) = \|x\|_1$, $R(x) = \blf{x_0}{y} + \frac{1}{2} \|y\|_2^2$. 
       Then $L(x) = \|x\|_1 + \frac{1}{2} \|x-x_0\|_2^2$. 
 \end{enumerate}
 
 We will assume 
 throughout that $\psi$ and $R$ are both convex functions, and furthermore that 
-$\arg\max_{x} \psi(x) + \blf{x}{y}$ can be efficiently 
+$\arg\sup_{x} \psi(x) + \blf{x}{y}$ can be efficiently 
 computed for all values of $y$.
 
 %In this paper we will consider a family of methods for minimizing $L(x)$, 
@@ -100,26 +100,26 @@ A_{t} \defined \sum_{s=1}^t \alpha_s.
 Then 
 the {\em primal boosted mirror descent} (\primal) algorithm is:
 \begin{enumerate}
-\item $x_1 \in \arg\min_x \psi(x)$
-\item $y_{t} \in \arg\max_{y \in \Theta} \blf{y}{x_t} - R(y) = \partial R^{*}(x_{t})$
-\item $x_{t+1} \in \arg\min_{x} \psi(x) + \blf{x}{\bar{y}_t} = \partial \psi^{*}(-\bar y_{t})$
+\item $x_1 \in \arg\inf_x \psi(x)$
+\item $y_{t} \in \arg\sup_{y \in Y} \blf{y}{x_t} - R(y) = \partial R^{*}(x_{t})$
+\item $x_{t+1} \in \arg\inf_{x} \psi(x) + \blf{x}{\bar{y}_t} = \partial \psi^{*}(-\bar y_{t})$
 \end{enumerate}
 As long as $\psi$ is strongly convex, for the proper choice of $\alpha_{t}$ we obtain the 
 bound (see Corollary~\ref{cor:method-1}):
 \begin{equation}
-\sup_{y \in \Theta} L(\bar{x}_T, y) \leq L_{*} + O(1/T).
+\sup_{y \in Y} L(\bar{x}_T, y) \leq L_{*} + O(1/T).
 \end{equation}
 In other words, $\bar{x}_T$ is close to being a global minimum of $L(x)$.
 However, it is often the case that $\psi$ is not strongly convex but $R$ is strongly convex. As we shall see, this will be the case for our application to herding.
 In this case we may wish to use the following slightly different algorithm, which we call {\em dual boosted mirror descent} (\dual):
 \begin{enumerate}
-\item $y_1 \in \arg\max_{y} R(y)$
-\item $x_t \in \arg\min_{x} \psi(x) + \blf{x}{y_t} = \partial \psi^{*}(-y_{t})$
-\item $y_{t+1} \in \arg\max_{y \in \Theta} \langle y, \bar{x}_t \rangle - R(y) = \partial R^{*}(\bar x_{t})$
+\item $y_1 \in \arg\sup_{y} R(y)$
+\item $x_t \in \arg\inf_{x} \psi(x) + \blf{x}{y_t} = \partial \psi^{*}(-y_{t})$
+\item $y_{t+1} \in \arg\sup_{y \in Y} \langle y, \bar{x}_t \rangle - R(y) = \partial R^{*}(\bar x_{t})$
 \end{enumerate}
 We then obtain the following bound 
 when $R$ is strongly convex (see Corollary~\ref{cor:method-2}):
-\[ \sup_{y \in \Theta} L(\bar{x}_T, y) \leq L_{*} + O(1/T). \]
+\[ \sup_{y \in Y} L(\bar{x}_T, y) \leq L_{*} + O(1/T). \]
 
 
 
