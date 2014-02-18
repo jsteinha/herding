@@ -4,61 +4,113 @@
 \section{Introduction} 
 \label{sec:intro}
 
-Many algorithms, such as SMC \citep{smc} and MCMC \citep{mcmc}, approximate a 
-distribution with samples. Most such algorithms require access to a full posterior and 
-may be prone to becoming stuck in local modes. In contrast, the herding algorithm introduced in 
-\citet{Welling:2009a} generates samples whose moments are guaranteed to converge 
-to any given collection of feasible moments. Moreover, \emph{only} the moments 
-are required; a full posterior is not needed.
+The purpose of this paper is to serve as a tutorial on sparsification. While 
+most of the results presented are known, they are often distributed across the 
+theory, machine learning, and optimization literatures, and we hope to bring 
+them all into one place, as well as to provide a unifying perspective. To start, 
+we define a generalized notion of sparsity that encompasses both sparsity and 
+low-rank conditions as special cases. Throughout, we will let $S$ denote a 
+compact subset of $\bR^n$ and let $\Conv(S)$ denote the convex hull of $S$ 
+(which will always be a closed set due to compactness of $S$). Two particularly 
+important examples are:
+\begin{example}
+\label{ex:simplex}
+Let $S$ consist of the $n$ standard unit vectors $e_1, \ldots, e_n$. Then 
+$\Conv(S)$ is the $n$-dimensional simplex $\Delta_n$.
+\end{example}
 
-Since its introduction, herding has been shown to have many desirable properties.
-For instance, \citet{Chen:2010a} showed that the moments converge at a rate of $O(1/T^{2})$ for 
-$T$ samples, which is even faster than the $O(1/T)$ rate that would be obtained 
-by sampling independently from the exact posterior. Furthermore, \citet{Bach:2012a} show that herding is 
-equivalent to conditional gradient, and \citet{Huszar:2012} show that 
-herding is equivalent to Bayesian quadrature. Herding was originally conceived of as a method 
-for inference in Markov random fields, and this line of work has been further explored in 
-\citet{Welling:2009a}, \citet{Gelfand:2010}, and \citet{Bornn:2013}.
+\begin{example}
+\label{ex:sdp}
+Let $S = \{vv^{\top} \mid \|v\|_2 = 1\}$. An alternative characterization 
+of $S$ is all rank-$1$, positive semidefinite matrices with trace $1$. The 
+convex hull of $S$ is $\Conv(S) = \{V \mid V \succeq 0, \Tr(V) = 1\}$.
+\end{example}
 
-In order to define herding, let $\sX$ be an observation space, $\phi : \sX \to \sF$ a 
-feature map to an inner product feature space, and $\bar\phi = \bE_{x \sim p}[\phi(x)]$ the empirical 
-moments of some distribution. Then the herding algorithm is the following simple procedure to 
-generate pseudosamples from $\sX$:
-\[
-x_{t} &\in \argmin_{x \in \sX} \ip{\phi(x)}{y_{t-1}} \\
-y_{t} &= y_{t-1}  + \bar \phi - \phi(x_{t}).
-\]
-In this paper we generalize the herding algorithm to minimize $\psi(x) + R^{*}(x)$ via the following set of updates, which 
-require only the convexity of $\psi$ and $R$:
-\[
-x_t &\in \argmin_{x} \psi(x) + \ip{x}{y_{t-1}} \\
-y_{t} &\in \argmax_{y} \ip{\bar{x}_t}{y} - R(y),
-\]
-where $\bar{x}_t$ is a certain weighted average of $x_1,\ldots,x_t$. Our 
-algorithm is described in more detail in Section~\ref{sec:algorithm}. This 
-generalization has several advantages:
-\begin{itemize}
-\item It allows us to cast herding in the framework of mirror descent \cite{Beck:2003}, 
-      which lets us better understand its convergence properties.
-\item It allows us to obtain generalizations of herding for infinite 
-      dimensional spaces that apply in cases where standard herding does not.
-\item It makes the known connections between herding, subgradient, and 
-      conditional gradient methods more clear. 
-\end{itemize}
-In particular, while it was known that herding was a form of conditional 
-gradient descent \cite{Bach:2012a} and hence (via the relationship in \citet{Bach:2012b}) also 
-a form of subgradient descent, our framework exposes all three algorithms 
-as special cases. A full table outlining the relationships for various choices of 
-$\psi$ and $R$ is given in Table~\ref{tab:connections}.
+\begin{definition}
+Given a set $S \subseteq \bR^n$, a \emph{$(S, k)$-sparse} point is a point 
+$x \in \Conv(S)$ that is a convex combination of at most $k$ extreme 
+points of $\Conv(S)$.
+\end{definition}
 
-In summary, we introduce a novel gradient descent algorithm to investigate herding and its generalizations, and make the following contributions:
-\begin{itemize}
-\item In Section \ref{sec:algorithm} we introduce a pair of convex optimization algorithms, which we call primal and dual boosted mirror descent (\primal and \dual). We show how \primal and \dual relate to conditional gradient (\cgd) and mirror descent (\md). 
-\item We then use \dual in Section \ref{sec:herding} to define two classes of generalized herding algorithms. Connections with the ``learning'' interpretation of herding are made by showing how to obtain herding as the limit of an entropically normalized case of \dual. 
-\item Section \ref{sec:proofs} presents convergence rates for \primal and \dual. As special cases, we recover a $O(\log T/ T)$ convergence rate for classical herding and a $O(1/T)$ rate for weighted herding. Both of these results apply to the infinite dimensional case. 
-\item In Section \ref{sec:lower-bounds} we prove a matching lower bound to the upper bound given in Section \ref{sec:proofs}, showing that any ``sparse'' herding-like method cannot converge faster than $O(1/T)$ in the the infinite dimensional case.% and that herding converges at the slower $O(\log T / T)$ rate.
-%\item Finally, in section \ref{sec:chen-proofs} we generalize the $O(1/T^{2})$ convergence proof of \citet{Chen:2010a} to a class of herding-like algorithms derived from \bmd. 
-\end{itemize}
+Recall that an extreme point is a point that cannot be written as a convex 
+combination of other points in $\Conv(S)$. Importantly, every extreme point 
+of $\Conv(S)$ lies in $S$. So, in Example~\ref{ex:simplex}, every 
+$(S,k)$-sparse point is also $k$-sparse in the usual sense. In 
+Example~\ref{ex:sdp}, every $(S,k)$-sparse point has rank at most $k$, since 
+it is in the convex hull of $k$ rank-$1$ matrices.
+
+\begin{example}
+\label{ex:marginal-polytope}
+Given a space $\sX$ and a function $\phi : \sX \to \bR^d$, let 
+$S = \{\phi(x) \mid x \in \sX\}$. Then $\Conv(S)$ is called the 
+\emph{marginal polytope} of $\sX$ with respect to $\phi$. The 
+marginal polytope consists of all possible expected values of 
+$\phi(x)$ with respect to an arbitrary probability distribution 
+on $\sX$. A $(S,k)$-sparse point in $\Conv(S)$ is a point that 
+can be written as a weighted average $\sum_{i=1}^k w_i \phi(x_i)$. 
+In this case, we call the $x_i$ \emph{pseudosamples}.
+\end{example}
+
+\begin{example}
+\label{ex:graph}
+TODO: graph sparsification example
+\end{example}
+
+%% Many algorithms, such as SMC \citep{smc} and MCMC \citep{mcmc}, approximate a 
+%% distribution with samples. Most such algorithms require access to a full posterior and 
+%% may be prone to becoming stuck in local modes. In contrast, the herding algorithm introduced in 
+%% \citet{Welling:2009a} generates samples whose moments are guaranteed to converge 
+%% to any given collection of feasible moments. Moreover, \emph{only} the moments 
+%% are required; a full posterior is not needed.
+%% 
+%% Since its introduction, herding has been shown to have many desirable properties.
+%% For instance, \citet{Chen:2010a} showed that the moments converge at a rate of $O(1/T^{2})$ for 
+%% $T$ samples, which is even faster than the $O(1/T)$ rate that would be obtained 
+%% by sampling independently from the exact posterior. Furthermore, \citet{Bach:2012a} show that herding is 
+%% equivalent to conditional gradient, and \citet{Huszar:2012} show that 
+%% herding is equivalent to Bayesian quadrature. Herding was originally conceived of as a method 
+%% for inference in Markov random fields, and this line of work has been further explored in 
+%% \citet{Welling:2009a}, \citet{Gelfand:2010}, and \citet{Bornn:2013}.
+%% 
+%% In order to define herding, let $\sX$ be an observation space, $\phi : \sX \to \sF$ a 
+%% feature map to an inner product feature space, and $\bar\phi = \bE_{x \sim p}[\phi(x)]$ the empirical 
+%% moments of some distribution. Then the herding algorithm is the following simple procedure to 
+%% generate pseudosamples from $\sX$:
+%% \[
+%% x_{t} &\in \argmin_{x \in \sX} \ip{\phi(x)}{y_{t-1}} \\
+%% y_{t} &= y_{t-1}  + \bar \phi - \phi(x_{t}).
+%% \]
+%% In this paper we generalize the herding algorithm to minimize $\psi(x) + R^{*}(x)$ via the following set of updates, which 
+%% require only the convexity of $\psi$ and $R$:
+%% \[
+%% x_t &\in \argmin_{x} \psi(x) + \ip{x}{y_{t-1}} \\
+%% y_{t} &\in \argmax_{y} \ip{\bar{x}_t}{y} - R(y),
+%% \]
+%% where $\bar{x}_t$ is a certain weighted average of $x_1,\ldots,x_t$. Our 
+%% algorithm is described in more detail in Section~\ref{sec:algorithm}. This 
+%% generalization has several advantages:
+%% \begin{itemize}
+%% \item It allows us to cast herding in the framework of mirror descent \cite{Beck:2003}, 
+%%       which lets us better understand its convergence properties.
+%% \item It allows us to obtain generalizations of herding for infinite 
+%%       dimensional spaces that apply in cases where standard herding does not.
+%% \item It makes the known connections between herding, subgradient, and 
+%%       conditional gradient methods more clear. 
+%% \end{itemize}
+%% In particular, while it was known that herding was a form of conditional 
+%% gradient descent \cite{Bach:2012a} and hence (via the relationship in \citet{Bach:2012b}) also 
+%% a form of subgradient descent, our framework exposes all three algorithms 
+%% as special cases. A full table outlining the relationships for various choices of 
+%% $\psi$ and $R$ is given in Table~\ref{tab:connections}.
+%% 
+%% In summary, we introduce a novel gradient descent algorithm to investigate herding and its generalizations, and make the following contributions:
+%% \begin{itemize}
+%% \item In Section \ref{sec:algorithm} we introduce a pair of convex optimization algorithms, which we call primal and dual boosted mirror descent (\primal and \dual). We show how \primal and \dual relate to conditional gradient (\cgd) and mirror descent (\md). 
+%% \item We then use \dual in Section \ref{sec:herding} to define two classes of generalized herding algorithms. Connections with the ``learning'' interpretation of herding are made by showing how to obtain herding as the limit of an entropically normalized case of \dual. 
+%% \item Section \ref{sec:proofs} presents convergence rates for \primal and \dual. As special cases, we recover a $O(\log T/ T)$ convergence rate for classical herding and a $O(1/T)$ rate for weighted herding. Both of these results apply to the infinite dimensional case. 
+%% \item In Section \ref{sec:lower-bounds} we prove a matching lower bound to the upper bound given in Section \ref{sec:proofs}, showing that any ``sparse'' herding-like method cannot converge faster than $O(1/T)$ in the the infinite dimensional case.% and that herding converges at the slower $O(\log T / T)$ rate.
+%% %\item Finally, in section \ref{sec:chen-proofs} we generalize the $O(1/T^{2})$ convergence proof of \citet{Chen:2010a} to a class of herding-like algorithms derived from \bmd. 
+%% \end{itemize}
 
 
 \end{document}
