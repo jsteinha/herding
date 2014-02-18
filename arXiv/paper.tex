@@ -4,14 +4,16 @@
 \usepackage{hyperref}
 \usepackage{tabularx}
 \usepackage{chngpage}
+\usepackage{fullpage}
 \input{latex-defs.tex}
 
 \allowdisplaybreaks
 
 \begin{document} 
 
-\title{Conjugate Gradient, Boosting, and Herding: \\ 
-	   Connections and Application}
+\title{Boosting, Sparsity, and Conditional Gradient: A Tutorial}
+%Conjugate Gradient, Boosting, and Herding: \\ 
+%	   Connections and Application}
 	   
 \thanks{The authors contributed equally to this work.}
 
@@ -28,17 +30,24 @@
 \keywords{boosting, optimization, mirror descent, Frank-Wolfe, conjugate gradient descent, herding, graph sparsification}
 
 \begin{abstract} 
-Much has been learned about herding since it was first proposed.
-We introduce a unifying framework for understanding herding and 
-related algorithms. The framework is based on a pair of optimization 
-algorithms that we call primal and dual boosted mirror descent.
-We define two classes of generalized herding algorithms, 
-including one for infinite dimensional spaces
-that may apply even when herding does not. A number 
-of convergence bounds that apply to herding and generalized
-herding are obtained. Along the way we provide
-a more cohesive picture of the connections between herding, 
-conditional gradient descent, and maximum entropy. 
+Many recent papers in machine learning and theoretical computer science have 
+focused on the idea of sparse or low-rank ``approximations'' to some object: 
+for instance, graph sparsification \cite{?}, low-rank SDP approximation \cite{?}, 
+and pseudosampling \cite{?}. In this paper we show that, whenever presented with 
+a strongly convex optimization problem whose dual problem is linear, we can obtain 
+sparse approximate solutions, and use this to re-derive many of the known 
+sparsification results.
+% Much has been learned about herding since it was first proposed.
+% We introduce a unifying framework for understanding herding and 
+% related algorithms. The framework is based on a pair of optimization 
+% algorithms that we call primal and dual boosted mirror descent.
+% We define two classes of generalized herding algorithms, 
+% including one for infinite dimensional spaces
+% that may apply even when herding does not. A number 
+% of convergence bounds that apply to herding and generalized
+% herding are obtained. Along the way we provide
+% a more cohesive picture of the connections between herding, 
+% conditional gradient descent, and maximum entropy. 
 \end{abstract} 
 
 \maketitle
@@ -52,6 +61,6 @@ conditional gradient descent, and maximum entropy.
 \subfile{conclusion.tex}
 
 \bibliography{herding}
-\bibliographystyle{icml2014}
+\bibliographystyle{plainnat} %icml2014}
 
 \end{document} \maketitle
