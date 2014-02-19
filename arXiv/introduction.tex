@@ -7,9 +7,38 @@
 The purpose of this paper is to serve as a tutorial on sparsification. While 
 most of the results presented are known, they are often distributed across the 
 theory, machine learning, and optimization literatures, and we hope to bring 
-them all into one place, as well as to provide a unifying perspective. To start, 
-we define a generalized notion of sparsity that encompasses both sparsity and 
-low-rank conditions as special cases. Throughout, we will let $S$ denote a 
+them all into one place, as well as to provide a unifying perspective. 
+
+By a ``sparsification result'', we mean, loosely, a method for approximating an 
+object (such as a matrix or a probability distribution) by a sparse linear 
+combination of a pre-defined set of atoms. For instance, \emph{graph 
+sparsification} consists of approximating the adjacency matrix of a graph by a 
+weighted matrix that contains only a small number of edges \cite{?}. 
+\emph{Low-rank matrix approximation} consists of approximating a matrix by a 
+linear combination of a small number of rank-$1$ matrices \cite{?}. 
+\emph{Pseudo-sampling} (also known as \emph{herding} \cite{?}) consists of 
+approximating the moments of a probability distribution using a weighted 
+combination of a small number of ``pseudo-samples'', e.g. 
+$\bE_{x \sim \pi}[\phi(x)] \approx \sum_{i=1}^k w_i \phi(x_i)$.
+
+Other sparsification results include:  approximating the 
+Nash equilibrium of a game by a weighted mixture of a small number of pure 
+strategies \cite{?}; finding low-complexity circuits that are indistinguishable 
+from a high-complexity circuit relative to a given oracle \cite{?}; and 
+approximating the maximum flow by a small number of resistive flows \cite{?}.
+
+In this paper, we will define a generalized notion of sparsity that captures 
+all of the above examples, and provide general sparsification algorithms that 
+can then be applied to each of these settings as special cases. However, in some 
+cases these general results are not enough to yield the best known bounds; we will 
+state when this is the case and cite the best bounds of which we are currently 
+aware.
+
+In writing this tutorial we are indebted to several authors who have already 
+published unifying results between different notions of sparsity. 
+
+\section{A Generalized Sparsity Result}
+Throughout, we will let $S$ denote a 
 compact subset of $\bR^n$ and let $\Conv(S)$ denote the convex hull of $S$ 
 (which will always be a closed set due to compactness of $S$). Two particularly 
 important examples are:
