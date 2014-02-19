@@ -27,7 +27,7 @@
 \urladdr{http://cs.stanford.edu/~jsteinhardt/}
 \email{jsteinhardt@cs.stanford.edu}
 
-\keywords{boosting, optimization, mirror descent, Frank-Wolfe, conjugate gradient descent, herding, graph sparsification}
+\keywords{boosting, optimization, mirror descent, Frank-Wolfe, conditional gradient descent, herding, graph sparsification}
 
 \begin{abstract} 
 Many recent papers in machine learning and theoretical computer science have 
@@ -35,8 +35,8 @@ focused on the idea of sparse or low-rank ``approximations'' to some object:
 for instance, graph sparsification \cite{?}, low-rank SDP approximation \cite{?}, 
 and pseudosampling \cite{?}. In this paper we show that, whenever presented with 
 a strongly convex optimization problem whose dual problem is linear, we can obtain 
-sparse approximate solutions, and use this to re-derive many of the known 
-sparsification results.
+sparse approximate solutions, and use this to re-derive (and in some cases 
+extend) many of the known sparsification results.
 % Much has been learned about herding since it was first proposed.
 % We introduce a unifying framework for understanding herding and 
 % related algorithms. The framework is based on a pair of optimization 
