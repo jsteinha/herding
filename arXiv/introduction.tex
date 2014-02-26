@@ -82,64 +82,71 @@ In this case, we call the $x_i$ \emph{pseudosamples}.
 
 \begin{example}
 \label{ex:graph}
-TODO: graph sparsification example
+Given an undirected graph $G$ with vertex set $\{1,\ldots,n\}$, let $E$ 
+denote its edge set, and let $m = |E|$. For a given 
+edge $e = (i,j)$, define $x_e \in \bR^n$ to be the vector with 
+$1$ in the $i$th coordinate, $-1$ in the $j$th coordinate, and 
+$0$s everywhere else. Let $X_e \eqdef mx_ex_e^{\top}$. 
+Define $S$ to be $\{X_e \mid e \in E\}$.
+
+The \emph{Laplacian} $L$ of $G$ is defined to be the matrix $L$ 
+with $L_{ij} = -1$ if $(i,j)$ is an edge, and $L_{ii}$ equal to 
+the degree of vertex $i$. It can be written as $L = \sum_{e \in E} x_ex_e^{\top}$. 
+In particular, $L \in \Conv(S)$.
+
+A $(S,k)$-sparse point can be written as a convex combination 
+\[ \sum_{r=1}^k w_rX_{e_r} = \sum_{r=1}^k (m\cdot w_r)x_{e_r}x_{e_r}^{\top} \]
+for some $k$ edges $e_1,\ldots,e_k$. Any such matrix is the Laplacian 
+of a \emph{weighted} graph (with edge weight $m\cdot w_r$ on edge $e_r$) 
+with $k$ edges and total edge weight $m$.
 \end{example}
 
-%% Many algorithms, such as SMC \citep{smc} and MCMC \citep{mcmc}, approximate a 
-%% distribution with samples. Most such algorithms require access to a full posterior and 
-%% may be prone to becoming stuck in local modes. In contrast, the herding algorithm introduced in 
-%% \citet{Welling:2009a} generates samples whose moments are guaranteed to converge 
-%% to any given collection of feasible moments. Moreover, \emph{only} the moments 
-%% are required; a full posterior is not needed.
-%% 
-%% Since its introduction, herding has been shown to have many desirable properties.
-%% For instance, \citet{Chen:2010a} showed that the moments converge at a rate of $O(1/T^{2})$ for 
-%% $T$ samples, which is even faster than the $O(1/T)$ rate that would be obtained 
-%% by sampling independently from the exact posterior. Furthermore, \citet{Bach:2012a} show that herding is 
-%% equivalent to conditional gradient, and \citet{Huszar:2012} show that 
-%% herding is equivalent to Bayesian quadrature. Herding was originally conceived of as a method 
-%% for inference in Markov random fields, and this line of work has been further explored in 
-%% \citet{Welling:2009a}, \citet{Gelfand:2010}, and \citet{Bornn:2013}.
-%% 
-%% In order to define herding, let $\sX$ be an observation space, $\phi : \sX \to \sF$ a 
-%% feature map to an inner product feature space, and $\bar\phi = \bE_{x \sim p}[\phi(x)]$ the empirical 
-%% moments of some distribution. Then the herding algorithm is the following simple procedure to 
-%% generate pseudosamples from $\sX$:
-%% \[
-%% x_{t} &\in \argmin_{x \in \sX} \ip{\phi(x)}{y_{t-1}} \\
-%% y_{t} &= y_{t-1}  + \bar \phi - \phi(x_{t}).
-%% \]
-%% In this paper we generalize the herding algorithm to minimize $\psi(x) + R^{*}(x)$ via the following set of updates, which 
-%% require only the convexity of $\psi$ and $R$:
-%% \[
-%% x_t &\in \argmin_{x} \psi(x) + \ip{x}{y_{t-1}} \\
-%% y_{t} &\in \argmax_{y} \ip{\bar{x}_t}{y} - R(y),
-%% \]
-%% where $\bar{x}_t$ is a certain weighted average of $x_1,\ldots,x_t$. Our 
-%% algorithm is described in more detail in Section~\ref{sec:algorithm}. This 
-%% generalization has several advantages:
-%% \begin{itemize}
-%% \item It allows us to cast herding in the framework of mirror descent \cite{Beck:2003}, 
-%%       which lets us better understand its convergence properties.
-%% \item It allows us to obtain generalizations of herding for infinite 
-%%       dimensional spaces that apply in cases where standard herding does not.
-%% \item It makes the known connections between herding, subgradient, and 
-%%       conditional gradient methods more clear. 
-%% \end{itemize}
-%% In particular, while it was known that herding was a form of conditional 
-%% gradient descent \cite{Bach:2012a} and hence (via the relationship in \citet{Bach:2012b}) also 
-%% a form of subgradient descent, our framework exposes all three algorithms 
-%% as special cases. A full table outlining the relationships for various choices of 
-%% $\psi$ and $R$ is given in Table~\ref{tab:connections}.
-%% 
-%% In summary, we introduce a novel gradient descent algorithm to investigate herding and its generalizations, and make the following contributions:
-%% \begin{itemize}
-%% \item In Section \ref{sec:algorithm} we introduce a pair of convex optimization algorithms, which we call primal and dual boosted mirror descent (\primal and \dual). We show how \primal and \dual relate to conditional gradient (\cgd) and mirror descent (\md). 
-%% \item We then use \dual in Section \ref{sec:herding} to define two classes of generalized herding algorithms. Connections with the ``learning'' interpretation of herding are made by showing how to obtain herding as the limit of an entropically normalized case of \dual. 
-%% \item Section \ref{sec:proofs} presents convergence rates for \primal and \dual. As special cases, we recover a $O(\log T/ T)$ convergence rate for classical herding and a $O(1/T)$ rate for weighted herding. Both of these results apply to the infinite dimensional case. 
-%% \item In Section \ref{sec:lower-bounds} we prove a matching lower bound to the upper bound given in Section \ref{sec:proofs}, showing that any ``sparse'' herding-like method cannot converge faster than $O(1/T)$ in the the infinite dimensional case.% and that herding converges at the slower $O(\log T / T)$ rate.
-%% %\item Finally, in section \ref{sec:chen-proofs} we generalize the $O(1/T^{2})$ convergence proof of \citet{Chen:2010a} to a class of herding-like algorithms derived from \bmd. 
-%% \end{itemize}
+With these examples in mind, we are now ready to state our main result:
+\begin{theorem}
+\label{thm:main}
+Given vector spaces $V$ and $W$, let $f : V \times W \to \bR$ be a function 
+such that 
+\begin{enumerate}
+\item $f(\cdot,w)$ is linear for each fixed $w$
+\item $f(v, \cdot)$ is strongly convex with respect to a norm $\|\cdot\|$ 
+      for each fixed $v$.
+\end{enumerate}
+Then, for any compact set $S \subset V$, and any point $x \in \Conv(S)$, 
+there exists a $(S,k)$-sparse point $y$ such that 
+\[ \max_{w \in W} f(y,w) \leq \max_{w \in W} f(x,w) + \frac{2D^2}{k+1}, \]
+where $D = \sup_{s, s' \in S} \|s-s'\|_*$ and $\|\cdot\|_*$ is the dual norm 
+of $\|\cdot\|$.
+\end{theorem}
+The proof of Theorem~\ref{thm:main} is given in Section~\ref{todo}. For now, 
+to give a flavor for the relevance of Theorem~\ref{thm:main}, we show how 
+to obtain a sparsification result for Example~\ref{ex:marginal-polytope}.
+\begin{proposition}
+\label{prop:pseudosamples}
+Let $\phi : \sX \to \bR^d$ and let $\sM = \Conv(\{\phi(x) \mid x \in \sX\})$ 
+be the marginal polytope as defined in Example~\ref{ex:marginal-polytope}. 
+Let $D$ be the diameter of $\sM$ in the $l^2$ norm. Then, for any 
+$\mu \in \sM$, there exists points $x_1,\ldots,x_k$ and weights 
+$w_1,\ldots,w_k$ such that
+\[ \left\|\mu - \sum_{i=1}^k w_i \phi(x_i)\right\|_2 \leq \sqrt{\frac{4D^2}{k+1}} \]
+\end{proposition}
+\begin{proof}
+Let $V = W = \bR^d$, and apply Theorem~\ref{thm:main} to the function 
+$f(v,w) = (v-\mu)^{\top}w - \frac{1}{2}\|w\|_2^2$. The function $f$ is 
+linear in $v$ for each $w$, and is strongly convex in $w$ with respect to the 
+$l^2$ norm for each $v$. Also note that 
+$\sup_{w \in W} f(v,w) = \frac{1}{2}\|v-\mu\|_2^2$. Since the dual of the 
+$l^2$ norm is the $l^2$ norm, Theorem~\ref{thm:main} says that there exists 
+a $(S,k)$-sparse point $y$ such that
+\[ \frac{1}{2}\|\mu - y\|_2^2 \leq \frac{1}{2}\|\mu - \mu\|_2^2 + \frac{2D^2}{k+1}. \]
+Since $\|\mu-\mu\|_2 = 0$ and any $(S,k)$-sparse point $y$ can be written 
+as $\sum_{i=1}^k w_i \phi(x_i)$, we have the desired result.
+\end{proof}
+Proposition~\ref{prop:pseudosamples} says that, given any distribution 
+$\pi$ over $\sX$, we can find $O(1/\epsilon^2)$ pseudosamples that approximate 
+the moments of $\pi$ with accuracy $\epsilon$ in the $l^2$ norm. We note 
+that in some instances this can be improved to $O(1/\epsilon)$, see 
+for instance \cite{chen}.
 
+We will establish many more such results in the coming sections.
 
 \end{document}
