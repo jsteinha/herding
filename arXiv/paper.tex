@@ -4,7 +4,7 @@
 \usepackage{hyperref}
 \usepackage{tabularx}
 \usepackage{chngpage}
-\usepackage{fullpage}
+%\usepackage{fullpage}
 \input{latex-defs.tex}
 
 \allowdisplaybreaks
@@ -15,7 +15,7 @@
 %Conjugate Gradient, Boosting, and Herding: \\ 
 %	   Connections and Application}
 	   
-\thanks{The authors contributed equally to this work.}
+\thanks{Both authors contributed equally to this work.}
 
 \author[J.~H.~Huggins]{Jonathan H.~Huggins}
 \address{Massachusetts Institute of Technology}
@@ -32,11 +32,13 @@
 \begin{abstract} 
 Many recent papers in machine learning and theoretical computer science have 
 focused on the idea of sparse or low-rank ``approximations'' to some object: 
-for instance, graph sparsification \cite{?}, low-rank SDP approximation \cite{?}, 
-and pseudosampling \cite{?}. In this paper we show that, whenever presented with 
+for instance, graph sparsification \citep{deCarliSilva:2011}, low-rank SDP approximation \citep{Arora:2007}, 
+and pseudosampling \citep{Welling:2009a,Chen:2010a}. In this paper we show that, when presented with 
 a strongly convex optimization problem whose dual problem is linear, we can obtain 
 sparse approximate solutions, and use this to re-derive (and in some cases 
-extend) many of the known sparsification results.
+extend) many of the known sparsification results. Our main technical tool
+is a generalization of the Frank-Wolfe (a.k.a.\ conditional gradient 
+descent) algorithm. 
 % Much has been learned about herding since it was first proposed.
 % We introduce a unifying framework for understanding herding and 
 % related algorithms. The framework is based on a pair of optimization 

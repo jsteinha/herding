@@ -14,13 +14,19 @@
 \newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
 \newcommand{\blf}[2]{b\left(#1, #2\right)}
 \definecolor{NAColor}{rgb}{.75,0,.75}
+\definecolor{SubtleColor}{rgb}{0,0,.50}
 \newcommand{\NA}[1]{\textcolor{NAColor}{($\star$) #1}}
+\newcounter{margincounter}
+\newcommand{\displaycounter}{{\arabic{margincounter}}}
+\newcommand{\incdisplaycounter}{{\stepcounter{margincounter}\arabic{margincounter}}}
+\newcommand{\fTBD}[1]{\textcolor{SubtleColor}{$\,^{(\incdisplaycounter)}$}\marginpar{\tiny\textcolor{SubtleColor}{ {\tiny $(\displaycounter)$} #1}}}
 \newcommand{\dee}{\mathrm{d}}
 \def\argmax{\operatornamewithlimits{arg\,max}}
 \def\argmin{\operatornamewithlimits{arg\,min}}
 \newcommand{\defined}{\ensuremath{\triangleq}}
 \newcommand{\mcX}{\mathcal X}
 \newcommand{\mcY}{\mathcal Y}
+\newcommand{\mcH}{\mathcal H}
 \newcommand{\reals}{\mathbb R}
 \newcommand{\bprf}{\begin{proof}}
 \newcommand{\eprf}{\end{proof}}

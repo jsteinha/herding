@@ -6,41 +6,49 @@
 
 The purpose of this paper is to serve as a tutorial on sparsification as it arises 
 in machine learning, computer science theory, and optimization. While most of the 
-results presented are known, they are often distributed across the these 
+results presented here are known, they are often distributed across these 
 literatures. Our objective is to bring them all into one place, 
 as well as to provide a unifying perspective.
 
-By a ``sparsification result'', we mean, loosely, a method for approximating an 
+By a ``sparsification result'', we mean, loosely speaking, a method for approximating an 
 object (such as a matrix or a probability distribution) by a sparse linear 
 combination of a pre-defined set of atoms. For instance, \emph{graph 
 sparsification} consists of approximating the adjacency matrix of a graph by a 
-weighted matrix that contains only a small number of edges \cite{?}. 
+weighted matrix that contains only a small number of edges \citep{?}. 
 \emph{Low-rank matrix approximation} consists of approximating a matrix by a 
-linear combination of a small number of rank-$1$ matrices \cite{?}. 
-\emph{Pseudo-sampling} (also known as \emph{herding} \cite{?}) consists of 
+linear combination of a small number of rank-$1$ matrices \citep{?}. 
+\emph{Pseudo-sampling} (also known as \emph{herding} \citep{?}) consists of 
 approximating the moments of a probability distribution using a weighted 
 combination of a small number of ``pseudo-samples'', e.g. 
 $\bE_{x \sim \pi}[\phi(x)] \approx \sum_{i=1}^k w_i \phi(x_i)$.
 
 Other sparsification results include:  approximating the 
 Nash equilibrium of a game by a weighted mixture of a small number of pure 
-strategies \cite{?}; finding low-complexity circuits that are indistinguishable 
-from a high-complexity circuit relative to a given oracle \cite{?}; and 
-approximating the maximum flow by a small number of resistive flows \cite{?}.
+strategies \citep{?}; finding low-complexity circuits that are indistinguishable 
+from a high-complexity circuit relative to a given oracle \citep{?}; and 
+approximating the maximum flow by a small number of resistive flows \citep{?}.
 
-In this paper, we will define a generalized notion of sparsity that captures 
-all of the above examples, and provide general sparsification algorithms that 
+\NA{Sparsification of 
+mathematical objects such as graphs, circuits, and probability measures is important
+because sparse approximations lead to objects that are much ``simpler'' than the 
+originals while remaining ``close'' to them. These simpler sparse approximations can
+then be manipulated more efficiently than the originals, typically because
+each atom can be operated on efficiently, which leads to, for example, 
+more efficient algorithms.}\fTBD{JHH: added some motivation.} 
+
+In this paper we will define a generalized notion of sparsity that captures 
+all of the above examples and provide general sparsification algorithms that 
 can then be applied to each of these settings as special cases. However, in some 
 cases these general results are not enough to yield the best known bounds; we will 
 state when this is the case and cite the best bounds of which we are currently 
 aware.
 
 In writing this tutorial we are indebted to several authors who have already 
-published unifying results between different notions of sparsity. 
+published unifying results between different notions of sparsity \citep{?}.
 
 \section{A Generalized Sparsity Result}
 Throughout, we will let $S$ denote a 
-compact subset of $\bR^n$ and let $\Conv(S)$ denote the convex hull of $S$ 
+compact subset of $\reals^n$ and let $\Conv(S)$ denote the convex hull of $S$ 
 (which will always be a closed set due to compactness of $S$). Two particularly 
 important examples are:
 \begin{example}
@@ -57,7 +65,7 @@ convex hull of $S$ is $\Conv(S) = \{V \mid V \succeq 0, \Tr(V) = 1\}$.
 \end{example}
 
 \begin{definition}
-Given a set $S \subseteq \bR^n$, a \emph{$(S, k)$-sparse} point is a point 
+Given a set $S \subseteq \reals^n$, an \emph{$(S, k)$-sparse} point is a point 
 $x \in \Conv(S)$ that is a convex combination of at most $k$ extreme 
 points of $\Conv(S)$.
 \end{definition}
@@ -71,12 +79,12 @@ it is in the convex hull of $k$ rank-$1$ matrices.
 
 \begin{example}
 \label{ex:marginal-polytope}
-Given a space $\sX$ and a function $\phi : \sX \to \bR^d$, let 
+Given a space $\sX$ and a function $\phi : \sX \to \reals^d$, let 
 $S = \{\phi(x) \mid x \in \sX\}$. Then $\Conv(S)$ is called the 
 \emph{marginal polytope} of $\sX$ with respect to $\phi$. The 
 marginal polytope consists of all possible expected values of 
 $\phi(x)$ with respect to an arbitrary probability distribution 
-on $\sX$. A $(S,k)$-sparse point in $\Conv(S)$ is a point that 
+on $\sX$. An $(S,k)$-sparse point in $\Conv(S)$ is a point that 
 can be written as a weighted average $\sum_{i=1}^k w_i \phi(x_i)$. 
 In this case, we call the $x_i$ \emph{pseudosamples}.
 \end{example}
@@ -85,17 +93,15 @@ In this case, we call the $x_i$ \emph{pseudosamples}.
 \label{ex:graph}
 Given an undirected graph $G$ with vertex set $\{1,\ldots,n\}$, let $E$ 
 denote its edge set, and let $m = |E|$. For a given 
-edge $e = (i,j)$, define $x_e \in \bR^n$ to be the vector with 
+edge $e = (i,j)$, define $x_e \in \reals^n$ to be the vector with 
 $1$ in the $i$th coordinate, $-1$ in the $j$th coordinate, and 
-$0$s everywhere else. Let $X_e \eqdef mx_ex_e^{\top}$. 
-Define $S$ to be $\{X_e \mid e \in E\}$.
-
-The \emph{Laplacian} $L$ of $G$ is defined to be the matrix $L$ 
+zeros everywhere else. Let $X_e \eqdef mx_{e} x_{e}^{\top}$ and 
+define $S$ to be $\{X_e \mid e \in E\}$.
+The \emph{Laplacian} $L$ of graph $G$ is defined to be the matrix $L$ 
 with $L_{ij} = -1$ if $(i,j)$ is an edge, and $L_{ii}$ equal to 
-the degree of vertex $i$. It can be written as $L = \sum_{e \in E} x_ex_e^{\top}$. 
-In particular, $L \in \Conv(S)$.
-
-A $(S,k)$-sparse point can be written as a convex combination 
+the degree of vertex $i$. Equivalently, it can be written as 
+$L = \sum_{e \in E} x_{e} x_{e}^{\top}$ and note in particular $L \in \Conv(S)$.
+An $(S,k)$-sparse point can be written as a convex combination 
 \[ \sum_{r=1}^k w_rX_{e_r} = \sum_{r=1}^k (m\cdot w_r)x_{e_r}x_{e_r}^{\top} \]
 for some $k$ edges $e_1,\ldots,e_k$. Any such matrix is the Laplacian 
 of a \emph{weighted} graph (with edge weight $m\cdot w_r$ on edge $e_r$) 
@@ -105,25 +111,33 @@ with $k$ edges and total edge weight $m$.
 With these examples in mind, we are now ready to state our main result:
 \begin{theorem}
 \label{thm:main}
-Given vector spaces $V$ and $W$, let $f : V \times W \to \bR$ be a function 
+Given vector spaces $V$ and $W$\fTBD{JHH: hmm...you've switched from $\reals^{d}$ to vector spaces}, let $f : V \times W \to \reals$ be a function 
 such that 
 \begin{enumerate}
 \item $f(\cdot,w)$ is linear for each fixed $w$
-\item $f(v, \cdot)$ is strongly convex with respect to a norm $\|\cdot\|$ 
+\item $f(v, \cdot)$ is strongly convex\fTBD{JHH: we haven't defined strongly convex yet} with respect to a norm $\|\cdot\|$ 
       for each fixed $v$.
 \end{enumerate}
 Then, for any compact set $S \subset V$, and any point $x \in \Conv(S)$, 
-there exists a $(S,k)$-sparse point $y$ such that 
+there exists an $(S,k)$-sparse point\fTBD{JHH: note that it should be {\bf an} $(S,k)$-sparse point} $y$ such that 
 \[ \max_{w \in W} f(y,w) \leq \max_{w \in W} f(x,w) + \frac{2D^2}{k+1}, \]
 where $D = \sup_{s, s' \in S} \|s-s'\|_*$ and $\|\cdot\|_*$ is the dual norm 
 of $\|\cdot\|$.
 \end{theorem}
-The proof of Theorem~\ref{thm:main} is given in Section~\ref{todo}. For now, 
+This result is tight in the following sense:\fTBD{JHH: added complementary lower bound result}
+\begin{theorem}
+\label{thm:lower-bound}
+There exists a choice of $f$ satisfying the conditions of Theorem~\ref{thm:main}, 
+a compact set $S \subset V$, and a point $x \in \Conv(S)$ such that for any 
+$(S,k)$-sparse point $y$, 
+\[ \max_{w \in W} f(y,w) \ge \max_{w \in W} f(x,w) + \Theta(1/k). \]
+\end{theorem}
+The proofs of Theorems~\ref{thm:main} and \ref{thm:lower-bound} are given in Section~\ref{TODO}. For now, 
 to give a flavor for the relevance of Theorem~\ref{thm:main}, we show how 
 to obtain a sparsification result for Example~\ref{ex:marginal-polytope}.
 \begin{proposition}
 \label{prop:pseudosamples}
-Let $\phi : \sX \to \bR^d$ and let $\sM = \Conv(\{\phi(x) \mid x \in \sX\})$ 
+Let $\phi : \sX \to \reals^d$ and let $\sM = \Conv(\{\phi(x) \mid x \in \sX\})$ 
 be the marginal polytope as defined in Example~\ref{ex:marginal-polytope}. 
 Let $D$ be the diameter of $\sM$ in the $l^2$ norm. Then, for any 
 $\mu \in \sM$, there exists points $x_1,\ldots,x_k$ and weights 
@@ -131,7 +145,7 @@ $w_1,\ldots,w_k$ such that
 \[ \left\|\mu - \sum_{i=1}^k w_i \phi(x_i)\right\|_2 \leq \sqrt{\frac{4D^2}{k+1}} \]
 \end{proposition}
 \begin{proof}
-Let $V = W = \bR^d$, and apply Theorem~\ref{thm:main} to the function 
+Let $V = W = \reals^d$, and apply Theorem~\ref{thm:main} to the function 
 $f(v,w) = (v-\mu)^{\top}w - \frac{1}{2}\|w\|_2^2$. The function $f$ is 
 linear in $v$ for each $w$, and is strongly convex in $w$ with respect to the 
 $l^2$ norm for each $v$. Also note that 
@@ -142,12 +156,30 @@ a $(S,k)$-sparse point $y$ such that
 Since $\|\mu-\mu\|_2 = 0$ and any $(S,k)$-sparse point $y$ can be written 
 as $\sum_{i=1}^k w_i \phi(x_i)$, we have the desired result.
 \end{proof}
+An analogous result can be obtained by instead choosing $\phi : \mcX \to \mcH$, where $(\mcH, \|\cdot\|_{\mcH})$ is a reproducing kernel Hilbert space and using $\|\cdot\|_{\mcH}$ instead of $\|\cdot\|_{2}$. 
 Proposition~\ref{prop:pseudosamples} says that, given any distribution 
 $\pi$ over $\sX$, we can find $O(1/\epsilon^2)$ pseudosamples that approximate 
-the moments of $\pi$ with accuracy $\epsilon$ in the $l^2$ norm. We note 
-that in some instances this can be improved to $O(1/\epsilon)$, see 
-for instance \cite{chen}.
+the moments of $\pi$ with accuracy $\epsilon$ in the $l^2$ (or Hilbert) norm.\fTBD{JHH: added Hilbert space discussion} As
+we shall see in Section \ref{sec:algorithm}, in some instances this 
+can be improved to $O(1/\epsilon)$.\fTBD{JHH: will give Chen extension, so no need
+to defer to Chen paper here}
+%We note that in some instances this can be improved to $O(1/\epsilon)$, see 
+%for instance \cite{chen}.
 
 We will establish many more such results in the coming sections.
+
+\NA{Proposed sections:
+\begin{enumerate}
+\item Intro
+\item Sparsity result and lower bound
+\item BMD 
+\item Proofs of sparsity result and lower bound
+\item Application: Herding, including Chen extension
+\item Application: Graph sparsification, low-rank matrix approximation, max flow
+\item Application: Circuits and boosting
+\item Application: Solving games 
+\item Concluding thoughts 
+\end{enumerate}
+\qquad(A) Appendix: BMD proofs}
 
 \end{document}
