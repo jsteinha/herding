@@ -111,16 +111,17 @@ with $k$ edges and total edge weight $m$.
 With these examples in mind, we are now ready to state our main result:
 \begin{theorem}
 \label{thm:main}
-Given vector spaces $V$ and $W$\fTBD{JHH: hmm...you've switched from $\reals^{d}$ to vector spaces}, let $f : V \times W \to \reals$ be a function 
-such that 
+Given vector spaces $\V$ and $\W$\fTBD{JHH: hmm...you've switched from $\reals^{d}$ to vector spaces}, let $h : \W \to \bR$ be a convex function and let $f : \V \times \W \to \reals$ be a function 
+such that
 \begin{enumerate}
 \item $f(\cdot,w)$ is linear for each fixed $w$
-\item $f(v, \cdot)$ is strongly convex\fTBD{JHH: we haven't defined strongly convex yet} with respect to a norm $\|\cdot\|$ 
-      for each fixed $v$.
+\item $f(v, \cdot) - h(\cdot)$ is convex for each fixed $v$.
 \end{enumerate}
-Then, for any compact set $S \subset V$, and any point $x \in \Conv(S)$, 
+Suppose further that $h$ is strongly convex with respect to a norm $\|\cdot\|$. 
+\fTBD{JHH: we haven't defined strongly convex yet}
+Then, for any compact set $S \subset \V$, and any point $x \in \Conv(S)$, 
 there exists an $(S,k)$-sparse point\fTBD{JHH: note that it should be {\bf an} $(S,k)$-sparse point} $y$ such that 
-\[ \max_{w \in W} f(y,w) \leq \max_{w \in W} f(x,w) + \frac{2D^2}{k+1}, \]
+\[ \max_{w \in \W} f(y,w) \leq \max_{w \in \W} f(x,w) + \frac{2D^2}{k+1}, \]
 where $D = \sup_{s, s' \in S} \|s-s'\|_*$ and $\|\cdot\|_*$ is the dual norm 
 of $\|\cdot\|$.
 \end{theorem}
@@ -128,9 +129,9 @@ This result is tight in the following sense:\fTBD{JHH: added complementary lower
 \begin{theorem}
 \label{thm:lower-bound}
 There exists a choice of $f$ satisfying the conditions of Theorem~\ref{thm:main}, 
-a compact set $S \subset V$, and a point $x \in \Conv(S)$ such that for any 
+a compact set $S \subset \V$, and a point $x \in \Conv(S)$ such that for any 
 $(S,k)$-sparse point $y$, 
-\[ \max_{w \in W} f(y,w) \ge \max_{w \in W} f(x,w) + \Theta(1/k). \]
+\[ \max_{w \in \W} f(y,w) \ge \max_{w \in \W} f(x,w) + \Theta(1/k). \]
 \end{theorem}
 The proofs of Theorems~\ref{thm:main} and \ref{thm:lower-bound} are given in Section~\ref{TODO}. For now, 
 to give a flavor for the relevance of Theorem~\ref{thm:main}, we show how 
@@ -145,7 +146,7 @@ $w_1,\ldots,w_k$ such that
 \[ \left\|\mu - \sum_{i=1}^k w_i \phi(x_i)\right\|_2 \leq \sqrt{\frac{4D^2}{k+1}} \]
 \end{proposition}
 \begin{proof}
-Let $V = W = \reals^d$, and apply Theorem~\ref{thm:main} to the function 
+Let $\V = \W = \reals^d$, and apply Theorem~\ref{thm:main} to the function 
 $f(v,w) = (v-\mu)^{\top}w - \frac{1}{2}\|w\|_2^2$. The function $f$ is 
 linear in $v$ for each $w$, and is strongly convex in $w$ with respect to the 
 $l^2$ norm for each $v$. Also note that 
