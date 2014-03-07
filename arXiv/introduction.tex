@@ -33,7 +33,7 @@ mathematical objects such as graphs, circuits, and probability measures is impor
 because sparse approximations lead to objects that are much ``simpler'' than the 
 originals while remaining ``close'' to them. These simpler sparse approximations can
 then be manipulated more efficiently than the originals, typically because
-each atom can be operated on efficiently, which leads to, for example, 
+each atom\fTBD{JHH: ``atom'' not defined yet} can be operated on efficiently, which leads to, for example, 
 more efficient algorithms.}\fTBD{JHH: added some motivation.} 
 
 In this paper we will define a generalized notion of sparsity that captures 
@@ -124,7 +124,7 @@ there exists an $(S,k)$-sparse point\fTBD{JHH: note that it should be {\bf an} $
 where $D = \sup_{s, s' \in S} \|s-s'\|_*$ and $\|\cdot\|_*$ is the dual norm 
 of $\|\cdot\|$.
 \end{theorem}
-This result is tight in the following sense:\fTBD{JHH: added complementary lower bound result}
+This result is tight in the following sense:\fTBD{JS: can we generalize this to arbitrary norms? or some norms other than $\ell_{2}$?}\fTBD{JHH: rewrite to explicitly give $f$ and $S$}
 \begin{theorem}
 \label{thm:lower-bound}
 There exists a choice of $f$ satisfying the conditions of Theorem~\ref{thm:main}, 
@@ -170,14 +170,14 @@ We will establish many more such results in the coming sections.
 
 \NA{Proposed sections:
 \begin{enumerate}
-\item Intro
-\item Sparsity result and lower bound
-\item BMD and proofs of sparsity result and lower bound
-\item Application: Low-rank matrix approximation, approximation of SDP matrix sums 
-\item Application: Graph sparsification, max flow
+\item (B) Intro
+\item (B) Sparsity result and lower bound
+\item (JS) BMD and proofs of sparsity result and lower bound
+\item (JH) Application: Low-rank matrix approximation, approximation of SDP matrix sums 
+\item (JH) Application: Graph sparsification, max flow
 \item Application: Solving games 
-\item Application: Herding, including Chen extension
-\item Application: Circuits and boosting
+\item (JH) Application: Herding, including Chen extension
+\item (JS) Application: Circuits and boosting
 \item Concluding thoughts 
 \end{enumerate}
 \qquad(A) Appendix: BMD proofs}
