@@ -1,0 +1,175 @@
+\documentclass[paper.tex]{subfiles}
+\begin{document}
+
+\section{Composite Mirror Descent and Sparsity}
+\label{sec:algorithm}
+
+Our sparsity result is algorithmic in nature, and relies on an algorithm called 
+\emph{composite mirror descent} \cite{comid}. In composite mirror descent, we 
+are given a sequence of functions $f_t(w) = g_t(w) + h_t(w)$, and the goal is to 
+minimize
+\[ \sum_{t=1}^T \alpha_t f_t(w), \]
+for some known non-negative weights $\alpha_t$. We assume throughout that $f_t$, 
+$g_t$, and $h_t$ are all convex. The composite mirror descent algorithm also 
+depends on an auxiliary convex function $\psi(w)$:
+\begin{algorithm}
+\caption{The composite mirror descent algorithm.}
+\label{alg:comid}
+\begin{algorithmic}
+\STATE {\bfseries Composite Mirror Descent}
+\STATE Initialize $\theta_0 \gets 0$, $\psi_0 \gets \psi$
+\FOR{$t = 1$ {\bfseries to} $T$}
+  \STATE $\psi_t \gets \psi_{t-1} + \alpha_t h_t$
+  \STATE $w_t \gets \argmin_{w \in \W} \psi_{t}(w) + \theta_{t-1}^{\top} w$
+  \STATE $\theta_t \gets \theta_t + \alpha_t \nabla g_t(w_t)$
+\ENDFOR
+\STATE Output $w^* = \frac{\sum_{t=1}^T \alpha_t w_t}{\sum_{t=1}^T \alpha_t}$
+\end{algorithmic}
+\end{algorithm}
+
+The implicit assumption of this algorithm is that 
+$\argmin_{w \in \W} \psi_t(w) + \theta_{t-1}^{\top}w$ can be computed efficiently. 
+Among other things, this will typically require that $h_t$ has some known parametric 
+form (as opposed to just being provided as a black box).
+
+% give example
+As an example, suppose that $\psi(w) = h_t(w) = \frac{1}{2}\|w\|_2^2$. Then 
+$\psi_t(w) = \frac{t+1}{2}\|w\|_2^2$, and 
+$\argmin_{w \in \W} \psi_t(w) + \theta_{t-1}^{\top} w = -\frac{1}{t+1}\theta_{t-1}$.
+There are also many other examples of functions for which the $\argmin$ can be 
+computed efficiently; this is closely related to the theory of Fenchel duality, 
+which we present in Section~\ref{sec:fenchel} together with additional examples.
+
+% define strong convexity
+The convergence rate of Algorithm~\ref{alg:comid} depends on the degree of 
+convexity of the functions $\psi$ and $h_t$. We can measure this convexity 
+using any norm $\|\cdot\|$ on $\W$.
+\begin{definition}
+A differentiable function $f$ is said to be \emph{$\rho$-strongly convex} with 
+respect to a norm $\|\cdot\|$ if
+\[ f(w) - f(w') - \nabla f(w')^{\top}(w - w') \geq \frac{\rho}{2}\|w-w'\|^2 \]
+for all $w, w' \in \W$.
+\end{definition}
+When $\rho = 1$ we sometimes just say that $f$ is strongly convex with respect to $\|\cdot\|$.
+If $\|\cdot\|$ is the $l^2$ norm and $f$ is twice-differentiable, then $f$ is $\rho$-strongly 
+convex if and only if $\nabla^2 f(w) \succeq \rho I$ for all $w \in \W$. In particular, 
+$f(w) = \frac{1}{2}\|w - w_0\|_2^2$ is $1$-strongly convex with respsect to $\|\cdot\|_2$ for 
+any $w_0$, although this is not true for general norms (for instance, 
+$\frac{1}{2}\|w-w_0\|_1^2$ is not strongly convex with respect to $\|\cdot\|_1$ for any value 
+of $\rho$). See Section~\ref{sec:fenchel} for more details.
+
+One additional notion we need is that of a dual norm.
+\begin{definition}
+Given a norm $\|\cdot\|$, the \emph{dual norm} $\|\cdot\|_*$ is defined as 
+\[ \|\theta\|_* \eqdef \sup_{\|w\| \leq 1} \theta^{\top}w. \]
+\end{definition}
+In other words, the dual norm is exactly constructed that H\"{o}lder's 
+inequality $\theta^{\top}w \leq \|\theta\|_* \|w\|$ holds. In particular, 
+the dual norm of $\|\cdot\|_2$ is $\|\cdot\|_2$, and the dual norm of 
+$\|\cdot\|_p$ is $\|\cdot\|_{\frac{p}{p-1}}$.
+
+% provide convergence theorem
+We are now ready to state the convergence rate of Algorithm~\ref{alg:comid}.
+\begin{theorem}
+\label{thm:comid}
+Let $\|\cdot\|$ be any norm on $\W$. Suppose that $\psi$ is $\rho_0$-strongly convex 
+with respect to $\|\cdot\|$, and that $h_t$ is $\rho_t$-strongly convex with respect 
+to $\|\cdot\|$. Suppose that $\|\nabla g_t\|_* \leq r$ for all $t$. Let 
+$A_t = \sum_{s=1}^t \alpha_s$ and $R_t = \rho_0 + \sum_{s=1}^t \alpha_s \rho_s$. 
+Then, defining $f(w) \eqdef \frac{1}{A_T} \sum_{t=1}^{T} \alpha_t f_t(w)$, we have
+\[ f(w^*) \leq \inf_{w} f(w) + \frac{r^2}{2A_T} \sum_{t=1}^T \frac{\alpha_t^2}{R_t}. \]
+\end{theorem}
+The proof is given in Appendix~\ref{apx:comid}.
+
+To unpack Theorem~\ref{thm:comid}, let us consider several special cases.
+\begin{corollary}
+Suppose that $\psi \equiv 0$ and $h_t$ is $\rho$-strongly convex with respect to 
+$\|\cdot\|$ for each $t$ for some fixed $\rho$. Then, for $\alpha_t = 1$, we have
+\[ f(w^*) \leq \inf_w f(w) + \frac{r^2 \log(T+1)}{2\rho T}, \]
+and for $\alpha_t = t$ we have
+\[ f(w^*) \leq \inf_w f(w) + \frac{2r^2}{\rho (T+1)}. \]
+\end{corollary}
+\begin{proof}
+For $\alpha_t = 1$, we have $A_T = T$ and $R_t = \rho t$. Then Theorem~\ref{thm:comid} 
+yields a convergence rate of
+\begin{align*}
+f(w^*) &\leq \inf_w f(w) + \frac{r^2}{2T} \sum_{t=1}^T \frac{1}{\rho t} \\
+ &\leq \inf_w f(w) + \frac{r^2 \log(T+1)}{2\rho T}.
+\end{align*}
+For $\alpha_t = t$, we have $A_T = \frac{T(T+1)}{2}$ and $R_t = \rho \frac{t(t+1)}{2}$. 
+Then Theorem~\ref{thm:comid} yields a convergence rate of
+\begin{align*}
+f(w^*) &\leq \inf_w f(w) + \frac{r^2}{T(T+1)} \sum_{t=1}^T \frac{2t^2}{\rho t(t+1)} \\
+ &\leq \inf_w f(w) + \frac{r^2}{T(T+1)} \sum_{t=1}^T \frac{2}{\rho} \\
+ &= \inf_w f(w) + \frac{2r^2}{\rho (T+1)}.
+\end{align*}
+\end{proof}
+
+\begin{corollary}
+Suppose that $\psi$ is $\rho$-strongly convex with respect to $\|\cdot\|$, but make 
+no assumptions on $h_t$ other than convexity. Then, for $\alpha_t = 1$, we have
+\[ f(w^*) \leq \inf_w f(w) + \frac{r^2}{2\rho}. \]
+\end{corollary}
+\begin{proof}
+We have $A_T = T$ and $R_t = \rho$. Then Theorem~\ref{thm:comid} yields
+\begin{align*}
+f(w^*) &\leq \inf_w f(w) + \frac{r^2}{2T} \sum_{t=1}^T \frac{1}{\rho} \\
+ &= \inf_w f(w) + \frac{r^2}{2\rho}.
+\end{align*}
+\end{proof}
+
+% give boosted version (cite Bach, Shai)
+\subsection{Composite Mirror Descent and Sparsity}
+\label{sec:boosted}
+What relationship does Composite Mirror Descent have to sparsification? The answer lies
+in a technique called \emph{boosting} which will allow us to cleverly pick the functions 
+$f_t(w)$. Boosting is an ubiquitous idea spanning multiple literatures; % TODO provide citations
+in our case, we suppose that we have fixed functions $h : \W \to \bR$ and 
+$f : \V \times \W \to \bR$ such that:
+\begin{enumerate}
+\item $f(\cdot, w)$ is linear in $v$ for each $w \in \W$.
+\item $f(v, \cdot) - h(\cdot)$ is convex in $w$ for each $v \in \V$.
+\end{enumerate}
+Let $v_t = \argmax_{v \in V} f(v, w_t)$. Then we will pick 
+$h_t(w) = h(w)$ and $g_t(w) = f(v_t, w) - h(w)$. Note that, 
+even though $g_t$ depends on $v_t$ and hence $w_t$, we can still 
+run Algorithm~\ref{alg:comid}, since we do not need access to $g_t$ 
+until \emph{after} selecting $w_t$. 
+
+This leads to the following primal-dual algorithm:
+\begin{algorithm}
+\caption{Primal-dual Composite Mirror Descent}
+\label{alg:boosted-comid}
+\begin{algorithmic}
+\STATE Initialize $\theta_0 \gets 0$, $\psi_0 \gets \psi$
+\FOR{$t = 1$ {\bfseries to} $T$}
+  \STATE $\psi_t \gets \psi_{t-1} + \alpha_t h$
+  \STATE $w_t \gets \argmin_{w \in \W} \psi_t(w) + \theta_{t-1}^{\top} w$
+  \STATE $v_t \gets \argmax_{v \in \V} f(v, w_t)$
+  \STATE $\theta_t \gets \theta_t + \alpha_t \left(\frac{\partial f(v_t, w_t)}{\partial w_t} - \frac{\partial h(w_t)}{\partial w_t}\right)$
+\ENDFOR
+\STATE Output $(v^*, w^*) = \left(\frac{\sum_{t=1}^T \alpha_t v_t}{\sum_{t=1}^T \alpha_t}, \frac{\sum_{t=1}^T \alpha_t w_t}{\sum_{t=1}^T \alpha_t}\right)$
+\end{algorithmic}
+\end{algorithm}
+
+% give convergence theorem for boosted version
+Algorithm~\ref{alg:boosted-comid} enjoys the following primal-dual convergence rate:
+\begin{theorem}
+TODO
+\end{theorem}
+
+\subsection{Fenchel duality}
+\label{sec:fenchel}
+% Fenchel conjugate properties
+% -definition
+% -convexity-smoothness duality
+% -examples: L2, entropy, p-norm, matrix entropy, log-det
+%  -compute Fenchel conjugate and derivative
+% -cite Kakade paper, maybe others?
+
+\subsection{Relations to Other Algorithms}
+\label{sec:derived}
+% derive gradient descent as a special case
+% also Frank-Wolfe
+
+\end{document}
