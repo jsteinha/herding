@@ -13,10 +13,9 @@ for some known non-negative weights $\alpha_t$. We assume throughout that $f_t$,
 $g_t$, and $h_t$ are all convex. The composite mirror descent algorithm also 
 depends on an auxiliary convex function $\psi(w)$:
 \begin{algorithm}
-\caption{The composite mirror descent algorithm.}
+\caption{Composite Mirror Descent}
 \label{alg:comid}
 \begin{algorithmic}
-\STATE {\bfseries Composite Mirror Descent}
 \STATE Initialize $\theta_0 \gets 0$, $\psi_0 \gets \psi$
 \FOR{$t = 1$ {\bfseries to} $T$}
   \STATE $\psi_t \gets \psi_{t-1} + \alpha_t h_t$
@@ -72,12 +71,12 @@ $\|\cdot\|_p$ is $\|\cdot\|_{\frac{p}{p-1}}$.
 We are now ready to state the convergence rate of Algorithm~\ref{alg:comid}.
 \begin{theorem}
 \label{thm:comid}
-Let $\|\cdot\|$ be any norm on $\W$. Suppose that $\psi$ is $\rho_0$-strongly convex 
+Let $\|\cdot\|$ be any norm on $\W$. Suppose that $\psi$ is non-negative and $\rho_0$-strongly convex 
 with respect to $\|\cdot\|$, and that $h_t$ is $\rho_t$-strongly convex with respect 
 to $\|\cdot\|$. Suppose that $\|\nabla g_t\|_* \leq r$ for all $t$. Let 
 $A_t = \sum_{s=1}^t \alpha_s$ and $R_t = \rho_0 + \sum_{s=1}^t \alpha_s \rho_s$. 
 Then, defining $f(w) \eqdef \frac{1}{A_T} \sum_{t=1}^{T} \alpha_t f_t(w)$, we have
-\[ f(w^*) \leq \inf_{w} f(w) + \frac{r^2}{2A_T} \sum_{t=1}^T \frac{\alpha_t^2}{R_t}. \]
+\[ f(w^*) \leq \inf_{w} \left\{ f(w) + \frac{1}{A_T} \psi(w)\right\} + \frac{r^2}{2A_T} \sum_{t=1}^T \frac{\alpha_t^2}{R_t}. \]
 \end{theorem}
 The proof is given in Appendix~\ref{apx:comid}.
 
@@ -106,17 +105,21 @@ f(w^*) &\leq \inf_w f(w) + \frac{r^2}{T(T+1)} \sum_{t=1}^T \frac{2t^2}{\rho t(t+
 \end{proof}
 
 \begin{corollary}
-Suppose that $\psi$ is $\rho$-strongly convex with respect to $\|\cdot\|$, but make 
-no assumptions on $h_t$ other than convexity. Then, for $\alpha_t = 1$, we have
-\[ f(w^*) \leq \inf_w f(w) + \frac{r^2}{2\rho}. \]
+Suppose that $\psi$ is $\rho_0$-strongly convex with respect to $\|\cdot\|$, but make 
+no assumptions on $h_t$ other than convexity. Then, for $\alpha_t = 1/\sqrt{T}$, we have
+\[ f(w^*) \leq \inf_w \left\{ f(w) + \frac{1}{\sqrt{T}} \psi(w)\right\} + \frac{r^2}{2\rho_0\sqrt{T}}. \]
 \end{corollary}
 \begin{proof}
-We have $A_T = T$ and $R_t = \rho$. Then Theorem~\ref{thm:comid} yields
+We have $A_T = \sqrt{T}$ and $R_t = \rho_0$. Then Theorem~\ref{thm:comid} yields
 \begin{align*}
-f(w^*) &\leq \inf_w f(w) + \frac{r^2}{2T} \sum_{t=1}^T \frac{1}{\rho} \\
- &= \inf_w f(w) + \frac{r^2}{2\rho}.
+f(w^*) &\leq \inf_w \left\{ f(w) + \frac{1}{\sqrt{T}} \psi(w)\right\} + \frac{r^2}{2\sqrt{T}} \sum_{t=1}^T \frac{1}{\rho_0 T} \\
+ &= \inf_w \left\{ f(w) + \frac{1}{\sqrt{T}} \psi(w)\right\} + \frac{r^2}{2\rho_0\sqrt{T}}.
 \end{align*}
 \end{proof}
+So, if the $h_t$ are strongly convex, we can obtain an $O\left(\frac{1}{T}\right)$ 
+convergence rate. If the $h_t$ are only (weakly) convex, we can still obtain an 
+$O\left(\frac{1}{\sqrt{T}}\right)$ convergence rate, by ``deforming'' $f$ by a 
+strongly convex function $\psi$.
 
 % give boosted version (cite Bach, Shai)
 \subsection{Composite Mirror Descent and Sparsity}
@@ -130,7 +133,9 @@ $f : \V \times \W \to \bR$ such that:
 \item $f(\cdot, w)$ is linear in $v$ for each $w \in \W$.
 \item $f(v, \cdot) - h(\cdot)$ is convex in $w$ for each $v \in \V$.
 \end{enumerate}
-Let $v_t = \argmax_{v \in V} f(v, w_t)$. Then we will pick 
+We will also assume that there is a compact set $S \subset \V$ with respect 
+to which we are trying to obtain sparsity. Let 
+$v_t = \argmax_{v \in S} f(v, w_t)$. Then we will pick 
 $h_t(w) = h(w)$ and $g_t(w) = f(v_t, w) - h(w)$. Note that, 
 even though $g_t$ depends on $v_t$ and hence $w_t$, we can still 
 run Algorithm~\ref{alg:comid}, since we do not need access to $g_t$ 
@@ -145,7 +150,7 @@ This leads to the following primal-dual algorithm:
 \FOR{$t = 1$ {\bfseries to} $T$}
   \STATE $\psi_t \gets \psi_{t-1} + \alpha_t h$
   \STATE $w_t \gets \argmin_{w \in \W} \psi_t(w) + \theta_{t-1}^{\top} w$
-  \STATE $v_t \gets \argmax_{v \in \V} f(v, w_t)$
+  \STATE $v_t \gets \argmax_{v \in S} f(v, w_t)$
   \STATE $\theta_t \gets \theta_t + \alpha_t \left(\frac{\partial f(v_t, w_t)}{\partial w_t} - \frac{\partial h(w_t)}{\partial w_t}\right)$
 \ENDFOR
 \STATE Output $(v^*, w^*) = \left(\frac{\sum_{t=1}^T \alpha_t v_t}{\sum_{t=1}^T \alpha_t}, \frac{\sum_{t=1}^T \alpha_t w_t}{\sum_{t=1}^T \alpha_t}\right)$
@@ -155,8 +160,30 @@ This leads to the following primal-dual algorithm:
 % give convergence theorem for boosted version
 Algorithm~\ref{alg:boosted-comid} enjoys the following primal-dual convergence rate:
 \begin{theorem}
-TODO
+Define the \emph{duality gap} $\Delta_T$ as
+\[ \Delta_T \eqdef \sup_{v \in \Conv(S)} f(v, w_T) - \inf_{w \in \W} f(v_T, w). \]
+Suppose that $\psi$ is $\rho_0$-strongly convex with 
+respect to a norm $\|\cdot\|$, and that $h$ is $\rho$-strongly 
+convex with respect to the same norm. Suppose that 
+$\|\nabla g_t\|_* \leq r$ for all $t$. Then, defining 
+$A_t \eqdef \sum_{s=1}^T \alpha_s$ as before, we have
+\[ \Delta_T \leq \frac{1}{A_T} \psi(w_T) + \frac{r^2}{2A_T} \sum_{t=1}^T \frac{\alpha_t^2}{\rho_0 + \rho A_t}. \]
+In addition, $v_T$ is $(S, T)$-sparse.
 \end{theorem}
+%\begin{remark}
+%If $f$ is a continuously differentiable function, the compactness of $S$ 
+%guarantees that $\sup_{v \in S} \|\nabla g(v, w)\|_*$ is finite for each 
+%$w$. 
+%\end{remark}
+\begin{corollary}
+Suppose that $\psi \equiv 0$ and $\rho > 0$, and set $\alpha_t = t$. Then 
+\[ \Delta_T \leq \frac{2r^2}{\rho (T+1)}. \]
+\end{corollary}
+
+\begin{corollary}
+Suppose that $\rho_0 > 0$ and set $\alpha_t = 1/\sqrt{T}$. Then
+\[ \Delta_T \leq \frac{1}{\sqrt{T}} \left[ \psi(w_T) + \frac{r^2}{2\rho_0} \right]. \]
+\end{corollary}
 
 \subsection{Fenchel duality}
 \label{sec:fenchel}
