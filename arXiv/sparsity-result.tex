@@ -52,7 +52,7 @@ for all $w, w' \in \W$.
 When $\rho = 1$ we sometimes just say that $f$ is strongly convex with respect to $\|\cdot\|$.
 If $\|\cdot\|$ is the $l^2$ norm and $f$ is twice-differentiable, then $f$ is $\rho$-strongly 
 convex if and only if $\nabla^2 f(w) \succeq \rho I$ for all $w \in \W$. In particular, 
-$f(w) = \frac{1}{2}\|w - w_0\|_2^2$ is $1$-strongly convex with respsect to $\|\cdot\|_2$ for 
+$f(w) = \frac{1}{2}\|w - w_0\|_2^2$ is $1$-strongly convex with respect to $\|\cdot\|_2$ for 
 any $w_0$, although this is not true for general norms (for instance, 
 $\frac{1}{2}\|w-w_0\|_1^2$ is not strongly convex with respect to $\|\cdot\|_1$ for any value 
 of $\rho$). See Section~\ref{sec:fenchel} for more details.
@@ -106,19 +106,21 @@ f(w^*) &\leq \inf_w f(w) + \frac{r^2}{T(T+1)} \sum_{t=1}^T \frac{2t^2}{\rho t(t+
 
 \begin{corollary}
 Suppose that $\psi$ is $\rho_0$-strongly convex with respect to $\|\cdot\|$, but make 
-no assumptions on $h_t$ other than convexity. Then, for $\alpha_t = 1/\sqrt{T}$, we have
-\[ f(w^*) \leq \inf_w \left\{ f(w) + \frac{1}{\sqrt{T}} \psi(w)\right\} + \frac{r^2}{2\rho_0\sqrt{T}}. \]
+no assumptions on $h_t$ other than convexity. Then, for $\alpha_t = 2/\sqrt{T}$,
+\fTBD{JHH: corrected choice of $\alpha_{t}$ and statement of theorem; also added in a necessary log factor} we have
+\[ f(w^*) \leq \inf_w \left\{ f(w) + \frac{1}{\sqrt{T}} \psi(w)\right\} + \frac{2r^2 \log(T+1)}{\rho_0\sqrt{T}}. \]
 \end{corollary}
 \begin{proof}
-We have $A_T = \sqrt{T}$ and $R_t = \rho_0$. Then Theorem~\ref{thm:comid} yields
+We have $A_T \ge \sqrt{T}$ and $R_t = \rho_0$ so Theorem~\ref{thm:comid} yields
 \begin{align*}
-f(w^*) &\leq \inf_w \left\{ f(w) + \frac{1}{\sqrt{T}} \psi(w)\right\} + \frac{r^2}{2\sqrt{T}} \sum_{t=1}^T \frac{1}{\rho_0 T} \\
- &= \inf_w \left\{ f(w) + \frac{1}{\sqrt{T}} \psi(w)\right\} + \frac{r^2}{2\rho_0\sqrt{T}}.
+f(w^*) 
+&\leq \inf_w \left\{ f(w) + \frac{1}{\sqrt{T}} \psi(w)\right\} + \frac{r^2}{2\sqrt{T}} \sum_{t=1}^T \frac{4}{\rho_0 t} \\
+&\leq \inf_w \left\{ f(w) + \frac{1}{\sqrt{T}} \psi(w)\right\} + \frac{2r^2\log(T+1)}{\rho_0\sqrt{T}}.
 \end{align*}
 \end{proof}
 So, if the $h_t$ are strongly convex, we can obtain an $O\left(\frac{1}{T}\right)$ 
 convergence rate. If the $h_t$ are only (weakly) convex, we can still obtain an 
-$O\left(\frac{1}{\sqrt{T}}\right)$ convergence rate, by ``deforming'' $f$ by a 
+$O\left(\frac{\log(T+1)}{\sqrt{T}}\right)$ convergence rate, by ``deforming'' $f$ by a 
 strongly convex function $\psi$.
 
 % give boosted version (cite Bach, Shai)
@@ -151,7 +153,7 @@ This leads to the following primal-dual algorithm:
   \STATE $\psi_t \gets \psi_{t-1} + \alpha_t h$
   \STATE $w_t \gets \argmin_{w \in \W} \psi_t(w) + \theta_{t-1}^{\top} w$
   \STATE $v_t \gets \argmax_{v \in S} f(v, w_t)$
-  \STATE $\theta_t \gets \theta_t + \alpha_t \left(\frac{\partial f(v_t, w_t)}{\partial w_t} - \frac{\partial h(w_t)}{\partial w_t}\right)$
+  \STATE $\theta_t \gets \theta_{t-1} + \alpha_t \left(\frac{\partial f(v_t, w_t)}{\partial w_t} - \frac{\partial h(w_t)}{\partial w_t}\right)$
 \ENDFOR
 \STATE Output $(v^*, w^*) = \left(\frac{\sum_{t=1}^T \alpha_t v_t}{\sum_{t=1}^T \alpha_t}, \frac{\sum_{t=1}^T \alpha_t w_t}{\sum_{t=1}^T \alpha_t}\right)$
 \end{algorithmic}
@@ -181,8 +183,8 @@ Suppose that $\psi \equiv 0$ and $\rho > 0$, and set $\alpha_t = t$. Then
 \end{corollary}
 
 \begin{corollary}
-Suppose that $\rho_0 > 0$ and set $\alpha_t = 1/\sqrt{T}$. Then
-\[ \Delta_T \leq \frac{1}{\sqrt{T}} \left[ \psi(w_T) + \frac{r^2}{2\rho_0} \right]. \]
+Suppose that $\rho_0 > 0$ and set $\alpha_t = 2/\sqrt{T}$. Then
+\[ \Delta_T \leq \frac{1}{\sqrt{T}} \left[ \psi(w_T) + \frac{2r^2\log(T+1)}{\rho_0} \right]. \]
 \end{corollary}
 
 \subsection{Fenchel duality}
