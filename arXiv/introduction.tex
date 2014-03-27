@@ -111,7 +111,7 @@ with $k$ edges and total edge weight $m$.
 With these examples in mind, we are now ready to state our main result:
 \begin{theorem}
 \label{thm:main}
-Given vector spaces $\V$ and $\W$\fTBD{JHH: hmm...you've switched from $\reals^{d}$ to vector spaces}, let $h : \W \to \bR$ be a convex function and let $f : \V \times \W \to \reals$ be a function 
+Given vector spaces $\V$ and $\W$\fTBD{JHH: hmm...you've switched from $\reals^{d}$ to vector spaces}, let $h : \W \to \reals$ be a convex function and let $f : \V \times \W \to \reals$ be a function 
 such that
 \begin{enumerate}
 \item $f(\cdot,w)$ is linear for each fixed $w$
@@ -125,13 +125,14 @@ there exists an $(S,k)$-sparse point\fTBD{JHH: note that it should be {\bf an} $
 where $D = \sup_{s, s' \in S} \|s-s'\|_*$ and $\|\cdot\|_*$ is the dual norm 
 of $\|\cdot\|$.
 \end{theorem}
-This result is tight in the following sense:\fTBD{JS: can we generalize this to arbitrary norms? or some norms other than $\ell_{2}$?}\fTBD{JHH: rewrite to explicitly give $f$ and $S$}
+This result is tight in the following sense:\fTBD{JS: can we generalize this to arbitrary norms? or some norms other than $\ell_{2}$?}
 \begin{theorem}
 \label{thm:lower-bound}
-There exists a choice of $f$ satisfying the conditions of Theorem~\ref{thm:main}, 
-a compact set $S \subset \V$, and a point $x \in \Conv(S)$ such that for any 
+Choose $S = \Delta_{n}$ as in Example \ref{ex:simplex} with $\V = \W = \Conv(S)$. Let $f(v,w) = \ip{v}{w} - \frac{1}{2}\|w\|^{2}$ (which satisfies the conditions of Theorem~\ref{thm:main}). Then with $x = 0$, for any 
 $(S,k)$-sparse point $y$, 
-\[ \max_{w \in \W} f(y,w) \ge \max_{w \in \W} f(x,w) + \Theta(1/k). \]
+\[ \max_{w \in \W} f(y,w) \ge \max_{w \in \W} f(x,w) + \Theta(1/k), \]
+i.e.,
+\[ \frac{1}{2}\|y\|_{2}^{2} \ge \Theta(1/k). \]
 \end{theorem}
 The proofs of Theorems~\ref{thm:main} and \ref{thm:lower-bound} are given in Section~\ref{TODO}. For now, 
 to give a flavor for the relevance of Theorem~\ref{thm:main}, we show how 
