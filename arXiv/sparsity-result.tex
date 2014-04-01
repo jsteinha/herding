@@ -160,7 +160,7 @@ This leads to the following primal-dual algorithm:
 \end{algorithm}
 
 % give convergence theorem for boosted version
-Algorithm~\ref{alg:boosted-comid} enjoys the following primal-dual convergence rate:
+Algorithm~\ref{alg:boosted-comid} enjoys the following primal-dual convergence rate:\fTBD{JHH: did you mean do use $v_{T}$ and $w_{T}$ here, or should those be $v^{*}$ and $w^{*}$?}
 \begin{theorem}
 Define the \emph{duality gap} $\Delta_T$ as
 \[ \Delta_T \eqdef \sup_{v \in \Conv(S)} f(v, w_T) - \inf_{w \in \W} f(v_T, w). \]
@@ -182,7 +182,7 @@ Suppose that $\psi \equiv 0$ and $\rho > 0$, and set $\alpha_t = t$. Then
 \[ \Delta_T \leq \frac{2r^2}{\rho (T+1)}. \]
 \end{corollary}
 
-\begin{corollary}
+\begin{corollary} \label{cor:duality-cor-2} % XXX: should come up with a better label for this
 Suppose that $\rho_0 > 0$ and set $\alpha_t = 2/\sqrt{T}$. Then
 \[ \Delta_T \leq \frac{1}{\sqrt{T}} \left[ \psi(w_T) + \frac{2r^2\log(T+1)}{\rho_0} \right]. \]
 \end{corollary}
